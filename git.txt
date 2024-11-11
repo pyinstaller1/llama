@@ -2,7 +2,7 @@
 !git remote -v
 !git branch
 
-!git clone https://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@github.com/pyinstaller1/llama.git
+!git clone https://ghp_rSkKshltIxS3aCZMFlycAVv8sskoon4SL PYY@github.com/pyinstaller1/llama.git
 !git config --global user.name "Your Name"
 !git config --global user.email "you@example.com"
 
