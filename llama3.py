@@ -6,7 +6,7 @@ def get_time():
 
 # 모델과 토크나이저 로드
 print("시작"+get_time())
-model_name = "verygood7/llama3-ko-8b"
+model_name = "verygood7/llama3-ko-8b/snapshots/10acb1aa4f341f2d3c899d78c520b0822a909b95/"
 tokenizer = AutoTokenizer.from_pretrained(model_name)
 print("토크나이저 완료"+get_time())
 model = AutoModelForCausalLM.from_pretrained(model_name)
