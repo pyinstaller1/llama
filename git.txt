@@ -12,3 +12,15 @@
 !git push https://ghp_rSkKshltIxS3aCZMFlycAVv8sskoon4SL PYY@github.com/pyinstaller1/llama.git
 
 
+
+
+
+스트림릿 코랩 실행
+37.py 코랩 업로드
+ngrok.set_auth_token("2ojoiXXpCMblFVVxrnTU2gx2fsI_TWZB8Aazin9VcGEPMATe")
+!pip install pyngrok streamlit
+!streamlit run 37.py &
+
+from pyngrok import ngrok
+print(ngrok.connect(8501))
+
