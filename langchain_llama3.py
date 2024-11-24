@@ -10,9 +10,16 @@ from datetime import datetime, timedelta
 import streamlit as st
 
 from langchain.schema import Document
+from transformers import pipeline
+
+
+def get_time():
+    now = datetime.now()
+    return f"     [{now.hour}시{now.minute}분{now.second}초]"
 
 
 
+"""
 def get_pdf(file):
     pdf_text = []
 
@@ -21,6 +28,18 @@ def get_pdf(file):
     pdf_text.extend(texts)
 
     return pdf_text
+"""
+
+def get_pdf(uploaded_files):   # PDF 파일들에서 데이터 가져오기
+    pdf_text = []
+
+    for file in uploaded_files:
+        loader = PyPDFLoader(file.name)
+        texts = loader.load_and_split()
+        pdf_text.extend(texts)
+
+    return pdf_text   # PDF 파일들에서 꺼낸 텍스트 데이터를 1개의 [리스트] 에 저장해서 리턴
+
 
 
 
@@ -67,9 +86,22 @@ def load_embeddings():
         encode_kwargs={'normalize_embeddings': True}
     )
 
+"""
 def get_vector_db(text_chunks):
     # 청크를 Document 객체로 변환
     chunk_documents = [Document(page_content=text) for text in text_chunks]
+    embeddings = load_embeddings()
+    vector_db = FAISS.from_documents(chunk_documents, embeddings)
+    return vector_db
+"""
+
+
+def get_vector_db(text_chunks):
+    # 청크를 Document 객체로 변환 (chunk_id 추가)
+    chunk_documents = [
+        Document(page_content=text, metadata={"chunk_id": idx}) 
+        for idx, text in enumerate(text_chunks)
+    ]
     embeddings = load_embeddings()
     vector_db = FAISS.from_documents(chunk_documents, embeddings)
     return vector_db
@@ -78,41 +110,44 @@ def get_vector_db(text_chunks):
 
 
 
+from langchain.chains.question_answering import load_qa_chain
+from langchain.prompts import PromptTemplate
+from langchain.chains import RetrievalQA
+from transformers import pipeline
+from langchain.llms import HuggingFacePipeline
 
+def get_chain(vector_db, model, tokenizer, template_input):
+    print("get_chain 함수 시작" + get_time())
 
-from langchain.memory import ConversationBufferMemory
-
-def get_chain(vector_db):
-    print("get_chain 함수 시작")
-
-    # Streamlit 세션에서 모델과 토크나이저 가져오기
-    model = st.session_state["model"]
-    tokenizer = st.session_state["tokenizer"]
-
-    # 람다 파이프라인을 통해 LLM을 래핑 (직접 호출로 연결)
-    def model_pipeline(input_text):
-        inputs = tokenizer(input_text, return_tensors="pt")
-        outputs = model.generate(inputs["input_ids"], max_length=300, pad_token_id=tokenizer.pad_token_id)
-        return tokenizer.decode(outputs[0], skip_special_tokens=True)
-
-    # 커스텀 래핑된 LLaMA 모델로 ConversationalRetrievalChain 생성
-    retriever = vector_db.as_retriever(search_type="similarity", search_kwargs={"k": 5})
-    chain = ConversationalRetrievalChain.from_llm(
-        llm=model_pipeline,
-        retriever=retriever,
-        memory=ConversationBufferMemory(memory_key="chat_history", return_messages=True, output_key="answer"),
-        get_chat_history=lambda h: h,
-        return_source_documents=True,
-        verbose=True
+    hf_pipeline = pipeline(
+        "text-generation",
+        model=model,
+        tokenizer=tokenizer,
+        device=0,
+        framework="pt",
+        return_text=True
     )
-    
-    print("ConversationalRetrievalChain 생성 성공")
-    return chain
+    print("Hugging Face pipeline 생성 성공")
 
+    llm = HuggingFacePipeline(pipeline=hf_pipeline)
+    print(f"LangChain에서 사용하는 모델 ID: {llm.pipeline.model.config._name_or_path}")
 
+    # retriever = vector_db.as_retriever(search_kwargs={"k": 5})  # 반환할 청크 수를 5개로 설정
+    retriever = vector_db.as_retriever()
+    print("Retriever 생성 성공")
 
+    prompt_template = PromptTemplate(
+        template = template_input
+        # template="Use the following context to answer the question:\n\nContext: {context}\n\nAnswer:"
+    )
 
+    combine_documents_chain = load_qa_chain(llm, chain_type="stuff", prompt=prompt_template)
 
+    chain = RetrievalQA(retriever=retriever, combine_documents_chain=combine_documents_chain)
+
+    print("get_chain 함수 완료" + get_time())
+    # return chain, retriever
+    return chain, retriever, hf_pipeline
 
 
 
