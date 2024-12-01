@@ -3,9 +3,9 @@ from transformers import AutoTokenizer, AutoModelForCausalLM
 import streamlit as st
 import os
 from datetime import datetime
-from langchain_llama3787 import *
+from langchain_llama3 import *
 
-# !pip install pyngrok streamlit pypdf faiss-gpu -U langchain-community
+# !pip install pyngrok streamlit pypdf faiss-gpu kiwipiepy -U langchain-community
 
 
 
@@ -18,6 +18,106 @@ def get_time_web():
     return f"&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[{now.hour}시{now.minute}분{now.second}초]"
 
 
+
+
+
+
+
+
+from kiwipiepy import Kiwi
+
+kiwi = Kiwi()
+stopwords = ['하다', '있다', '되다', '가', '이', '를', '은', '는', '다', '요', '죠']
+
+from sklearn.metrics.pairwise import cosine_similarity
+import numpy as np
+
+# 질문에 대한 키워드 추출
+def extract_keywords(question):
+    keywords = [
+        token.form
+        for token in kiwi.tokenize(question)
+        if token.tag in ['NNG', 'NNP', 'VV', 'NP', 'MAG']   # 명사, 동사, 대명사, 부사
+    ]
+    filtered_keywords = [word for word in keywords if word not in stopwords]  # 불용어 제거
+    return filtered_keywords
+
+
+
+
+
+def calculate_similarity_with_keywords(question, vector_db, text_chunks, question_vector):
+    # 키워드 추출
+    keywords = extract_keywords(question)
+
+    # 모든 벡터 가져오기
+    stored_vectors = np.array([
+        vector_db.index.reconstruct(i) for i in range(vector_db.index.ntotal)
+    ])
+    
+    # 디버깅: 벡터 모양 확인
+    print(f"질문 벡터 크기: {np.array(question_vector).shape}")
+    print(f"저장된 벡터 크기: {stored_vectors.shape}")
+
+    # 유사도 계산
+    all_similarities_with_bonus = []
+    for i, vector in enumerate(stored_vectors):
+        # 디버깅: 현재 계산 중인 벡터 확인
+        print(f"벡터 {i + 1} 크기: {vector.shape}")
+        
+        # 코사인 유사도 계산
+        similarity = cosine_similarity(
+            np.array(question_vector).reshape(1, -1),
+            vector.reshape(1, -1)
+        )[0][0]
+        
+        # 키워드 보너스 계산
+        keyword_bonus = sum([0.5 for keyword in keywords if keyword in text_chunks[i]])
+        
+        # 총 유사도 계산
+        all_similarities_with_bonus.append(
+            (i + 1, similarity + keyword_bonus)
+        )
+
+    # 유사도 순으로 정렬
+    sorted_similarities = sorted(all_similarities_with_bonus, key=lambda x: x[1], reverse=True)
+    return sorted_similarities
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+"""
+@st.cache_resource  # Streamlit의 cache를 사용하여 한 번만 모델을 로드
+def load_tokenizer():
+    print("토크나이저 로드 시작"+get_time())
+    model_name = "verygood7/llama3-ko-8b"
+    subfolder = "snapshots/10acb1aa4f341f2d3c899d78c520b0822a909b95"
+    tokenizer = AutoTokenizer.from_pretrained(model_name, subfolder=subfolder)
+    print("토크나이저 로드 완료"+get_time())
+    return tokenizer
+"""
 
 
 """
@@ -33,19 +133,6 @@ def load_model():
     return tokenizer, model
 
 
-
-@st.cache_resource  # Streamlit의 cache를 사용하여 한 번만 모델을 로드
-def load_tokenizer():
-    print("토크나이저 로드 시작"+get_time())
-    model_name = "verygood7/llama3-ko-8b"
-    subfolder = "snapshots/10acb1aa4f341f2d3c899d78c520b0822a909b95"
-    tokenizer = AutoTokenizer.from_pretrained(model_name, subfolder=subfolder)
-    print("토크나이저 로드 완료"+get_time())
-    return tokenizer
-"""
-
-
-"""
 if 'tokenizer' not in st.session_state:
     # st.session_state['tokenizer'] = load_tokenizer()
     st.session_state['tokenizer'], st.session_state['model'] = load_model()
@@ -58,13 +145,16 @@ if 'tokenizer' not in st.session_state:
 
 """
 
-from transformers import AutoTokenizer, AutoModelForCausalLM
-from datetime import datetime
-
 
 def get_time():
     now = datetime.now()
     return f"     [{now.hour}시{now.minute}분{now.second}초]"
+
+
+
+from transformers import AutoTokenizer, AutoModelForCausalLM
+from datetime import datetime
+
 
 
 
@@ -99,7 +189,7 @@ print("기존 get_chain 함수 삭제 완료")
 
 # 모델 로드 및 전역 변수 정의
 if "tokenizer" not in globals() or "model" not in globals():
-    print("모델 로드 시작")
+    print("모델 로드 시작" + get_time())
     model_name = "verygood7/llama3-ko-8b"
     subfolder = "snapshots/10acb1aa4f341f2d3c899d78c520b0822a909b95"
 
@@ -121,8 +211,8 @@ else:
 
 
 
-
 """
+
 print("모델 로드 시작")
 model = st.session_state["model"]
 print("토크나이저 로드 시작")
@@ -172,20 +262,14 @@ pdf_text = get_pdf(uploaded_files)
 text_content = " ".join(doc.page_content for doc in pdf_text)  # Document 객체 리스트 -> 문자열 변환
 
 
+
+
+
 # text_chunks = get_text_chunks(text_content, st.session_state['tokenizer'])
 text_chunks = get_text_chunks(text_content, tokenizer)
-
 vector_db = get_vector_db(text_chunks)
 
 
-
-"""
-for doc_id, doc in vector_db.docstore._dict.items():
-    chunk_id = doc.metadata.get("chunk_id", "N/A")
-    content = doc.page_content.replace('\n', ' ').replace('\r', ' ')
-    split_content = '\n'.join([content[i:i+70] for i in range(0, len(content),70)])
-    print(f"청크 {int(chunk_id)+1}:\n{split_content}\n")
-"""
 
 
 for doc_id, doc in vector_db.docstore._dict.items():
@@ -208,31 +292,13 @@ embedding_model = HuggingFaceEmbeddings(
 
 
 
-
-# 질문 벡터 확인
-question = "장기려가 뭐했냐?" # "건강보험이 뭐냐?"
-question_vector = embedding_model.embed_query(question)
-print(f"질문 벡터: {question_vector}")
-
-# 청크 벡터 확인 (예: 첫 번째 청크)
-stored_vectors = vector_db.index.reconstruct_n(0, 1)
-# print(f"저장된 첫 번째 청크 벡터: {stored_vectors}")
-
-
 from sklearn.metrics.pairwise import cosine_similarity
 import numpy as np
 
-
-question_vector_2d = np.array(question_vector).reshape(1, -1)   # 질문 벡터 (1D 배열을 2D로 변환)
-stored_vectors = np.array(stored_vectors)  # 저장된 기존의 FAISS 벡터DB  (2D 배열)
-similarities = cosine_similarity(question_vector_2d, stored_vectors) # 코사인 유사도 계산
-
-print("유사도 점수:", similarities)
-
-
-
-
 template_input="Use the following context to answer the question:\n\nContext: {context}\n\nAnswer:"
+# template_input="답변은 질문과 관련된 정보를 중심으로 작성하며, 질문 속 키워드({keywords})를 강조하여 명확하고 구체적으로 설명하세요."
+
+
 
 if "chain" not in st.session_state:
   st.session_state["chain"] = None
@@ -247,87 +313,61 @@ chain = st.session_state["chain"]
 
 
 
-# 질문에 대해 검색된 문서 가져오기
-docs = retriever.get_relevant_documents(question)
-
-stored_vectors = vector_db.index.reconstruct_n(0, vector_db.index.ntotal)
-
-# 청크 4의 벡터와 질문 벡터 간 유사도 점수 계산
-chunk_4_vector = stored_vectors[3]  # 청크 4는 0부터 시작하는 인덱스 기준 3
-similarity_with_chunk_4 = cosine_similarity(
-    np.array(question_vector).reshape(1, -1),
-    np.array(chunk_4_vector).reshape(1, -1)
-)[0][0]
-
-print(f"청크 4와 질문 간 유사도 점수: {similarity_with_chunk_4:.4f}")
 
 
-"""
+
+
+# 질문 벡터 확인
+question = "장기려가 뭐했냐?"  # 예시 질문
+question_vector = embedding_model.embed_query(question)
+print(f"질문 벡터: {question_vector}")
+
+
+
+
+
+from sklearn.metrics.pairwise import cosine_similarity
+import numpy as np
+
+# retriever에서 검색된 문서와 관련된 유사도 계산
+docs = retriever.get_relevant_documents(question)  # 질문과 관련된 문서들
+
 if docs:
-    # 저장된 모든 벡터 가져오기 (중복 방지)
-    stored_vectors = vector_db.index.reconstruct_n(0, vector_db.index.ntotal)  # 2D 배열
+    question_vector = embedding_model.embed_query(question)   # 질문 벡터
+    stored_vectors = vector_db.index.reconstruct_n(0, vector_db.index.ntotal)   # 벡터DB의 PDF 파일 벡터
 
-    # 검색된 문서 순서대로 유사도 점수 계산
-    for rank, doc in enumerate(docs, start=1):
-        chunk_id = int(doc.metadata.get("chunk_id", -1))  # 청크 ID 가져오기
-        content = doc.page_content[:38].replace("\n", " ").replace("\r", " ")  # 청크 내용 요약
         
-        # 코사인 유사도 계산
-        similarity_score = cosine_similarity(
-            np.array(question_vector).reshape(1, -1),
-            np.array(stored_vectors[chunk_id]).reshape(1, -1)
-        )[0][0]
-
-        # 순위와 유사도 점수 출력
-        print(f"{rank}위 청크 {chunk_id + 1}: {content}, 유사도 점수: {similarity_score:.4f}")
-
-    # 검색된 청크 번호 확인
-    chunk_ids = [int(doc.metadata["chunk_id"]) + 1 for doc in docs if "chunk_id" in doc.metadata]
-    print(f"선택된 청크 번호: {chunk_ids}")
-"""
-
-if docs:
-    # 검색된 문서의 ID와 내용을 출력
-    print("\n[검색된 청크들]")
-    for doc in docs:
-        print(f"청크 ID: {int(doc.metadata.get('chunk_id')) + 1}, 내용: {doc.page_content[:50]}...")  # ID에 +1 적용
-
-    # 모든 저장된 벡터 가져오기
-    stored_vectors = vector_db.index.reconstruct_n(0, vector_db.index.ntotal)
-
-    # 모든 청크의 유사도 계산
-    all_similarities = [
-        (i + 1, cosine_similarity(np.array(question_vector).reshape(1, -1), stored_vectors[i].reshape(1, -1))[0][0])  # ID +1 적용
-        for i in range(len(stored_vectors))
+    # 유사도 계산 (Cosine Similarity)
+    similarities = [
+        (doc.metadata['chunk_id'], cosine_similarity(np.array(question_vector).reshape(1, -1), np.array(stored_vectors[doc.metadata['chunk_id']]).reshape(1, -1))[0][0])
+        for doc in docs
     ]
 
-    # 유사도 순으로 정렬하여 출력
-    sorted_similarities = sorted(all_similarities, key=lambda x: x[1], reverse=True)
-    print("\n[유사도 순 정렬된 청크]")
-    for rank, (chunk_id, similarity) in enumerate(sorted_similarities[:10], start=1):  # 상위 10개만
-        print(f"{rank}위 청크 {chunk_id}: 유사도 점수 {similarity:.4f}")  # ID에 이미 +1 적용됨
+    # sorted_similarities = sorted(similarities, key=lambda x: x[1], reverse=True)
+    sorted_similarities = calculate_similarity_with_keywords(question, vector_db, text_chunks, question_vector)
+
+
+    for rank, (chunk_id, similarity) in enumerate(sorted_similarities, start=1):
+        print(f"{rank}위 청크 {chunk_id}: 유사도 점수 {similarity:.4f}")
+
+
+else:
+    print("검색된 문서가 없습니다.")
 
 
 
-
-
-
-
-
-
-
-# 체인이 요구하는 입력 키 확인
-print(f"체인이 요구하는 입력 키: {chain.input_keys}")
 
 chain_result = chain.run({"query": question})
-
 answer = chain_result.split("Answer:", 1)[1].strip()
 print(f"LangChain 답변: {answer} " + get_time())
 
 
-# Hugging Face 파이프라인 직접 호출
-hf_pipeline_result = hf_pipeline(question, max_length=512, num_return_sequences=1)
-print(f"Hugging Face 파이프라인 답변: {hf_pipeline_result[0]['generated_text']} {get_time()}")
+
+
+
+
+
+
 
 print("답변 완료"+get_time())
 

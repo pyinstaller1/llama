@@ -63,19 +63,6 @@ def get_text_chunks(text, tokenizer):  # PDF 데이터를 900단어 단위의 �
 
 
 
-"""
-def get_vector_db(text_chunks):      # 청크 문장 => 벡터 DB 저장
-    embeddings = HuggingFaceEmbeddings(
-        model_name="jhgan/ko-sroberta-multitask",
-        model_kwargs={'device': 'cpu'},
-        encode_kwargs={'normalize_embeddings': True}
-    )
-    vector_db = FAISS.from_documents(text_chunks, embeddings)
-    return vector_db   # 벡터 DB를 리턴
-"""
-
-
-
 
 
 @st.cache_resource  # 한 번만 로드하여 캐싱
@@ -85,15 +72,6 @@ def load_embeddings():
         model_kwargs={'device': 'cpu'},
         encode_kwargs={'normalize_embeddings': True}
     )
-
-"""
-def get_vector_db(text_chunks):
-    # 청크를 Document 객체로 변환
-    chunk_documents = [Document(page_content=text) for text in text_chunks]
-    embeddings = load_embeddings()
-    vector_db = FAISS.from_documents(chunk_documents, embeddings)
-    return vector_db
-"""
 
 
 def get_vector_db(text_chunks):
@@ -146,7 +124,6 @@ def get_chain(vector_db, model, tokenizer, template_input):
     chain = RetrievalQA(retriever=retriever, combine_documents_chain=combine_documents_chain)
 
     print("get_chain 함수 완료" + get_time())
-    # return chain, retriever
     return chain, retriever, hf_pipeline
 
 
