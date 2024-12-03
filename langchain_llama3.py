@@ -19,17 +19,6 @@ def get_time():
 
 
 
-"""
-def get_pdf(file):
-    pdf_text = []
-
-    loader = PyPDFLoader(file.name)
-    texts = loader.load_and_split()
-    pdf_text.extend(texts)
-
-    return pdf_text
-"""
-
 def get_pdf(uploaded_files):   # PDF 파일들에서 데이터 가져오기
     pdf_text = []
 
@@ -39,9 +28,6 @@ def get_pdf(uploaded_files):   # PDF 파일들에서 데이터 가져오기
         pdf_text.extend(texts)
 
     return pdf_text   # PDF 파일들에서 꺼낸 텍스트 데이터를 1개의 [리스트] 에 저장해서 리턴
-
-
-
 
 
 
@@ -56,7 +42,7 @@ def get_text_chunks(text, tokenizer):  # PDF 데이터를 900단어 단위의 �
         chunk_overlap=100,
         length_function=lambda txt: token_len(txt, tokenizer)
     )
-    chunks = text_splitter.split_text(text)
+    chunks = text_splitter.split_documents(text)
     return chunks
 
 
@@ -65,7 +51,7 @@ def get_text_chunks(text, tokenizer):  # PDF 데이터를 900단어 단위의 �
 
 
 
-@st.cache_resource  # 한 번만 로드하여 캐싱
+# @st.cache_resource  # 한 번만 로드하여 캐싱
 def load_embeddings():
     return HuggingFaceEmbeddings(
         model_name="jhgan/ko-sroberta-multitask",
@@ -74,15 +60,20 @@ def load_embeddings():
     )
 
 
+
 def get_vector_db(text_chunks):
-    # 청크를 Document 객체로 변환 (chunk_id 추가)
+
+    text_chunks = [chunk.page_content for chunk in text_chunks]
+
     chunk_documents = [
         Document(page_content=text, metadata={"chunk_id": idx}) 
         for idx, text in enumerate(text_chunks)
     ]
+    
     embeddings = load_embeddings()
     vector_db = FAISS.from_documents(chunk_documents, embeddings)
     return vector_db
+
 
 
 
@@ -94,13 +85,13 @@ from langchain.chains import RetrievalQA
 from transformers import pipeline
 from langchain.llms import HuggingFacePipeline
 
-def get_chain(vector_db, model, tokenizer, template_input):
+def get_chain(vector_db):
     print("get_chain 함수 시작" + get_time())
 
     hf_pipeline = pipeline(
         "text-generation",
-        model=model,
-        tokenizer=tokenizer,
+        model=st.session_state["model"],
+        tokenizer=st.session_state["tokenizer"],
         device=0,
         framework="pt",
         return_text=True
@@ -113,6 +104,10 @@ def get_chain(vector_db, model, tokenizer, template_input):
     # retriever = vector_db.as_retriever(search_kwargs={"k": 5})  # 반환할 청크 수를 5개로 설정
     retriever = vector_db.as_retriever()
     print("Retriever 생성 성공")
+
+
+    template_input="Use the following context to answer the question:\n\nContext: {context}\n\nAnswer:"
+    # template_input="답변은 질문과 관련된 정보를 중심으로 작성하며, 질문 속 키워드({keywords})를 강조하여 명확하고 구체적으로 설명하세요."
 
     prompt_template = PromptTemplate(
         template = template_input
