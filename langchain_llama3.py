@@ -130,9 +130,117 @@ def get_chain(vector_db):
 
 
 
+from kiwipiepy import Kiwi
+
+kiwi = Kiwi()
+stopwords = ['하다', '있다', '되다', '가', '이', '를', '은', '는', '다', '요', '죠']
+
+from sklearn.metrics.pairwise import cosine_similarity
+import numpy as np
+
+# 질문에 대한 키워드 추출
+def extract_keywords(question):
+    keywords = [
+        token.form
+        for token in kiwi.tokenize(question)
+        if token.tag in ['NNG', 'NNP', 'VV', 'NP', 'MAG']   # 명사, 동사, 대명사, 부사
+    ]
+    filtered_keywords = [word for word in keywords if word not in stopwords]  # 불용어 제거
+    return filtered_keywords
 
 
 
+def calculate_similarity_with_keywords(question, vector_db, text_chunks, question_vector):
+    # 키워드 추출
+    keywords = extract_keywords(question)
+
+    # 모든 벡터 가져오기
+    stored_vectors = np.array([
+        vector_db.index.reconstruct(i) for i in range(vector_db.index.ntotal)
+    ])
+    
+    # 디버깅: 벡터 모양 확인
+    print(f"질문 벡터 크기: {np.array(question_vector).shape}")
+    print(f"저장된 벡터 크기: {stored_vectors.shape}")
+
+    # 유사도 계산
+    all_similarities_with_bonus = []
+    for i, vector in enumerate(stored_vectors):
+        # 디버깅: 현재 계산 중인 벡터 확인
+        print(f"벡터 {i + 1} 크기: {vector.shape}")
+        
+        # 코사인 유사도 계산
+        similarity = cosine_similarity(
+            np.array(question_vector).reshape(1, -1),
+            vector.reshape(1, -1)
+        )[0][0]
+        
+        # 키워드 보너스 계산
+        keyword_bonus = sum([0.5 for keyword in keywords if keyword in text_chunks[i]])
+        
+        # 총 유사도 계산
+        all_similarities_with_bonus.append(
+            (i + 1, similarity + keyword_bonus)
+        )
+
+    # 유사도 순으로 정렬
+    sorted_similarities = sorted(all_similarities_with_bonus, key=lambda x: x[1], reverse=True)
+    return sorted_similarities
+
+
+
+
+
+
+
+
+
+
+
+
+
+def ask(x, context='', is_input_full=False):
+    print(x)
+    print(get_time())
+
+    PROMPT = '''You are a helpful AI assistant. Please answer the user's questions kindly. 당신은 유능한 AI 어시스턴트 입니다. 사용자의 질문에 대해 친절하게 답변해주세요.'''
+    instruction = x
+
+    messages = [
+        {"role": "system", "content": f"{PROMPT}"},
+        {"role": "user", "content": f"{instruction}"}
+        ]
+
+    prompt = st.session_state["pipeline"].tokenizer.apply_chat_template(
+            messages, 
+            tokenize=False, 
+            add_generation_prompt=True
+    )
+
+    print(prompt)
+
+    print("질문 데이터 생성 완료   " + get_time())
+
+
+    terminators = [
+        st.session_state["pipeline"].tokenizer.eos_token_id,
+        st.session_state["pipeline"].tokenizer.convert_tokens_to_ids("<|eot_id|>")
+    ]
+
+
+    print("답변 생성 시작   " + get_time())
+    outputs = st.session_state["pipeline"](
+        prompt,
+        max_new_tokens=2048,
+        eos_token_id=terminators,
+        do_sample=True,
+        temperature=0.6,
+        top_p=0.9
+    )
+
+    print(outputs[0]["generated_text"][len(prompt):])
+    print("답변 생성 완료   " + get_time())
+    return outputs[0]["generated_text"][len(prompt):]
 
 
 

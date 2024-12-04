@@ -1,5 +1,6 @@
 
 from transformers import AutoTokenizer, AutoModelForCausalLM
+import torch
 import streamlit as st
 import os
 from datetime import datetime

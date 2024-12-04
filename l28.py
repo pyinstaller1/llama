@@ -1,5 +1,7 @@
 
 from transformers import AutoTokenizer, AutoModelForCausalLM
+import transformers
+import torch
 import streamlit as st
 import os
 from datetime import datetime
@@ -45,7 +47,7 @@ def extract_keywords(question):
 
 
 
-def calculate_similarity_with_keywords(question, vector_db, text_chunks, question_vector):
+def calculate_similarity_with_keywords8(question, vector_db, text_chunks, question_vector):
     # 키워드 추출
     keywords = extract_keywords(question)
 
@@ -90,16 +92,33 @@ def calculate_similarity_with_keywords(question, vector_db, text_chunks, questio
 def load_model():
     model_name = "verygood7/llama3-ko-8b"
     subfolder = "snapshots/10acb1aa4f341f2d3c899d78c520b0822a909b95"
-    print("토크나이저 로드 시작"+get_time())
+    
+    print("토크나이저 로드 시작 " + get_time())
     tokenizer = AutoTokenizer.from_pretrained(model_name, subfolder=subfolder)
-    print("토크나이저 로드 완료"+get_time())
-    model = AutoModelForCausalLM.from_pretrained(model_name, subfolder=subfolder)
-    print("모델 로드 완료"+get_time())
+    print("토크나이저 로드 완료 " + get_time())
+    
+    # GPU 강제 요구
+    if not torch.cuda.is_available():
+        raise RuntimeError("GPU를 사용할 수 없습니다. GPU 환경에서 실행하세요.")
+
+    device = torch.device("cuda")  # GPU 강제 사용
+
+    print("모델 로드 시작 " + get_time())
+    model = AutoModelForCausalLM.from_pretrained(
+        model_name,
+        subfolder=subfolder,
+        torch_dtype=torch.float16  # FP16으로 VRAM 절약
+    ).to(device)
+    
+    print("모델 로드 완료 " + get_time())
     return tokenizer, model
 
 
+
+
+
+
 if 'tokenizer' not in st.session_state:
-    # st.session_state['tokenizer'] = load_tokenizer()
     st.session_state['tokenizer'], st.session_state['model'] = load_model()
     print("토크나이저, 모델 로드 완료"+get_time())    
 
@@ -115,7 +134,17 @@ if "messages" in st.session_state and len(st.session_state["messages"]) > 0:
   for chat_message in st.session_state["messages"]:
     st.chat_message(chat_message[0]).write(chat_message[1])
 
-
+if "pipeline" not in st.session_state:
+    print("라마3 모델 로드 시작   " + get_time())
+    st.session_state["pipeline"] = transformers.pipeline(
+        "text-generation",
+        model=st.session_state["model"],
+        tokenizer = st.session_state["tokenizer"],
+        model_kwargs={"torch_dtype": torch.bfloat16},
+        device_map="auto",
+    )
+    st.session_state["pipeline"].model.eval()
+    print("라마3 모델 로드 완료   " + get_time())
 
 print("시작"+get_time())
 
@@ -146,7 +175,19 @@ with st.sidebar:
 
             if "chain" not in st.session_state:
                 st.session_state["chain"] = None
-            st.session_state["chain"], retriever, hf_pipeline = get_chain(vector_db)
+
+            if "retriever" not in st.session_state:
+                st.session_state["retriever"] = None
+            if "vector_db" not in st.session_state:
+                st.session_state["vector_db"] = None
+            st.session_state["vector_db"] = vector_db
+            if "text_chunks" not in st.session_state:
+                st.session_state["text_chunks"] = None
+            st.session_state["text_chunks"] = text_chunks
+
+
+
+            st.session_state["chain"], st.session_state["retriever"], hf_pipeline = get_chain(vector_db)
 
             message_info.empty()   # 저장이 완료되면 안내 메세지 삭제
 
@@ -165,57 +206,60 @@ with st.sidebar:
 
 question = st.chat_input("질문을 입력하세요.")
 if question:
-    st.chat_message("user").write(question + get_time_web())
     if  len(uploaded_files) != 0:                # 첨부파일이 있으면, RAG
-        st.chat_message("user").write(question)
+        st.chat_message("user").write(question + get_time_web())
+        question_time = question + get_time_web()
 
         with st.spinner("RAG 답변 생성 중..."):
+            from langchain.embeddings import HuggingFaceEmbeddings
+            from sklearn.metrics.pairwise import cosine_similarity
+            import numpy as np
+            embedding_model = HuggingFaceEmbeddings(
+              model_name="jhgan/ko-sroberta-multitask",
+              model_kwargs={'device': 'cpu'},
+              encode_kwargs={'normalize_embeddings': True}
+            )
+            
+            # retriever에서 검색된 문서와 관련된 유사도 계산
+            docs = st.session_state["retriever"].get_relevant_documents(question)  # 질문과 관련된 문서들
+            
+            if docs:
+              question_vector = embedding_model.embed_query(question)   # 질문 벡터
+              stored_vectors = st.session_state["vector_db"].index.reconstruct_n(0, st.session_state["vector_db"].index.ntotal)   # 벡터DB의 PDF 파일 벡터
+              
+              # 유사도 계산 (Cosine Similarity)
+              similarities = [
+                (doc.metadata['chunk_id'], cosine_similarity(np.array(question_vector).reshape(1, -1), np.array(stored_vectors[doc.metadata['chunk_id']]).reshape(1, -1))[0][0])
+                for doc in docs
+                ]
+              
+              # sorted_similarities = sorted(similarities, key=lambda x: x[1], reverse=True)
+              sorted_similarities = calculate_similarity_with_keywords(question, st.session_state["vector_db"], st.session_state["text_chunks"], question_vector)
+              
+              for rank, (chunk_id, similarity) in enumerate(sorted_similarities, start=1):
+                print(f"{rank}위 청크 {chunk_id}: 유사도 점수 {similarity:.4f}")
+            else:
+              print("검색된 문서가 없습니다.")
 
-            # 5.py에서 이 부분에 RAG 챗봇을 만듭니다.
 
-            answer ="RAG 챗봇은 5.py 에서 만듭니다."
-            st.chat_message("assistant").write(answer) 
+
+            # answer ="RAG 챗봇은 5.py 에서 만듭니다."
+            print(777)
+            chain_result = st.session_state["chain"].run({"query": question})
+            print(888)
+            answer = chain_result.split("Answer:", 1)[1].strip()
+            print(f"LangChain 답변: {answer} " + get_time())
+            st.chat_message("assistant").write(answer + get_time_web()) 
 
 
     if  len(uploaded_files) == 0:            # 첨부 파일이 없으면, 챗GPT 3.5
-        st.chat_message("user").write(question)
-        print(777)
+        st.chat_message("user").write(question + get_time_web())
+        question_time = question + get_time_web()
 
         with st.spinner("라마3 모델이 답변 생성 중..."):
-            print(77777777777)
-
-            answer ="라마3 모델이 답변합니다."
-            st.chat_message("assistant").write(answer)
-            
-            # key = os.getenv('OPENAI_KEY')
-            # llm = ChatOpenAI(openai_api_key = key)   # 챗GPT에게 질문 (PDF가 없어서 RAG 아님)
-            # answer = llm.invoke(question)                # 챗GPT에게 답변을 받아옴 (RAG 아님)
-            # answer = answer.content
-            # st.chat_message("assistant").write(answer)   # 챗GPT의 답변 출력
-
-
-
-    """
-    # tokenizer의 __call__ 메서드를 사용해 입력과 attention_mask를 함께 가져옴
-    inputs = st.session_state['tokenizer'](question, return_tensors="pt")
-    print("질문 엔코딩 완료" + get_time())
-
-    # 모델에 입력값과 attention_mask를 전달하여 출력 생성
-    outputs = st.session_state['model'].generate(
-        inputs["input_ids"], 
-        max_length=300,
-        pad_token_id=st.session_state['tokenizer'].pad_token_id,
-        attention_mask=inputs["attention_mask"],
-        temperature=0.7,        # 생성의 다양성을 약간 추가
-        top_p=0.9,              # 선택 범위를 넓혀 보다 풍부한 답변 생성
-        repetition_penalty=1.2  # 반복을 억제하여 답변이 다양해짐
-    )
-    print("답변 벡터 생성 output 완료" + get_time())
-
-    answer = st.session_state['tokenizer'].decode(outputs[0], skip_special_tokens=True)
-                                                
-    st.chat_message("assistant").write(answer+get_time_web())
-    """
+            # answer ="라마3 모델이 답변합니다."
+            answer = ask(question)
+            st.chat_message("assistant").write(answer + get_time_web())
 
 
 
@@ -232,6 +276,11 @@ if question:
 
 
 
-    st.session_state["messages"].append(["user", question+get_time_web()])
+
+    st.session_state["messages"].append(["user", question_time])
     st.session_state["messages"].append(["assistant", answer+get_time_web()])
     print("답변 완료"+get_time())
+
+
+
+
