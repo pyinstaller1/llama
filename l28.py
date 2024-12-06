@@ -10,8 +10,8 @@ from langchain_llama3 import *
 st.set_page_config(page_title="라마3", page_icon="🦙")
 
 
-# pip install streamlit pypdf faiss-gpu kiwipiepy -U langchain-community transformers torch
-# !pip install pyngrok streamlit pypdf faiss-gpu kiwipiepy -U langchain-community
+# pip install streamlit kiwipiepy -U langchain-community transformers torch
+# !pip install pyngrok streamlit kiwipiepy -U langchain-community
 # !ngrok authtoken 2pfBXJdvp34yPDeEAVXCrvFS2aD_5guh96guiVvtwcnmEsPo9
 
 # from pyngrok import ngrok
