@@ -97,12 +97,17 @@ def load_model():
     print("토크나이저 로드 시작 " + get_time())
     tokenizer = AutoTokenizer.from_pretrained(model_name, subfolder=subfolder)
     print("토크나이저 로드 완료 " + get_time())
-    
-    # GPU 강제 요구
-    if not torch.cuda.is_available():
-        raise RuntimeError("GPU를 사용할 수 없습니다. GPU 환경에서 실행하세요.")
 
-    device = torch.device("cuda")  # GPU 강제 사용
+    # GPU가 사용 가능한지 확인
+    if torch.cuda.is_available():
+        device = torch.device("cuda")
+        torch_dtype = torch.float16  # GPU에서는 FP16 사용
+        print("GPU가 감지되었습니다. GPU 환경에서 실행합니다.")
+    else:
+        device = torch.device("cpu")
+        torch_dtype = torch.float32  # CPU에서는 FP32 사용
+        print("GPU를 사용할 수 없습니다. CPU 환경에서 실행합니다.")
+    
 
     print("모델 로드 시작 " + get_time())
     model = AutoModelForCausalLM.from_pretrained(
