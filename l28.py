@@ -93,6 +93,10 @@ def calculate_similarity_with_keywords8(question, vector_db, text_chunks, questi
 def load_model():
     model_name = "verygood7/llama3-ko-8b"
     subfolder = "snapshots/10acb1aa4f341f2d3c899d78c520b0822a909b95"
+
+    # model_path = "C:\\model\\llama3"
+
+    
     
     print("토크나이저 로드 시작 " + get_time())
     tokenizer = AutoTokenizer.from_pretrained(model_name, subfolder=subfolder)
@@ -113,6 +117,7 @@ def load_model():
     model = AutoModelForCausalLM.from_pretrained(
         model_name,
         subfolder=subfolder,
+        # model_path,
         torch_dtype=torch.float16  # FP16으로 VRAM 절약
     ).to(device)
     
