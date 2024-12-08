@@ -85,7 +85,7 @@ from langchain.chains import RetrievalQA
 from transformers import pipeline
 from langchain.llms import HuggingFacePipeline
 
-def get_chain(vector_db):
+def get_chain8(vector_db):
     print("get_chain 함수 시작" + get_time())
 
     hf_pipeline = pipeline(
@@ -96,96 +96,31 @@ def get_chain(vector_db):
         framework="pt",
         return_text=True
     )
-    print("Hugging Face pipeline 생성 성공")
-
     llm = HuggingFacePipeline(pipeline=hf_pipeline)
-    print(f"LangChain에서 사용하는 모델 ID: {llm.pipeline.model.config._name_or_path}")
 
-    # retriever = vector_db.as_retriever(search_kwargs={"k": 5})  # 반환할 청크 수를 5개로 설정
-    retriever = vector_db.as_retriever()
-    print("Retriever 생성 성공")
+    retriever = vector_db.as_retriever()   # as_retriever(search_kwargs={"k": 5})   청크5개
 
-
-    template_input="Use the following context to answer the question:\n\nContext: {context}\n\nAnswer:"
-    # template_input="답변은 질문과 관련된 정보를 중심으로 작성하며, 질문 속 키워드({keywords})를 강조하여 명확하고 구체적으로 설명하세요."
 
     prompt_template = PromptTemplate(
-        template = template_input
-        # template="Use the following context to answer the question:\n\nContext: {context}\n\nAnswer:"
-    )
+        template="Use the following context to answer the question:\n\nContext: {context}\n\n Answer:"
+        )
+
+
+
+
+    
+
+
 
     combine_documents_chain = load_qa_chain(llm, chain_type="stuff", prompt=prompt_template)
-
     chain = RetrievalQA(retriever=retriever, combine_documents_chain=combine_documents_chain)
 
     print("get_chain 함수 완료" + get_time())
-    return chain, retriever, hf_pipeline
+    return chain, retriever
 
 
 
 
-
-
-
-
-
-
-from kiwipiepy import Kiwi
-
-kiwi = Kiwi()
-stopwords = ['하다', '있다', '되다', '가', '이', '를', '은', '는', '다', '요', '죠']
-
-from sklearn.metrics.pairwise import cosine_similarity
-import numpy as np
-
-# 질문에 대한 키워드 추출
-def extract_keywords(question):
-    keywords = [
-        token.form
-        for token in kiwi.tokenize(question)
-        if token.tag in ['NNG', 'NNP', 'VV', 'NP', 'MAG']   # 명사, 동사, 대명사, 부사
-    ]
-    filtered_keywords = [word for word in keywords if word not in stopwords]  # 불용어 제거
-    return filtered_keywords
-
-
-
-def calculate_similarity_with_keywords(question, vector_db, text_chunks, question_vector):
-    # 키워드 추출
-    keywords = extract_keywords(question)
-
-    # 모든 벡터 가져오기
-    stored_vectors = np.array([
-        vector_db.index.reconstruct(i) for i in range(vector_db.index.ntotal)
-    ])
-    
-    # 디버깅: 벡터 모양 확인
-    print(f"질문 벡터 크기: {np.array(question_vector).shape}")
-    print(f"저장된 벡터 크기: {stored_vectors.shape}")
-
-    # 유사도 계산
-    all_similarities_with_bonus = []
-    for i, vector in enumerate(stored_vectors):
-        # 디버깅: 현재 계산 중인 벡터 확인
-        print(f"벡터 {i + 1} 크기: {vector.shape}")
-        
-        # 코사인 유사도 계산
-        similarity = cosine_similarity(
-            np.array(question_vector).reshape(1, -1),
-            vector.reshape(1, -1)
-        )[0][0]
-        
-        # 키워드 보너스 계산
-        keyword_bonus = sum([0.5 for keyword in keywords if keyword in text_chunks[i]])
-        
-        # 총 유사도 계산
-        all_similarities_with_bonus.append(
-            (i + 1, similarity + keyword_bonus)
-        )
-
-    # 유사도 순으로 정렬
-    sorted_similarities = sorted(all_similarities_with_bonus, key=lambda x: x[1], reverse=True)
-    return sorted_similarities
 
 
 
