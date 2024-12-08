@@ -28,75 +28,14 @@ def get_time_web():
     return f"&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[{now.hour}시{now.minute}분{now.second}초]"
 
 
-from kiwipiepy import Kiwi
-
-kiwi = Kiwi()
-stopwords = ['하다', '있다', '되다', '가', '이', '를', '은', '는', '다', '요', '죠']
-
-from sklearn.metrics.pairwise import cosine_similarity
-import numpy as np
-
-# 질문에 대한 키워드 추출
-def extract_keywords(question):
-    keywords = [
-        token.form
-        for token in kiwi.tokenize(question)
-        if token.tag in ['NNG', 'NNP', 'VV', 'NP', 'MAG']   # 명사, 동사, 대명사, 부사
-    ]
-    filtered_keywords = [word for word in keywords if word not in stopwords]  # 불용어 제거
-    return filtered_keywords
-
-
-
-def calculate_similarity_with_keywords8(question, vector_db, text_chunks, question_vector):
-    # 키워드 추출
-    keywords = extract_keywords(question)
-
-    # 모든 벡터 가져오기
-    stored_vectors = np.array([
-        vector_db.index.reconstruct(i) for i in range(vector_db.index.ntotal)
-    ])
-    
-    # 디버깅: 벡터 모양 확인
-    print(f"질문 벡터 크기: {np.array(question_vector).shape}")
-    print(f"저장된 벡터 크기: {stored_vectors.shape}")
-
-    # 유사도 계산
-    all_similarities_with_bonus = []
-    for i, vector in enumerate(stored_vectors):
-        # 디버깅: 현재 계산 중인 벡터 확인
-        print(f"벡터 {i + 1} 크기: {vector.shape}")
-        
-        # 코사인 유사도 계산
-        similarity = cosine_similarity(
-            np.array(question_vector).reshape(1, -1),
-            vector.reshape(1, -1)
-        )[0][0]
-        
-        # 키워드 보너스 계산
-        keyword_bonus = sum([0.5 for keyword in keywords if keyword in text_chunks[i]])
-        
-        # 총 유사도 계산
-        all_similarities_with_bonus.append(
-            (i + 1, similarity + keyword_bonus)
-        )
-
-    # 유사도 순으로 정렬
-    sorted_similarities = sorted(all_similarities_with_bonus, key=lambda x: x[1], reverse=True)
-    return sorted_similarities
 
 
 
 
-
-# @st.cache_resource  # Streamlit의 cache를 사용하여 한 번만 모델을 로드
 def load_model():
     model_name = "verygood7/llama3-ko-8b"
     subfolder = "snapshots/10acb1aa4f341f2d3c899d78c520b0822a909b95"
-
     # model_path = "C:\\model\\llama3"
-
-    
     
     print("토크나이저 로드 시작 " + get_time())
     tokenizer = AutoTokenizer.from_pretrained(model_name, subfolder=subfolder)
@@ -105,7 +44,7 @@ def load_model():
     # GPU가 사용 가능한지 확인
     if torch.cuda.is_available():
         device = torch.device("cuda")
-        torch_dtype = torch.float16  # GPU에서는 FP16 사용
+        torch_dtype = torch.float16  # GPU에서는 FP16으로 VRAM 절약
         print("GPU가 감지되었습니다. GPU 환경에서 실행합니다.")
     else:
         device = torch.device("cpu")
@@ -118,14 +57,11 @@ def load_model():
         model_name,
         subfolder=subfolder,
         # model_path,
-        torch_dtype=torch.float16  # FP16으로 VRAM 절약
+        torch_dtype=torch_dtype
     ).to(device)
     
     print("모델 로드 완료 " + get_time())
     return tokenizer, model
-
-
-
 
 
 
@@ -145,6 +81,7 @@ if "messages" in st.session_state and len(st.session_state["messages"]) > 0:
   for chat_message in st.session_state["messages"]:
     st.chat_message(chat_message[0]).write(chat_message[1])
 
+"""
 if "pipeline" not in st.session_state:
     print("라마3 모델 로드 시작   " + get_time())
     st.session_state["pipeline"] = transformers.pipeline(
@@ -156,6 +93,7 @@ if "pipeline" not in st.session_state:
     )
     st.session_state["pipeline"].model.eval()
     print("라마3 모델 로드 완료   " + get_time())
+"""
 
 print("시작"+get_time())
 
@@ -198,7 +136,7 @@ with st.sidebar:
 
 
 
-            st.session_state["chain"], st.session_state["retriever"], hf_pipeline = get_chain(vector_db)
+            st.session_state["chain"], st.session_state["retriever"] = get_chain(vector_db)
 
             message_info.empty()   # 저장이 완료되면 안내 메세지 삭제
 
@@ -222,6 +160,7 @@ if question:
         question_time = question + get_time_web()
 
         with st.spinner("RAG 답변 생성 중..."):
+            
             from langchain.embeddings import HuggingFaceEmbeddings
             from sklearn.metrics.pairwise import cosine_similarity
             import numpy as np
@@ -254,7 +193,7 @@ if question:
 
 
 
-            # answer ="RAG 챗봇은 5.py 에서 만듭니다."
+            # RAG 답변
             print(777)
             chain_result = st.session_state["chain"].run({"query": question})
             print(888)
@@ -263,12 +202,11 @@ if question:
             st.chat_message("assistant").write(answer + get_time_web()) 
 
 
-    if  len(uploaded_files) == 0:            # 첨부 파일이 없으면, 챗GPT 3.5
+    if  len(uploaded_files) == 0:            # 첨부 파일이 없으면, 라마3 LLM이 답변
         st.chat_message("user").write(question + get_time_web())
         question_time = question + get_time_web()
 
         with st.spinner("라마3 모델이 답변 생성 중..."):
-            # answer ="라마3 모델이 답변합니다."
             answer = ask(question)
             st.chat_message("assistant").write(answer + get_time_web())
 
