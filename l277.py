@@ -1,5 +1,6 @@
 
 
+
 from transformers import AutoTokenizer, AutoModelForCausalLM
 import torch
 import streamlit as st
@@ -257,10 +258,10 @@ def get_chain(vector_db):
     )
     llm = HuggingFacePipeline(pipeline=hf_pipeline)
 
-    retriever = vector_db.as_retriever()   # as_retriever(search_kwargs={"k": 5})   청크5개
+    retriever = vector_db.as_retriever(search_kwargs={"k": 2})   # as_retriever(search_kwargs={"k": 5})   청크5개
 
     prompt_template = PromptTemplate(
-        template="Use the following context to answer the question:\n\nContext: {context}\n\n Answer:"
+        template="Answer should be Korean. Include the chunk sentence that contains keyword of question into the answer. Include the keyword into the answer absoltely. Use the following context to answer the question:\n\nContext: {context}\n\n Answer:"
         )
 
     combine_documents_chain = load_qa_chain(llm, chain_type="stuff", prompt=prompt_template)
@@ -278,97 +279,53 @@ def get_chain(vector_db):
 
 
 
-
-
-from io import BytesIO
-
-# Streamlit의 UploadedFile과 동일한 구조를 모방한 클래스
-class UploadedFile:
-    def __init__(self, name, content):
-        self.name = name  # 파일 이름
-        self.content = content  # 파일 내용 (바이너리 데이터)
-
-    def read(self):
-        """Streamlit의 UploadedFile처럼 바이너리 데이터를 반환"""
-        return self.content
-
-uploaded_files = [
-    UploadedFile(
-        name="건강보험자료.txt",
-        content=open("./건강보험자료.txt", "rb").read()
-    )
-]
-
-
-
-
-
-
-
-
-
-
-
-"""
-with open('건강보험자료.txt', 'r', encoding='utf-8') as f:
-  texts = f.readlines()
-pdf_text = texts
-
-# pdf_text = get_pdf(uploaded_files)
-# text_content = " ".join(doc.page_content for doc in pdf_text)  # Document 객체 리스트 -> 문자열 변환
-
-
-
-from langchain.schema import Document  # Document 클래스 추가
-
-text_content = [Document(page_content=doc.page_content, metadata={"source": "txt", "page_number": idx}) 
-                for idx, doc in enumerate(pdf_text)]
-"""
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+import re
 from langchain.schema import Document
 
 # 텍스트 파일 읽기
-with open('건강보험자료.txt', 'r', encoding='utf-8') as f:
+with open('학습데이터.txt', 'r', encoding='utf-8') as f:
     full_text = f.read()
 
 # 텍스트를 청크로 분리
-def split_into_chunks(text, chunk_size=900, overlap=100):
+def split_into_chunks(text, chunk_size=380, overlap=100):
     chunks = []
     start = 0
     while start < len(text):
-        end = start + chunk_size
-        chunk = text[start:end]
-        chunks.append(chunk)
-        start += chunk_size - overlap
+        if "질문:" in text[start:]:
+            question_start = text.find("질문:", start)
+            answer_end = text.find("질문:", question_start + 1)  # 다음 '질문:' 위치 찾기
+
+            # 답변의 끝이 있다면, '질문: ~ 답변:' 구간을 하나의 청크로 저장
+            if question_start != -1 and answer_end != -1:
+                chunk = text[question_start:answer_end].strip()
+                chunks.append(chunk)
+                start = answer_end  # 다음 질문으로 넘어가도록
+            else:
+                # 마지막 질문/답변이 끝까지 포함되도록 처리
+                chunk = text[question_start:].strip()
+                chunks.append(chunk)
+                break
+        else:
+            break
     return chunks
 
 # 텍스트를 청크로 나누기
-text_chunks = split_into_chunks(full_text, chunk_size=900, overlap=100)
+text_chunks = split_into_chunks(full_text, chunk_size=380, overlap=100)
 
-# LangChain의 Document 리스트로 변환
+# LangChain의 Document 리스트로 변환 (청크의 내용과 함께 메타데이터 추가)
 chunk_documents = [
     Document(page_content=chunk, metadata={"chunk_id": idx})
     for idx, chunk in enumerate(text_chunks)
 ]
 
+# 벡터 DB 생성 (임베딩 없이 문서 객체만 사용)
+vector_db = get_vector_db(chunk_documents)
+
+# 결과 확인
+print(vector_db)
 
 text_chunks = chunk_documents
-# text_chunks = get_text_chunks(text_content, st.session_state['tokenizer'])
-# text_chunks = get_text_chunks(text_content, tokenizer)
+print(text_chunks)
 
 
 
@@ -402,23 +359,6 @@ text_chunks = chunk_documents
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-vector_db = get_vector_db(text_chunks)
 
 for doc_id, doc in vector_db.docstore._dict.items():
     chunk_id = doc.metadata.get("chunk_id", "N/A")
@@ -465,7 +405,11 @@ embedding_model = HuggingFaceEmbeddings(
 
 
 # 🔥 질문을 정의합니다.
-question = "장기려가 뭐했냐?"  # 예시 질문
+# question = "장기려가 뭐했냐?"  # 예시 질문
+question = "직장가입자 건강보험증 발송은 어디로 하나요?"
+
+
+
 
 # 🔥 질문 벡터를 생성합니다.
 question_vector = embedding_model.embed_query(question)  # 🔥 질문 벡터 생성
@@ -492,7 +436,7 @@ if docs:
 
     # 🔥 3️⃣ 청크와 유사도 정렬
 
-    question = "장기려가 뭐했냐?"
+    # question = "장기려가 뭐했냐?"
     sorted_similarities = calculate_similarity_with_keywords(question, vector_db, text_chunks, question_vector)
 
     for rank, (chunk_id, similarity) in enumerate(sorted_similarities, start=1):
@@ -543,12 +487,48 @@ else:
 
 
 
+
+"""
+
 import re
 
 def clean_answer(answer):
+
+    # 🔥 Answer: 이후의 텍스트만 추출
+    if "Answer:" in answer:
+        answer = answer.split("Answer:", 1)[1].strip()
+
+    # 🔥 정규 표현식으로 [Your Website] 같은 불필요한 부분 제거
+    answer = re.sub(r'\[.*?\]', '', answer)  # 🔥 대괄호 [ ] 안의 모든 내용 제거
+
+    # 🔥 불필요한 줄바꿈과 공백 정리
+    answer = re.sub(r'\s+', ' ', answer)  # 🔥 여러 개의 공백, 줄바꿈을 하나로 통합
+
+    # 🔥 문장 나누기 및 중복 제거
+    sentences = answer.split(". ")  # '.' 기준으로 문장 나누기
+    unique_sentences = list(dict.fromkeys(sentences))  # 중복 제거
+
+    # 🔥 마지막 문장 생략 (최소 2문장 이상일 경우)
+    if len(unique_sentences) > 1:
+        unique_sentences = unique_sentences[:-1]
+
+    # 🔥 중복 제거된 문장 다시 연결
+    cleaned_answer = ". ".join(unique_sentences).strip()
+
+    return cleaned_answer
+"""
+
+
+
+
+import re
+from sklearn.feature_extraction.text import TfidfVectorizer
+from sklearn.metrics.pairwise import cosine_similarity
+
+def clean_answer(answer, similarity_threshold=0.8):
     """
     Answer 부분의 불필요한 [Your Website], [Your Blog] 같은 부분을 제거하고
-    중복된 공백을 정리하는 함수.
+    중복된 공백과 문장을 정리하며 마지막 문장을 생략하는 함수.
     """
     # 🔥 Answer: 이후의 텍스트만 추출
     if "Answer:" in answer:
@@ -559,7 +539,48 @@ def clean_answer(answer):
 
     # 🔥 불필요한 줄바꿈과 공백 정리
     answer = re.sub(r'\s+', ' ', answer)  # 🔥 여러 개의 공백, 줄바꿈을 하나로 통합
-    return answer.strip()
+
+    # 🔥 문장 나누기
+    sentences = answer.split(". ")  # '.' 기준으로 문장 나누기
+
+    # 🔥 중복 제거: 유사도 기반 문장 비교
+    unique_sentences = []
+    vectorizer = TfidfVectorizer().fit_transform(sentences)
+    similarity_matrix = cosine_similarity(vectorizer)
+
+    for i, sentence in enumerate(sentences):
+        is_duplicate = False
+        # 이전 문장들과 유사도를 비교하여 threshold를 넘으면 중복으로 판단
+        for j in range(i):
+            if similarity_matrix[i, j] > similarity_threshold:
+                is_duplicate = True
+                break
+        if not is_duplicate:
+            unique_sentences.append(sentence)
+
+    # 🔥 마지막 문장 생략 (최소 2문장 이상일 경우)
+    if len(unique_sentences) > 1:
+        unique_sentences = unique_sentences[:-1]
+
+    # 🔥 중복 제거된 문장 다시 연결
+    cleaned_answer = ". ".join(unique_sentences).strip()
+
+    return cleaned_answer
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 def update_chain_with_top_chunks(top_chunks, text_chunks):
@@ -590,7 +611,7 @@ def get_top_context_from_chunks(top_chunk_ids, text_chunks, top_score, second_sc
 
     # 🔥 1위와 2위의 점수 차이가 클 경우, 1위만 자세히 참조
     if top_score > second_score * 2:  # 1위 점수가 2위의 2배 이상이면
-        print(f"⚠️ 1위 청크의 점수가 2위보다 2배 높음. 1위 청크만 참조합니다.")
+        print(f"⚠️ 1위 청크의 점수가 2위보다 2배 이상 높음. 1위 청크만 참조합니다.")
         return "\n".join(context_parts)  # 🔥 1위 청크만 반환
 
     # 🔥 나머지 2~4위 청크의 요약 추가
@@ -678,27 +699,6 @@ else:
 cleaned_answer = clean_answer(answer)
 
 print(f"LangChain 답변: {cleaned_answer} " + get_time())
-print("답변 완료" + get_time())
-
-
-
-
-
-
-
-
-
-def summarize_text(text, max_length=300):
-    if len(text) > max_length:
-        return text[:max_length] + "..."
-    return text
-
-
-# 요약된 답변 생성
-short_answer = summarize_text(cleaned_answer, max_length=500)
-
-# 최종 출력
-print(f"LangChain 답변7: {short_answer} " + get_time())
 print("답변 완료" + get_time())
 
 
