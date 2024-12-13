@@ -1,6 +1,8 @@
 
 
 
+
+
 from transformers import AutoTokenizer, AutoModelForCausalLM
 import torch
 import streamlit as st
@@ -406,8 +408,8 @@ embedding_model = HuggingFaceEmbeddings(
 
 # 🔥 질문을 정의합니다.
 # question = "장기려가 뭐했냐?"  # 예시 질문
-question = "직장가입자 건강보험증 발송은 어디로 하나요?"
-
+# question = "직장가입자 건강보험증 발송은 어디로 하나요?"
+question = "임의계속자격 급여정지의 경우 보험료가 경감 되나요?"
 
 
 
@@ -443,7 +445,7 @@ if docs:
         print(f"{rank}위 청크 {chunk_id + 1}: 유사도 점수 {similarity:.4f}")  # 🔥 chunk_id + 1로 1부터 시작
 
     # 🔥 4️⃣ 상위 4개 청크 선택
-    top_chunks = [chunk_id for chunk_id, similarity in sorted_similarities[:4] if chunk_id < len(stored_vectors)]  # 상위 4개 청크 선택
+    top_chunks = [chunk_id for chunk_id, similarity in sorted_similarities[:2] if chunk_id < len(stored_vectors)]  # 상위 2개 청크 선택
     print(f"💎 선택된 청크 ID: {[chunk_id + 1 for chunk_id in top_chunks]}")  # 🔥 1부터 시작
 
     # 📚 5️⃣ vector_db에 저장된 모든 키 확인
@@ -564,9 +566,19 @@ def clean_answer(answer, similarity_threshold=0.8):
 
     # 🔥 중복 제거된 문장 다시 연결
     cleaned_answer = ". ".join(unique_sentences).strip()
+    
+
+
+    # 학습데이터.txt
+    if "답변:" in cleaned_answer:
+      parts = cleaned_answer.split("답변:", 1)
+      cleaned_answer = parts[1].strip()
+      
+      if "질문:" in cleaned_answer:
+        cleaned_answer = cleaned_answer.split("질문:", 1)[0].strip()
+
 
     return cleaned_answer
-
 
 
 
@@ -665,8 +677,8 @@ def update_retriever_with_top_chunks(top_chunk_ids, vector_db, text_chunks):
 sorted_similarities = calculate_similarity_with_keywords(question, vector_db, text_chunks, question_vector)
 
 # 🔥 상위 4개 청크 선택
-top_chunks = [chunk_id for chunk_id, _ in sorted_similarities[:4]]
-top_scores = [score for _, score in sorted_similarities[:4]]  # 🔥 각 청크의 유사도 점수 추출
+top_chunks = [chunk_id for chunk_id, _ in sorted_similarities[:2]]
+top_scores = [score for _, score in sorted_similarities[:2]]  # 🔥 각 청크의 유사도 점수 추출
 
 # 🔥 새로운 retriever와 chain 생성
 update_chain_with_top_chunks(top_chunks, text_chunks)
@@ -674,6 +686,12 @@ update_chain_with_top_chunks(top_chunks, text_chunks)
 # 🔥 상위 청크의 컨텍스트 생성 (중요한 문장만 추출)
 keywords = extract_keywords(question)
 context = get_top_context_from_chunks(top_chunks, text_chunks, top_scores[0], top_scores[1])  # 🔥 점수 추가
+
+
+print("context")
+print(context)
+
+
 
 # 🔥 LLM에 질문을 명확히 전달하기 위한 프롬프트 생성
 prompt = f"""
@@ -700,11 +718,6 @@ cleaned_answer = clean_answer(answer)
 
 print(f"LangChain 답변: {cleaned_answer} " + get_time())
 print("답변 완료" + get_time())
-
-
-
-
-
 
 
 
