@@ -1,5 +1,7 @@
 
 
+
+
 import torch
 import transformers
 from transformers import AutoTokenizer, AutoModelForCausalLM
@@ -24,7 +26,7 @@ from langchain_llama3 import *
 st.set_page_config(page_title="라마3", page_icon="🦙")
 
 
-# pip install streamlit kiwipiepy -U langchain-community transformers torch scikit-learn
+# pip install streamlit kiwipiepy -U langchain-community transformers torch scikit-learn pypdf faiss-cpu
 # !pip install pyngrok streamlit pypdf faiss-cpu kiwipiepy -U langchain-community
 # !ngrok authtoken 2pfBXJdvp34yPDeEAVXCrvFS2aD_5guh96guiVvtwcnmEsPo9
 
@@ -114,7 +116,38 @@ def clean_answer(answer):
         if pattern in answer:
             answer = answer.split(pattern, 1)[0].strip()
 
+
+    if combo_chunk == "380":
+      # 🔥 중복된 문장 제거
+      sentences = answer.split('.')  # '.' 기준으로 문장을 나눔
+      unique_sentences = []
+      
+      for sentence in sentences:
+        sentence = sentence.strip()  # 공백 제거
+        if sentence and sentence not in unique_sentences:
+          unique_sentences.append(sentence)
+      answer = '. '.join(unique_sentences)  # 중복 제거된 문장 합치기
+
     return answer
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -150,7 +183,13 @@ def get_chain(vector_db):
 
 
 # 텍스트를 청크로 분리
-def get_text_chunks_question(text, chunk_size=380, overlap=100):
+def get_text_chunks_qa(text, chunk_size=380, overlap=100):
+    print("qa")
+
+
+    if isinstance(text, list):
+      text = " ".join([doc.page_content for doc in text])
+    print(text)
     chunks = []
     start = 0
     while start < len(text):
@@ -171,6 +210,9 @@ def get_text_chunks_question(text, chunk_size=380, overlap=100):
         else:
             break
     
+    print(7777777)
+    print(chunks)
+    
     chunk_documents = [
       Document(page_content=chunk, metadata={"chunk_id": idx})
       for idx, chunk in enumerate(chunks)
@@ -182,6 +224,7 @@ def get_text_chunks_question(text, chunk_size=380, overlap=100):
 
 
 def get_text_chunks(text, chunk_size=380, overlap=100):
+    print("no qa")
 
     # text가 Document 객체들의 리스트라면, 각 Document의 page_content를 하나의 문자열로 결합
     if isinstance(text, list):
@@ -322,6 +365,9 @@ print("시작"+get_time())
 with st.sidebar:
     uploaded_files = st.file_uploader("PDF 자료를 여기에 첨부하세요.", type=['pdf'], accept_multiple_files=True)
     process = st.button("첨부된 파일 등록")
+
+    combo_chunk = st.sidebar.selectbox("청크 구분", ["380", "질문:"], index=0)  # 기본값 "380"
+
     if process:
         if len(uploaded_files) == 0:
             st.error("파일을 첨부하세요.")
@@ -332,9 +378,12 @@ with st.sidebar:
 
             # combo_chunk = "질문:"   ###
             if combo_chunk == "질문:":
-                text_chunks = get_text_chunks_question(pdf_text, chunk_size=380, overlap=100)
+                text_chunks = get_text_chunks_qa(pdf_text, chunk_size=380, overlap=100)
             if combo_chunk == "380":
                 text_chunks = get_text_chunks(pdf_text, chunk_size=380, overlap=100)
+            
+            print(8888888)
+            print(text_chunks)
 
             vector_db = get_vector_db(text_chunks)
 
@@ -429,8 +478,6 @@ if question:
     st.session_state["messages"].append(["user", question_time])
     st.session_state["messages"].append(["assistant", answer+get_time_web()])
     print("답변 완료"+get_time())
-
-
 
 
 
