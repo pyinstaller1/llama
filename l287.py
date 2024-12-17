@@ -73,12 +73,8 @@ def calculate_similarity_with_keywords(question, vector_db, text_chunks):
     
     stored_vectors = np.array([vector_db.index.reconstruct(i) for i in range(vector_db.index.ntotal)])
 
-    embedding_model = HuggingFaceEmbeddings(
-      model_name="jhgan/ko-sroberta-multitask",
-      model_kwargs={'device': 'cpu'},
-      encode_kwargs={'normalize_embeddings': True}
-    )
 
+    embedding_model = load_embeddings()
     question_vector = embedding_model.embed_query(question)
     
     all_similarities_with_bonus = []
@@ -117,7 +113,7 @@ def clean_answer(answer):
             answer = answer.split(pattern, 1)[0].strip()
 
 
-    if combo_chunk == "380":
+    if 1 == 1: # combo_chunk == "380":
       # 🔥 중복된 문장 제거
       sentences = answer.split('.')  # '.' 기준으로 문장을 나눔
       unique_sentences = []
@@ -279,6 +275,9 @@ def get_new_vectcor_db(top_chunk_ids, vector_db, text_chunks):
         for idx, doc in enumerate(selected_documents)
     ]
 
+    print("new_chunk")
+    print(chunk_documents)
+
     embeddings = load_embeddings()
     new_vector_db = FAISS.from_documents(chunk_documents, embeddings)  # 🔥 새로운 vector_db 생성
     
@@ -363,7 +362,7 @@ print("시작"+get_time())
 
 
 with st.sidebar:
-    uploaded_files = st.file_uploader("PDF 자료를 여기에 첨부하세요.", type=['pdf'], accept_multiple_files=True)
+    uploaded_files = st.file_uploader("PDF 자료를 여기에 첨부하세요.", type=['pdf', 'txt'], accept_multiple_files=True)
     process = st.button("첨부된 파일 등록")
 
     combo_chunk = st.sidebar.selectbox("청크 구분", ["380", "질문:"], index=0)  # 기본값 "380"
@@ -433,11 +432,11 @@ if question:
             top_scores = [score for _, score in sorted_similarities[:2]]
             if len(top_scores) >= 2:
                 if top_scores[0] >= 2 * top_scores[1]:
-                    top_chunk_ids = [chunk_id+1 for chunk_id, _ in sorted_similarities[:1]]   # 상위 1개 청크 선택
+                    top_chunk_ids = [chunk_id for chunk_id, _ in sorted_similarities[:1]]   # 상위 1개 청크 선택
                 else:
-                    top_chunk_ids = [chunk_id+1 for chunk_id, _ in sorted_similarities[:2]]   # 상위 2개 청크 선택
+                    top_chunk_ids = [chunk_id for chunk_id, _ in sorted_similarities[:2]]   # 상위 2개 청크 선택
             else:
-                top_chunk_ids = [chunk_id+1 for chunk_id, _ in sorted_similarities[:1]]   # 상위 1개 청크 선택
+                top_chunk_ids = [chunk_id for chunk_id, _ in sorted_similarities[:1]]   # 상위 1개 청크 선택
 
             print(top_chunk_ids)
             get_new_chain(top_chunk_ids, st.session_state["text_chunks"])
@@ -478,6 +477,3 @@ if question:
     st.session_state["messages"].append(["user", question_time])
     st.session_state["messages"].append(["assistant", answer+get_time_web()])
     print("답변 완료"+get_time())
-
-
-

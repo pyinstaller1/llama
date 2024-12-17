@@ -11,6 +11,7 @@ import streamlit as st
 
 from langchain.schema import Document
 from transformers import pipeline
+import os
 
 
 def get_time():
@@ -22,10 +23,26 @@ def get_time():
 def get_pdf(uploaded_files):   # PDF 파일들에서 데이터 가져오기
     pdf_text = []
 
+    """
     for file in uploaded_files:
         loader = PyPDFLoader(file.name)
         texts = loader.load_and_split()
         pdf_text.extend(texts)
+    """
+
+
+    for file in uploaded_files:
+        _, ext = os.path.splitext(file.name)  # 파일 확장자 추출
+
+        if ext.lower() == '.pdf':  # PDF 파일 처리
+            loader = PyPDFLoader(file.name)
+            texts = loader.load_and_split()
+            pdf_text.extend(texts)
+
+        elif ext.lower() == '.txt':  # 텍스트 파일 처리
+            with open(file.name, 'r', encoding='utf-8') as f:
+                texts = f.readlines()  # 텍스트 파일의 모든 줄 읽기
+            pdf_text.extend(texts)
 
     return pdf_text   # PDF 파일들에서 꺼낸 텍스트 데이터를 1개의 [리스트] 에 저장해서 리턴
 
