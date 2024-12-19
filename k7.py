@@ -16,7 +16,7 @@ warnings.filterwarnings('ignore', category=urllib3.exceptions.InsecureRequestWar
 
 
 
-list = "стороны    "
+list = "беспилотник"
 # list = "найду"
 # list = "найти"
 list = re.sub(r'\u0301', '', list)
@@ -57,6 +57,12 @@ if span:
         meaning = "   ".join([a.text for a in meaning[:3]])
 
 
+        if meaning:
+            pass
+        else:
+            meaning = ""
+
+
 
         
 
@@ -85,7 +91,10 @@ else:
         meaning = "   ".join([a.text for a in meaning[:3]])
 
 
-
+        if meaning:
+            pass
+        else:
+            meaning = ""
 
 
 
