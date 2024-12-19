@@ -40,8 +40,14 @@ if span:
 
 
 
-    stress = soup.find("strong", {"class": "Cyrl headword"}).text
-    # meaning = soup.find("span", {"class": "mention-gloss"})
+    stress = soup.find("strong", {"class": "Cyrl headword"})
+    if stress:
+        stress = stress.text
+    else:
+        stress = ""
+
+
+
 
     meaning = soup.find_all("span", {"class": "mention-gloss"})
     meaning = "   ".join([a.text for a in meaning[:3]])
@@ -78,7 +84,17 @@ else:
     soup = BeautifulSoup(html.text, "html.parser")
 
 
-    stress = soup.find("strong", {"class": "Cyrl headword"}).text
+    stress = soup.find("strong", {"class": "Cyrl headword"})
+    if stress:
+        stress = stress.text
+    else:
+        stress = ""
+
+
+
+
+
+    
     meaning = soup.find_all("span", {"class": "mention-gloss"})
     meaning = "   ".join([a.text for a in meaning[:3]])
 
