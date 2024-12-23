@@ -1,9 +1,9 @@
-
 from django.shortcuts import render
 from django.http import StreamingHttpResponse, JsonResponse
 import requests
 from bs4 import BeautifulSoup
-
+import re
+from janome.tokenizer import Tokenizer
 import time
 import urllib3
 
@@ -11,53 +11,82 @@ import urllib3
 
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
-
-
-
-
+# 기본 페이지로 연결되는 뷰
 def index(request):
-    return render(request, 'index.html')
+    return render(request, 'index.html')  # index.html 템플릿을 렌더링
 
 
-
-
-
-def generate_streaming_html(request):
+def get_words(request):
     sentence = request.GET.get('sentence', '')
-    words = sentence.split()
 
-    # 각 단어에 대한 정의를 실시간으로 클라이언트로 전송
-    for word in words:
-        definition = get_definition_from_api(word)  # 단어에 대한 정의 가져오기
-        yield f"<p><strong>{word}</strong>: {definition}</p>"
-        
-        time.sleep(1)  # 실시간 응답을 위해 약간의 시간 지연 (필요 시 조정)
+    tokenizer = Tokenizer()
+    tokens = tokenizer.tokenize(sentence)
 
-def get_definition_from_api(word):
-    try:
-        # 실제 크롤링할 웹사이트 URL
-        url = f'https://www.weblio.jp/content/{word}'
-        response = requests.get(url, verify=False)
+    word_list = []
+    suffixes = ['れ', 'られ', 'れる', 'られる', 'せる', 'させる', 'た', 'だ']
+    stop_words = ['が', 'に', 'の', 'し', 'て', 'など']
 
-        if response.status_code == 200:
-            soup = BeautifulSoup(response.text, 'html.parser')
-            soup = soup.find("div", class_="kiji")
-            
-            if soup:
-                meaning = "   ".join([a.text.split("【")[0].split("〔")[0][:8] for a in soup.find_all("h2", class_="midashigo")])
-                return meaning
+    hiragana_pattern = re.compile(r'[ぁ-ん]$')
+
+    for token in tokens:
+        surface = token.surface
+
+        # 'れ'나 'られ'와 같은 접미사가 붙은 동사를 처리
+        if surface in suffixes and len(word_list) > 0:
+            if hiragana_pattern.search(word_list[-1]):
+                word_list[-1] = word_list[-1] + surface  # 앞 단어와 합치기
             else:
-                return "Definition not found"
+                word_list.append(surface)
         else:
-            return "Failed to retrieve data"
-    
-    except requests.exceptions.RequestException as e:
-        return f"Error: {str(e)}"
+            word_list.append(surface)
+        
+    word_list = [word for word in word_list if word not in stop_words]
+    print(word_list)
 
-def crawl_words(request):
+    for word in word_list:
+
+        str_word = ""
+
+        html = requests.get(f"https://dic.daum.net/search.do?dic=jp&q={word}")
+        soup = BeautifulSoup(html.text, "html.parser")
+
+        list_hiragana = [div.find("a", class_=["txt_cleansch", "txt_searchword"]).text for div in soup.find_all("div", class_=["cleanword_type kujk_type", "search_type kujk_type"])[:8]]
+        list_meaning = [re.sub("\\(.*?\\)\\s*", "", div.find("span", class_="txt_search").text)[:10] for div in soup.find_all("div", class_=["cleanword_type kujk_type", "search_type kujk_type"])[:8]]
+        list_kanji = [div.find("span", class_="sub_txt").text.replace("\n", "").replace("\t", "").replace(" ", "").replace("口", "") if div.find("span", class_="sub_txt") else "" for div in soup.find_all("div", class_=["cleanword_type kujk_type", "search_type kujk_type"])[:8]]
+
+
+
+        # 중복 제거
+        unique_hiragana = []
+        unique_meaning = []
+        unique_kanji = []
+
+        for idx, h in enumerate(list_hiragana):
+            if h not in unique_hiragana:
+                unique_hiragana.append(h)
+                unique_meaning.append(list_meaning[idx])
+                unique_kanji.append(list_kanji[idx])
+
+        list_hiragana = unique_hiragana[:3]
+        list_meaning = unique_meaning[:3]
+        list_kanji = unique_kanji[:3]
+
+        for i in range(len(list_hiragana)):
+            str_word += list_hiragana[i] + " [" + list_kanji[i] + "] " + list_meaning[i] + "<br>"
+        str_word += "<br>"
+        # print(str_word)
+        yield str_word
+        time.sleep(1)
+
+
+
+
+
+def get_response(request):
     # 실시간으로 데이터를 스트리밍하려면 StreamingHttpResponse 사용
-    response = StreamingHttpResponse(generate_streaming_html(request))
+    response = StreamingHttpResponse(get_words(request))
     response['Content-Type'] = 'text/html; charset=utf-8'
-    return response
 
+    
+    return response
 

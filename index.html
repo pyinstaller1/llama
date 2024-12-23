@@ -7,13 +7,15 @@
         // 문장을 입력받고 Ajax를 통해 데이터를 실시간으로 받아오는 함수
         function fetchDefinitions() {
             var sentence = document.getElementById("sentence").value;
+            console.log(sentence); // 콘솔에 출력
+
 
             // 실시간 데이터 스트리밍을 받기 위한 AJAX 요청
             var xhr = new XMLHttpRequest();
-            xhr.open("GET", "/crawl/?sentence=" + encodeURIComponent(sentence), true);
+            xhr.open("GET", "/get_response/?sentence=" + encodeURIComponent(sentence), true);
             xhr.onreadystatechange = function() {
                 if (xhr.readyState === 3) {  // 데이터를 받기 시작할 때
-                    document.getElementById("result").innerHTML += xhr.responseText;  // 실시간으로 출력
+                    document.getElementById("result").innerHTML = xhr.responseText;  // 실시간으로 출력
                 }
             };
             xhr.send();
@@ -22,12 +24,11 @@
 </head>
 <body>
     <h1>단어 크롤러</h1>
-    <input type="text" id="sentence" placeholder="단어를 입력하세요" />
+
+    <textarea id="sentence" placeholder="일본어 문장을 입력하세요" rows="10" cols="50">観客７人が強風にあおられたテントの下敷きになるなどして負傷し</textarea>
     <button onclick="fetchDefinitions()">크롤링 시작</button>
 
     <div id="result"></div>  <!-- 실시간 결과가 이곳에 출력됩니다 -->
 </body>
 </html>
-
-
 
