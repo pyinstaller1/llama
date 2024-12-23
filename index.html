@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>단어 크롤러</title>
+    <script>
+        // 문장을 입력받고 Ajax를 통해 데이터를 실시간으로 받아오는 함수
+        function fetchDefinitions() {
+            var sentence = document.getElementById("sentence").value;
+
+            // 실시간 데이터 스트리밍을 받기 위한 AJAX 요청
+            var xhr = new XMLHttpRequest();
+            xhr.open("GET", "/crawl/?sentence=" + encodeURIComponent(sentence), true);
+            xhr.onreadystatechange = function() {
+                if (xhr.readyState === 3) {  // 데이터를 받기 시작할 때
+                    document.getElementById("result").innerHTML += xhr.responseText;  // 실시간으로 출력
+                }
+            };
+            xhr.send();
+        }
+    </script>
+</head>
+<body>
+    <h1>단어 크롤러</h1>
+    <input type="text" id="sentence" placeholder="단어를 입력하세요" />
+    <button onclick="fetchDefinitions()">크롤링 시작</button>
+
+    <div id="result"></div>  <!-- 실시간 결과가 이곳에 출력됩니다 -->
+</body>
+</html>
+
+
+
