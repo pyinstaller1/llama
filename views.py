@@ -16,6 +16,9 @@ def index(request):
     return render(request, 'index.html')  # index.html 템플릿을 렌더링
 
 
+
+
+
 def get_words(request):
     sentence = request.GET.get('sentence', '')
 
@@ -42,6 +45,8 @@ def get_words(request):
         
     word_list = [word for word in word_list if word not in stop_words]
     print(word_list)
+
+    count_word_list = 0
 
     for word in word_list:
 
@@ -72,11 +77,26 @@ def get_words(request):
         list_kanji = unique_kanji[:3]
 
         for i in range(len(list_hiragana)):
+            if list_kanji[i]:   # word의 한자와 다른 한자 단어 제거
+                if re.match(r'[\u4e00-\u9fff]', word[0]) and re.match(r'[\u4e00-\u9fff]', list_kanji[i][0]) and re.sub(r'[^\u4e00-\u9fff]', '', word) != re.sub(r'[^\u4e00-\u9fff]', '', list_kanji[i]):
+                    continue
+
+            if re.match(r'[カ-ン]', word[0]):   # 카타카나 word와 다른 카타카나 단어 제거
+                if re.match(r'[カ-ン]', word[0]) and re.match(r'[カ-ン]', list_hiragana[i][0]) and re.sub(r'[^カ-ン]', '', word) != re.sub(r'[^カ-ン]', '', list_hiragana[i]):
+                    continue
+
+            
             str_word += list_hiragana[i] + " [" + list_kanji[i] + "] " + list_meaning[i] + "<br>"
         str_word += "<br>"
-        # print(str_word)
+
+
+        if count_word_list == 0:
+            yield str(word_list).replace("'", "") + "word_list"
+            count_word_list = 1
+
         yield str_word
-        time.sleep(1)
+
+
 
 
 
