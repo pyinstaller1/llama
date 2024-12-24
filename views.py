@@ -51,6 +51,7 @@ def get_words(request):
     for word in word_list:
 
         str_word = ""
+        str_word_list = ""
 
         html = requests.get(f"https://dic.daum.net/search.do?dic=jp&q={word}")
         soup = BeautifulSoup(html.text, "html.parser")
@@ -76,6 +77,8 @@ def get_words(request):
         list_meaning = unique_meaning[:3]
         list_kanji = unique_kanji[:3]
 
+        count_str_word_list = 0
+
         for i in range(len(list_hiragana)):
             if list_kanji[i]:   # word의 한자와 다른 한자 단어 제거
                 if re.match(r'[\u4e00-\u9fff]', word[0]) and re.match(r'[\u4e00-\u9fff]', list_kanji[i][0]) and re.sub(r'[^\u4e00-\u9fff]', '', word) != re.sub(r'[^\u4e00-\u9fff]', '', list_kanji[i]):
@@ -87,12 +90,21 @@ def get_words(request):
 
             
             str_word += list_hiragana[i] + " [" + list_kanji[i] + "] " + list_meaning[i] + "<br>"
+            if count_str_word_list == 0:
+                str_word_list += word_list[i] + "<br>"
+                count_str_word_list = 1
+            else:
+                str_word_list += "<br>"
+            print(str_word_list)
+            
         str_word += "<br>"
+        str_word_list += "<br>"
 
-
+        """
         if count_word_list == 0:
             yield str(word_list).replace("'", "") + "word_list"
             count_word_list = 1
+        """
 
         yield str_word
 
