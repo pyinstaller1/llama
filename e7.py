@@ -98,7 +98,7 @@ html = requests.get("https://www.wordreference.com/enko/" + word)
 soup = BeautifulSoup(html.text, "html.parser")
 
 span = soup.find("span", {"class": "pronWR tooltip pronWidget"})
-pron = "[" + span.text.split("/")[1].replace("ˈ", "")+ "]"
+pron = "[" + span.text.split("/")[1].replace("ˈ", "").replace("ˌ", "")+ "]"
 print(pron)
 
 
