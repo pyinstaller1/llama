@@ -43,7 +43,7 @@ def get_words(request):
     word_list = []
     stop_words = ['が', 'に', 'へ', 'の', 'し', 'て', 'など', 'を', 'は', 'と', 'も', 'だ', 'から', 'まで', 'なる', 'で', 'なっ', 'い', 'ます', 'です', 'ました','いる', 'です', 'する',  'でした', '。', '「', '」', '.', ',', '、', '・', ' ']
 
-    hiragana_pattern = re.compile(r'[ぁ-ん]$')
+    # hiragana_pattern = re.compile(r'[ぁ-ん]$')
 
     for token in tokens:
         word_list.append(token.surface)
@@ -68,6 +68,19 @@ def get_words(request):
 
         tr = soup.find_all("tr", {"class": "even"})
         print(tr)
+
+
+        """
+        for tr_meaning in tr[:5*3]:
+            if tr_meaning.find("td", {"class": "ToWrd"}):
+                if tr_meaning.find("td", {"class": "ToWrd"}).contents[0]:
+                    if str(tr_meaning.find("td", {"class": "ToWrd"}).contents[0])[0] != "<":
+                        print(tr_meaning.find("td", {"class": "ToWrd"}).contents[0])
+                        meaning += str(tr_meaning.find("td", {"class": "ToWrd"}).contents[0])
+                        # meaning = ", ".join(str(tr_meaning.find("td", {"class": "ToWrd"}).contents))
+        meaning += str(tr_meaning.find("td", {"class": "ToWrd"}).contents[0]) if tr_meaning.find("td", {"class": "ToWrd"}) and tr_meaning.find("td", {"class": "ToWrd"}).contents and str(tr_meaning.find("td", {"class": "ToWrd"}).contents[0])[0] != "<" else ""
+
+        """
 
         if tr:
             meaning = ", ".join([tr_meaning.find("td", {"class": "ToWrd"}).contents[0].strip() for tr_meaning in tr[:5*3] if tr_meaning.find("td", {"class": "ToWrd"}) ])
