@@ -6,6 +6,7 @@ import re
 from janome.tokenizer import Tokenizer
 import time
 import urllib3
+from translate import Translator
 
 
 
@@ -22,12 +23,16 @@ def index(request):
 def get_words(request):
     sentence = request.GET.get('sentence', '')
 
+    translator = Translator(to_lang="ko", from_lang="ja")
+    translated = translator.translate(sentence).replace(".", ".<br>")
+
+
     tokenizer = Tokenizer()
     tokens = tokenizer.tokenize(sentence)
 
     word_list = []
     suffixes = ['れ', 'られ', 'れる', 'られる', 'せる', 'させる', 'た', 'だ']
-    stop_words = ['が', 'に', 'の', 'し', 'て', 'など']
+    stop_words = ['が', 'に', 'へ', 'の', 'し', 'て', 'など', 'を', 'は', 'と', 'も', 'だ', 'から', 'まで', 'なる', 'で', 'なっ', 'い', 'ます', 'です', 'ました','いる', 'です', 'する',  'でした', '。', '「', '」', '.', ',', '、', '・', ' ']
 
     hiragana_pattern = re.compile(r'[ぁ-ん]$')
 
@@ -44,6 +49,17 @@ def get_words(request):
             word_list.append(surface)
         
     word_list = [word for word in word_list if word not in stop_words]
+
+    word_list = [
+        word[:-3] + 'る' if word.endswith('られた') else
+        word[:-3] + 'す' if word.endswith('された') else
+        word[:-3] + 'す' if word.endswith('される') else
+        word[:-3] + 'る' if word.endswith('られる') else
+        word
+        for word in word_list
+        ]
+
+ 
     print(word_list)
 
     count_word_list = 0
@@ -61,7 +77,6 @@ def get_words(request):
         list_kanji = [div.find("span", class_="sub_txt").text.replace("\n", "").replace("\t", "").replace(" ", "").replace("口", "") if div.find("span", class_="sub_txt") else "" for div in soup.find_all("div", class_=["cleanword_type kujk_type", "search_type kujk_type"])[:8]]
 
 
-
         # 중복 제거
         unique_hiragana = []
         unique_meaning = []
@@ -76,7 +91,6 @@ def get_words(request):
         list_hiragana = unique_hiragana[:3]
         list_meaning = unique_meaning[:3]
         list_kanji = unique_kanji[:3]
-
 
 
         # 한자의 한글 뜻 kanji_meaning
@@ -107,25 +121,31 @@ def get_words(request):
                 kanji_meaning = kanji_meaning + list_span[i] + " " + list_a[i] + "&nbsp;&nbsp;&nbsp;"
             kanji_meaning += "end"
             kanji_meaning = kanji_meaning.strip().replace("&nbsp;&nbsp;&nbsp;end", "")
-            
 
 
         # str_word: 히라가나 [한자] 한글뜻   kanji_meaning
         for i in range(len(list_hiragana)):
+
             if list_kanji[i]:   # 한자 word의 한자와 다른 한자 단어 제거
-                if re.match(r'[\u4e00-\u9fff]', word[0]) and re.match(r'[\u4e00-\u9fff]', list_kanji[i][0]) and re.sub(r'[^\u4e00-\u9fff]', '', word) != re.sub(r'[^\u4e00-\u9fff]', '', list_kanji[i]):
+                if re.match(r'[\u4e00-\u9fff]', word[0]) and re.match(r'[\u4e00-\u9fff]', list_kanji[i][0]) and re.sub(r'[^\u4e00-\u9fff]', '', word) != re.sub(r'[^\u4e00-\u9fff]', '', list_kanji[i]) and '·' not in list_kanji[i]:
                     continue
 
-            if re.match(r'[カ-ン]', word[0]):   # 카타카나 word와 다른 카타카나 단어 제거
-                if re.match(r'[カ-ン]', word[0]) and re.match(r'[カ-ン]', list_hiragana[i][0]) and re.sub(r'[^カ-ン]', '', word) != re.sub(r'[^カ-ン]', '', list_hiragana[i]):
+            if re.match(r'[ア-ン]', word[0]):   # 카타카나 word와 다른 카타카나 단어 제거
+                if re.match(r'[ア-ン]', word[0]) and re.match(r'[カ-ン]', list_hiragana[i][0]) and re.sub(r'[^ア-ン]', '', word) != re.sub(r'[^ア-ン]', '', list_hiragana[i]):
                     continue
+
+            if len(list_hiragana[0]) <= 8 and len(list_hiragana[i]) > 8: # 긴 설명의 단어 제거
+                continue
+
+            if re.match(r'[ア-ン]', word[0]) and re.match(r'[あ-ん]', list_hiragana[i][0]) and word != list_hiragana[i]:   # 가타카나 word 와 다른 가타카나 제거
+                continue
+
 
             
             str_word += list_hiragana[i] + " [" + list_kanji[i] + "] " + list_meaning[i] + "&nbsp;&nbsp;&nbsp;" + kanji_meaning + "<br>"
 
 
-        print(88888888888)
-        print(str_word)
+
         # word_list 의 중복 의미 들 중 1번째 단어 위치에만, word_list 단어 원본 표시 => str_word_list
         count_str_word_list = 0
         for i in range(len(str_word.split("<br>"))):
@@ -135,21 +155,20 @@ def get_words(request):
             else:
                 str_word_list += "<br>"         # 1단어의 1번째 종류가 아니면, <br> 만 추가 해서 str_word와 줄을 맞춤
 
-
         str_word += "<br>"
-        str_word_list += "<br>"
-
 
 
 
         if count_word_list == 0: # 1회성 데이터
-            yield str(word_list).replace("'", "") + "!border!"
-            count_word_list = 1
+            if len(word_list) == 1:
+                yield (translated + "<br>" + str(word_list)).replace("'", "").replace("[", "[ ").replace("]", " ]") + "!border!" + str_word + "!border_title!" + str_word_list + "!border_title!"
+            else:
+                yield (translated + "<br>" + str(word_list)).replace("'", "").replace("[", "[ ").replace("]", " ]") + "!border!"
+                count_word_list = 1
 
-        print(str_word + "!border_title!" + str_word_list)
-        print(777)
 
         yield str_word + "!border_title!" + str_word_list + "!border_title!" # 실시간 데이터
+        time.sleep(0.8)
 
 
 
