@@ -3,7 +3,7 @@
 <html lang="ko">
 <head>
     <meta charset="UTF-8">
-    <title>Japan</title>
+    <title>Japanese lyrics</title>
     <style>
         /* 전체 레이아웃을 flex로 사용하여 가로로 배치 */
         #container {
@@ -112,15 +112,12 @@
             console.log(sentence);
             // sentence.replace(/\n/g, "<br>")
 
-            let list_japan = sentence.split(/(?<=\.|\?|!|。|<br>)/).map(s => s.trim()).filter(Boolean);
-            console.log(list_japan);
-
 
             
 
             // 실시간 데이터 스트리밍을 받기 위한 AJAX 요청
             var xhr = new XMLHttpRequest();
-            xhr.open("GET", "/get_response/?sentence=" + encodeURIComponent(sentence), true);
+            xhr.open("GET", "/get_response_js/?sentence=" + encodeURIComponent(sentence), true);
 
             count_word_list = 0;
             count_border_title = 0;
@@ -200,7 +197,7 @@
 </head>
 
 <body>
-    <h3>일본어 문장 분석</h3>
+    <h3>Japanese lyrics</h3>
 
 
     <div id="container">

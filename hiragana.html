@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>한글 ⇨ 히라가나</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+        }
+        .container {
+            display: flex;
+            justify-content: flex-start; /* 좌측 정렬 */
+            align-items: flex-start; /* 위쪽 정렬 */
+        }
+        textarea {
+            width: 500px;
+            height: 380px;
+            font-size: 20px;
+            padding: 10px;
+            border-radius: 10px;
+            border: 1px solid #ccc;
+            overflow-y: auto;  /* 스크롤 추가 */
+        }
+        #result {
+            font-size: 20px;
+            min-height: 380px;
+            width: 500px;
+            padding: 10px;
+            white-space: pre-wrap;
+            border: none;  /* 테두리 없애기 */
+            border-radius: 15px;  /* 둥근 모서리 */
+            background-color: #e7e8f9;
+            text-align: left; /* 결과는 왼쪽 정렬 */
+            overflow-y: hidden;  /* 스크롤 숨기기 */
+            max-height: 380px; /* 최대 높이 설정 */
+        }
+        button {
+            margin-top: 10px;
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+        /* 화살표 세로로 3개 배치 */
+        .arrows {
+            display: flex;
+            flex-direction: column; /* 세로로 배치 */
+            justify-content: center; /* 세로로 가운데 정렬 */
+            align-items: center;
+        }
+        .arrow {
+            font-size: 80px;  /* 화살표 크기 */
+            margin: 5px 0;  /* 화살표 간 간격 */
+            margin-left: 8px;  /* 왼쪽 마진 10px */
+            margin-right: 8px;  /* 왼쪽 마진 10px */
+        }
+    </style>
+</head>
+<body>
+    <h3>한글 ⇨ 히라가나</h3>
+    <div class="container">
+        <textarea id="koreanInput" placeholder="한글 문장을 입력하세요">한글 문장을 입력하세요</textarea>
+        
+        <!-- 화살표 3개 세로로 배치 -->
+        <div class="arrows">
+            <div class="arrow">⇨</div>
+            <div class="arrow">⇨</div>
+            <div class="arrow">⇨</div>
+        </div>
+
+        <div id="result">ひらがな</div>
+    </div>
+    <button onclick="convertToHiragana()">변환</button>&nbsp;&nbsp;&nbsp;
+    <button onclick="window.location.href='/'">문장 분석</button>
+
+    <script>
+        function convertToHiragana() {
+
+
+
+
+
+
+
+            
+            var inputText = document.getElementById("koreanInput").value;
+            var hiraganaText = '';
+
+            hiraganaText = inputText;  // 현재는 입력된 한글을 그대로 결과로 설정
+
+            document.getElementById("result").innerHTML = hiraganaText;
+
+
+
+
+
+
+
+
+
+
+
+
+            
+
+            // 변환 버튼을 누르면 textarea 스크롤을 맨 위로 올리기
+            var textarea = document.getElementById("koreanInput");
+            textarea.scrollTop = 0;  // 스크롤을 맨 위로 설정
+            
+        }
+
+        // 스크롤 동기화
+        var textarea = document.getElementById("koreanInput");
+        var resultDiv = document.getElementById("result");
+
+        // 텍스트에리어의 스크롤을 resultDiv로 동기화
+        textarea.addEventListener("scroll", function() {
+            resultDiv.scrollTop = textarea.scrollTop;
+        });
+    </script>
+</body>
+</html>
+

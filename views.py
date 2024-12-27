@@ -7,6 +7,7 @@ from janome.tokenizer import Tokenizer
 import time
 import urllib3
 from translate import Translator
+import jaconv  # jaconv 라이브러리를 사용해 히라가나로 변환
 
 
 
@@ -15,6 +16,29 @@ urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 # 기본 페이지로 연결되는 뷰
 def index(request):
     return render(request, 'index.html')  # index.html 템플릿을 렌더링
+
+
+
+
+def hiragana(request):
+    sentence = request.GET.get('sentence', '')
+    hiragana_sentence = ''
+    
+    if sentence:
+        hiragana_sentence = jaconv.hira(sentence)  # 문장을 히라가나로 변환
+    
+    return render(request, 'hiragana.html', {'hiragana': hiragana_sentence})
+
+
+def index_js(request):
+    return render(request, 'js.html')  # index.html 템플릿을 렌더링
+
+
+def get_words_js(request):
+    sentence = request.GET.get('sentence', '')
+    print(888)
+    print(sentence)
+
 
 
 
@@ -32,7 +56,7 @@ def get_words(request):
 
     word_list = []
     suffixes = ['れ', 'られ', 'れる', 'られる', 'せる', 'させる', 'た', 'だ']
-    stop_words = ['が', 'に', 'へ', 'の', 'し', 'て', 'など', 'を', 'は', 'と', 'も', 'だ', 'から', 'まで', 'なる', 'で', 'なっ', 'い', 'ます', 'です', 'ました','いる', 'です', 'する',  'でした', '。', '「', '」', '.', ',', '、', '・', ' ']
+    stop_words = ['が', 'に', 'へ', 'の', 'し', 'て', 'など', 'を', 'お', 'は', 'と', 'も', 'だ', 'から', 'まで', 'なる', 'で', 'なっ', 'い', 'ます', 'です', 'ました','いる', 'です', 'する',  'でした', '。', '「', '」', '.', ',', '、', '・', ' ']
 
     hiragana_pattern = re.compile(r'[ぁ-ん]$')
 
@@ -161,14 +185,14 @@ def get_words(request):
 
         if count_word_list == 0: # 1회성 데이터
             if len(word_list) == 1:
-                yield (translated + "<br>" + str(word_list)).replace("'", "").replace("[", "[ ").replace("]", " ]") + "!border!" + str_word + "!border_title!" + str_word_list + "!border_title!"
+                yield (translated + "<br>+[" + str(word_list)).replace("'", "").replace("[", "[ ").replace("]", " ]") + "!border!" + str_word + "!border_title!" + str_word_list + "!border_title!"
             else:
-                yield (translated + "<br>" + str(word_list)).replace("'", "").replace("[", "[ ").replace("]", " ]") + "!border!"
+                yield (translated + "<br>+[" + str(word_list)).replace("'", "").replace("[", "[ ").replace("]", " ]") + "!border!"
                 count_word_list = 1
 
 
         yield str_word + "!border_title!" + str_word_list + "!border_title!" # 실시간 데이터
-        time.sleep(0.8)
+        time.sleep(1)
 
 
 
@@ -180,7 +204,19 @@ def get_response(request):
     # 실시간으로 데이터를 스트리밍하려면 StreamingHttpResponse 사용
     response = StreamingHttpResponse(get_words(request))
     response['Content-Type'] = 'text/html; charset=utf-8'
+    return response
+
+
+
+def get_response_js(request):
+    response = StreamingHttpResponse(get_words_js(request))
+    response['Content-Type'] = 'text/html; charset=utf-8'
 
     
     return response
+
+
+
+
+
 
