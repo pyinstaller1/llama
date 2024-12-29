@@ -107,14 +107,8 @@
 
             sentence = sentence.replace(/\n+/g, '.');
 
-            console.log(sentence);
-            // sentence = sentence.replace(/\n/g, "<br>");
-            console.log(sentence);
-            // sentence.replace(/\n/g, "<br>")
-
             let list_japan = sentence.split(/(?<=\.|\?|!|。|<br>)/).map(s => s.trim()).filter(Boolean);
-            console.log(list_japan);
-
+            list_japan = list_japan.filter(item => item !== ".");
 
             
 
@@ -143,9 +137,21 @@
 
 
 
-                            document.getElementById("result_word_list").innerHTML += `<span style="color: darkblue; font-size:20px;">${list_japan[i]}</span><br>`;  // 1회성 데이터 출력
-                            document.getElementById("result_word_list").innerHTML += list_korean[i] + "<br><br>";  // 1회성 데이터 출력
+
+                            if (/[가-힣]/.test(sentence)) { // 한-일 번역
+                                document.getElementById("result_word_list").innerHTML += `<span style="color: darkblue; font-size:20px;">${list_korean[i].slice(0, -1)}</span><br>`;  // 1회성 데이터 출력
+                                document.getElementById("result_word_list").innerHTML += list_japan[i] + "<br><br>";  // 1회성 데이터 출력
+                            } else {   // 일-한 번역
+                                document.getElementById("result_word_list").innerHTML += `<span style="color: darkblue; font-size:20px;">${list_japan[i]}</span><br>`;  // 1회성 데이터 출력
+                                document.getElementById("result_word_list").innerHTML += list_korean[i] + "<br><br>";  // 1회성 데이터 출력
+                            }
+
+
+
+
                         }
+
+
 
                         document.getElementById("result_word_list").innerHTML += parts[0].split("<br>+[")[1]
 

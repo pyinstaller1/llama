@@ -7,7 +7,8 @@ from janome.tokenizer import Tokenizer
 import time
 import urllib3
 from translate import Translator
-import jaconv  # jaconv 라이브러리를 사용해 히라가나로 변환
+import json
+import os
 
 
 
@@ -21,13 +22,8 @@ def index(request):
 
 
 def hiragana(request):
-    sentence = request.GET.get('sentence', '')
-    hiragana_sentence = ''
-    
-    if sentence:
-        hiragana_sentence = jaconv.hira(sentence)  # 문장을 히라가나로 변환
-    
-    return render(request, 'hiragana.html', {'hiragana': hiragana_sentence})
+    # sentence = request.GET.get('sentence', '')
+    return render(request, 'hiragana.html')
 
 
 def index_js(request):
@@ -36,8 +32,84 @@ def index_js(request):
 
 def get_words_js(request):
     sentence = request.GET.get('sentence', '')
+    state = "hjk"
+
+    with open(os.path.join(os.path.dirname(__file__), 'japan.json'), 'r', encoding='utf-8') as file:
+        data = json.load(file)
+    korean_to_hiragana = data.get("korean_to_hiragana", {})
+
     print(888)
-    print(sentence)
+
+    list_lyrics = []
+    for sentence_small in sentence.split("."):
+        list_lyrics.append(sentence_small)
+
+    print(list_lyrics)
+
+
+    if len(list_lyrics) >= 2:
+        if re.search(r'[一-龯]', list_lyrics[0]) and re.search(r'[一-龯]', list_lyrics[1]):
+            state = "h"
+            
+    if len(list_lyrics) >= 2:
+        if re.search(r'[一-龯]', list_lyrics[0]):
+            if re.search(r'[ぁ-ん|ァ-ヶ]', list_lyrics[1]) and not re.search(r'[一-龯]', list_lyrics[1]):
+                state = "hj"
+            if not re.search(r'[ぁ-ん|ァ-ヶ]', list_lyrics[1]) and not re.search(r'[一-龯]', list_lyrics[1]):
+                state = "hk"
+
+            
+    if len(list_lyrics) >= 3:
+        if not re.search(r'[一-龯]', list_lyrics[0]) and not re.search(r'[一-龯]', list_lyrics[1]) and not re.search(r'[一-龯]', list_lyrics[2]):
+            if re.search(r'[ぁ-ん|ァ-ヶ]', list_lyrics[0]) and re.search(r'[ぁ-ん|ァ-ヶ]', list_lyrics[1]):
+                state = "j"
+            else:
+                state = "jk"
+
+
+    if len(list_lyrics) >= 3:
+        if re.search(r'[一-龯]', list_lyrics[0]) and re.search(r'[一-龯]', list_lyrics[3]):
+            if re.search(r'[ぁ-ん|ァ-ヶ]', list_lyrics[1]):
+                state = "hjk"
+                print("hjk")
+            else:
+                state = "hkk"
+                print("hkk")
+    print(state)
+
+    # h hj hk j jk hjk hkk
+
+    
+    for i in range(len(list_lyrics)):
+
+        if state in ["hjk", "hkk"]:
+            print((i+1)%3)
+            if (i+1)%3 == 2:
+                print(list_lyrics[i])
+                hiragana_sentence = ""
+                for char in list_lyrics[i]:
+                    hiragana_sentence += korean_to_hiragana.get(char, char)
+                print(hiragana_sentence)
+                list_lyrics[i] = hiragana_sentence
+                print(777)
+                
+
+
+
+
+
+    
+    print(list_lyrics)
+    
+
+       # if re.search(r'[ぁ-ん|ァ-ヶ]', list_lyrics[i]):
+
+            
+
+
+
+
+    return
 
 
 
@@ -46,17 +118,39 @@ def get_words_js(request):
 
 def get_words(request):
     sentence = request.GET.get('sentence', '')
-
-    translator = Translator(to_lang="ko", from_lang="ja")
-    translated = translator.translate(sentence).replace(".", ".<br>")
-
-
-    tokenizer = Tokenizer()
-    tokens = tokenizer.tokenize(sentence)
-
+    sentence_temp = ""
+    
     word_list = []
     suffixes = ['れ', 'られ', 'れる', 'られる', 'せる', 'させる', 'た', 'だ']
-    stop_words = ['が', 'に', 'へ', 'の', 'し', 'て', 'など', 'を', 'お', 'は', 'と', 'も', 'だ', 'から', 'まで', 'なる', 'で', 'なっ', 'い', 'ます', 'です', 'ました','いる', 'です', 'する',  'でした', '。', '「', '」', '.', ',', '、', '・', ' ']
+    stop_words = ['が', 'に', 'へ', 'の', 'し', 'て', 'など', 'を', 'お', 'は', 'と', 'も', 'だ', 'か', 'から', 'まで', 'なる', 'で', 'なっ', 'い', 'ます', 'です', 'ました','いる', 'です', 'する',  'でした', '。', '「', '」', '.', ',', '、', '？', '！', '・', ' ']
+
+
+    if re.compile(r"[가-힣]").search(sentence):
+
+        translated_temp = ""
+        translated = ""
+
+        translator = Translator(to_lang="ja", from_lang="ko")
+        translated = translator.translate(re.sub(r'[.?!]', '|', sentence))
+        translated = re.sub(r'\|+', '|', translated)
+        translated = translated.replace("|", ".")
+        
+        sentence_temp = sentence
+        sentence = translated    # 일-한 번역 => 한-일 번역
+        translated = sentence_temp
+
+        tokenizer = Tokenizer()
+        tokens = tokenizer.tokenize(sentence)
+
+
+        
+    else:
+        translator = Translator(to_lang="ko", from_lang="ja")
+        translated = translator.translate(sentence).replace(".", ".<br>")
+
+        tokenizer = Tokenizer()
+        tokens = tokenizer.tokenize(sentence)
+
 
     hiragana_pattern = re.compile(r'[ぁ-ん]$')
 
@@ -68,12 +162,15 @@ def get_words(request):
             if hiragana_pattern.search(word_list[-1]):
                 word_list[-1] = word_list[-1] + surface  # 앞 단어와 합치기
             else:
-                word_list.append(surface)
+                if surface not in ["."]:
+                    word_list.append(surface)
         else:
             word_list.append(surface)
         
     word_list = [word for word in word_list if word not in stop_words]
+    word_list = [word for word in word_list if word not in ["？."]]
 
+            
     word_list = [
         word[:-3] + 'る' if word.endswith('られた') else
         word[:-3] + 'す' if word.endswith('された') else
@@ -83,8 +180,6 @@ def get_words(request):
         for word in word_list
         ]
 
- 
-    print(word_list)
 
     count_word_list = 0
 
@@ -182,6 +277,11 @@ def get_words(request):
         str_word += "<br>"
 
 
+
+        if sentence_temp != "":
+            translated = sentence
+
+        
 
         if count_word_list == 0: # 1회성 데이터
             if len(word_list) == 1:

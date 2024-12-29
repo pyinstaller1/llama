@@ -74,40 +74,30 @@
     <button onclick="window.location.href='/'">문장 분석</button>
 
     <script>
-        function convertToHiragana() {
+    function convertToHiragana() {
+        var inputText = document.getElementById("koreanInput").value;
+        var hiraganaText = inputText;  // 현재는 입력된 한글을 그대로 결과로 설정
 
+        console.log(hiraganaText)
 
+        fetch('/static/japan.json')
+            .then(response => response.json())
+            .then(data => {
+                const koreanToHiragana = data.korean_to_hiragana;
 
+                Object.keys(koreanToHiragana).forEach(function(korean) {
+                    var hiragana = koreanToHiragana[korean];
+                    console.log(hiragana)
+                    console.log(7)
+                    var regex = new RegExp(korean, 'g');  // 한글 문자열을 찾는 정규식
+                    hiraganaText = hiraganaText.replace(regex, hiragana);  // 변환
+                    
+                });
 
+                document.getElementById("result").innerHTML = hiraganaText;
+            });
+    }
 
-
-
-            
-            var inputText = document.getElementById("koreanInput").value;
-            var hiraganaText = '';
-
-            hiraganaText = inputText;  // 현재는 입력된 한글을 그대로 결과로 설정
-
-            document.getElementById("result").innerHTML = hiraganaText;
-
-
-
-
-
-
-
-
-
-
-
-
-            
-
-            // 변환 버튼을 누르면 textarea 스크롤을 맨 위로 올리기
-            var textarea = document.getElementById("koreanInput");
-            textarea.scrollTop = 0;  // 스크롤을 맨 위로 설정
-            
-        }
 
         // 스크롤 동기화
         var textarea = document.getElementById("koreanInput");
