@@ -58,8 +58,8 @@ def get_words_js(request):
             state = "h"
             if re.search(r'[ぁ-ん|ァ-ヶ]', list_lyrics[1]) and not re.search(r'[一-龯]', list_lyrics[1]):
                 state = "hj"
-            # if not re.search(r'[ぁ-ん|ァ-ヶ]', list_lyrics[1]) and not re.search(r'[一-龯]', list_lyrics[1]):
-            #    state = "hk"
+            if not re.search(r'[ぁ-ん|ァ-ヶ]', list_lyrics[1]) and not re.search(r'[一-龯]', list_lyrics[1]): ##### hj   hk
+                state = "hj" ##### hj   hk
                 
     if len(list_lyrics) >= 2:
         if re.search(r'[ぁ-ん|ァ-ヶ]', list_lyrics[0]) and not re.search(r'[一-龯]', list_lyrics[0]):
@@ -118,6 +118,79 @@ def get_words_js(request):
 
         translated_lines = [line.strip() for line in translated.split("|") if line.strip()]
         """
+
+
+        print(sentence)
+
+
+
+
+
+
+
+
+
+        
+        list_sentence = sentence.split(".")
+        print(list_sentence)
+
+        new_sentence = ".".join([list_sentence[i].strip() for i in range(len(list_sentence)) if i % 2 == 0])
+        print(new_sentence)
+
+
+
+
+
+
+
+
+        translator = Translator(to_lang="ko", from_lang="ja")
+        translated = translator.translate(new_sentence) # .replace(".", ".<br>")
+        print(translated)
+        list_korea = []
+        for item in translated.split("."):
+            list_korea.append(item.strip())
+        print(list_korea)
+
+
+        
+        print(8888888888888888)
+
+
+
+
+
+
+
+
+
+
+
+        list_korea = []
+        for i in range(len(list_sentence)):
+            print(8)
+            if (i+1)%2 == 1:
+                print(list_sentence[i])
+                list_korea.append(list_sentence[i])
+        print(list_korea)
+        print(88888888888)
+
+        return
+
+
+
+
+
+
+
+        translator = Translator(to_lang="ja", from_lang="ko")
+        translated = translator.translate(re.sub(r'[.?!]', '|', sentence))
+        translated = re.sub(r'\|+', '|', translated)
+        translated = translated.replace("|", ".")
+
+
+        return
+        
 
 
 
@@ -211,6 +284,11 @@ def get_words(request):
     else:
         translator = Translator(to_lang="ko", from_lang="ja")
         translated = translator.translate(sentence).replace(".", ".<br>")
+
+
+        print(sentence)
+        print(translated)
+        print(8888888888888888)
 
         tokenizer = Tokenizer()
         tokens = tokenizer.tokenize(sentence)
