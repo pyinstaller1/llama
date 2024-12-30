@@ -34,30 +34,43 @@ def get_words_js(request):
     sentence = request.GET.get('sentence', '')
     state = "hjk"
 
-    with open(os.path.join(os.path.dirname(__file__), 'japan.json'), 'r', encoding='utf-8') as file:
+    with open(os.path.join(os.path.dirname(__file__), 'static\\japan.json'), 'r', encoding='utf-8') as file:
         data = json.load(file)
     korean_to_hiragana = data.get("korean_to_hiragana", {})
-
-    print(888)
 
     list_lyrics = []
     for sentence_small in sentence.split("."):
         list_lyrics.append(sentence_small)
 
-    print(list_lyrics)
 
 
-    if len(list_lyrics) >= 2:
-        if re.search(r'[一-龯]', list_lyrics[0]) and re.search(r'[一-龯]', list_lyrics[1]):
+
+
+    if len(list_lyrics) == 1:
+        if re.search(r'[一-龯]', list_lyrics[0]):
             state = "h"
+    if len(list_lyrics) == 1:
+        if not re.search(r'[一-龯]', list_lyrics[0]):
+            state = "j"
             
     if len(list_lyrics) >= 2:
         if re.search(r'[一-龯]', list_lyrics[0]):
+            state = "h"
             if re.search(r'[ぁ-ん|ァ-ヶ]', list_lyrics[1]) and not re.search(r'[一-龯]', list_lyrics[1]):
                 state = "hj"
+            # if not re.search(r'[ぁ-ん|ァ-ヶ]', list_lyrics[1]) and not re.search(r'[一-龯]', list_lyrics[1]):
+            #    state = "hk"
+                
+    if len(list_lyrics) >= 2:
+        if re.search(r'[ぁ-ん|ァ-ヶ]', list_lyrics[0]) and not re.search(r'[一-龯]', list_lyrics[0]):
+            state = "j"
+            if re.search(r'[ぁ-ん|ァ-ヶ]', list_lyrics[1]) and not re.search(r'[一-龯]', list_lyrics[1]):
+                state = "j"
+            if re.search(r'[ぁ-ん|ァ-ヶ]', list_lyrics[1]) and re.search(r'[一-龯]', list_lyrics[1]):
+                state = "h"
             if not re.search(r'[ぁ-ん|ァ-ヶ]', list_lyrics[1]) and not re.search(r'[一-龯]', list_lyrics[1]):
-                state = "hk"
-
+                state = "jk"
+                
             
     if len(list_lyrics) >= 3:
         if not re.search(r'[一-龯]', list_lyrics[0]) and not re.search(r'[一-龯]', list_lyrics[1]) and not re.search(r'[一-龯]', list_lyrics[2]):
@@ -75,14 +88,108 @@ def get_words_js(request):
             else:
                 state = "hkk"
                 print("hkk")
-    print(state)
+    print("state: " + state)
+    list_lyrics = [item for item in list_lyrics if item != '']
+
 
     # h hj hk j jk hjk hkk
 
-    
-    for i in range(len(list_lyrics)):
+    if state in ['h', 'j']:
+        list_lyrics = [item for item in list_lyrics for _ in range(2)]
+        print(list_lyrics)
+        state = "hj"
 
-        if state in ["hjk", "hkk"]:
+
+
+
+    # translated = re.sub(r'\|+', '|', translated)
+    # translated = translated.replace("|", ".")
+        
+    if state in ["hj"]:
+        print("hj")
+        translator = Translator(to_lang="ko", from_lang="ja")
+        translated = translator.translate(re.sub(r'[.?!]', "|", sentence))
+        print(7)
+        print(re.sub(r'[.?!]', "|", sentence.replace("(", "").replace(")", "")))
+        print(sentence)
+        print(translated)
+
+        return
+
+
+
+
+
+
+
+
+
+
+def translate_batch(lines, src_lang='ja', dest_lang='en'):
+    translator = Translator()
+    # 여러 문장을 한 번에 번역 (리스트로 전달)
+    translations = translator.translate(lines, src=src_lang, dest=dest_lang)
+    return [translation.text for translation in translations]
+
+# 번역할 일본어 문장들
+lines = [
+    "諦めを手にしないで",  # Don't give up
+    "都會かくれた ポ-カ- poker face",  # The city hides the poker face
+    "海に捨ててしまおう",  # Let's throw it into the sea
+    "あの微笑みを忘れないで"  # Don't forget that smile
+]
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        list_translated = [translated.split("<br>")[i] for i in range(len(translated.split("<br>"))) if i % 2 == 0]
+
+        list_korea = []
+        korea = []
+        for i in range(len(translated.split("|"))):
+            print(8)
+            if (i+3)%3 == 1:
+                print(list_lyrics[i])
+                list_korea.append(translated.split("|")[i])
+        print(list_korea)
+        korea = ' | '.join(list_korea)
+        print(korea)
+
+
+
+
+
+        
+        for i in range(len(list_lyrics)):
+            if (i+3)%3 == 1:
+                print(list_lyrics[i])
+                translated = translator.translate(re.sub(r'[.?!]', '|', sentence))
+                list_korea = translated.split("|")
+                print(list_korea)
+
+
+    if state in ["hjk", "hkk"]:
+        for i in range(len(list_lyrics)):
             print((i+1)%3)
             if (i+1)%3 == 2:
                 print(list_lyrics[i])
@@ -102,7 +209,6 @@ def get_words_js(request):
     print(list_lyrics)
     
 
-       # if re.search(r'[ぁ-ん|ァ-ヶ]', list_lyrics[i]):
 
             
 
