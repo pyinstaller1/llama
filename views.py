@@ -107,74 +107,32 @@ def get_words_js(request):
         
     if state in ["hj"]:
         print("hj")
+
+
+        """
+        print(re.sub(r'[.?!]', '|', sentence))
         translator = Translator(to_lang="ko", from_lang="ja")
-        translated = translator.translate(re.sub(r'[.?!]', "|", sentence))
+        translated = translator.translate(re.sub(r'[.?!]', '|', sentence))
         print(7)
-        print(re.sub(r'[.?!]', "|", sentence.replace("(", "").replace(")", "")))
         print(sentence)
-        print(translated)
 
-        return
-
-
+        translated_lines = [line.strip() for line in translated.split("|") if line.strip()]
+        """
 
 
 
+        # list_translated = [translated.split("<br>")[i] for i in range(len(translated.split("<br>"))) if i % 2 == 0]
 
-
-
-
-
-def translate_batch(lines, src_lang='ja', dest_lang='en'):
-    translator = Translator()
-    # 여러 문장을 한 번에 번역 (리스트로 전달)
-    translations = translator.translate(lines, src=src_lang, dest=dest_lang)
-    return [translation.text for translation in translations]
-
-# 번역할 일본어 문장들
-lines = [
-    "諦めを手にしないで",  # Don't give up
-    "都會かくれた ポ-カ- poker face",  # The city hides the poker face
-    "海に捨ててしまおう",  # Let's throw it into the sea
-    "あの微笑みを忘れないで"  # Don't forget that smile
-]
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-        list_translated = [translated.split("<br>")[i] for i in range(len(translated.split("<br>"))) if i % 2 == 0]
-
+        list_sentence = sentence.split(".")
+        print(list_sentence)
         list_korea = []
         korea = []
-        for i in range(len(translated.split("|"))):
+        for i in range(len(list_sentence)):
             print(8)
             if (i+3)%3 == 1:
-                print(list_lyrics[i])
-                list_korea.append(translated.split("|")[i])
+                print(list_sentence[i])
+                list_korea.append(list_sentence[i])
         print(list_korea)
-        korea = ' | '.join(list_korea)
-        print(korea)
-
 
 
 
