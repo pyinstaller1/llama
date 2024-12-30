@@ -41,8 +41,7 @@ def get_words_js(request):
     list_lyrics = []
     for sentence_small in sentence.split("."):
         list_lyrics.append(sentence_small)
-
-
+    list_lyrics = [item for item in list_lyrics if item != ""]
 
 
 
@@ -59,7 +58,7 @@ def get_words_js(request):
             if re.search(r'[ぁ-ん|ァ-ヶ]', list_lyrics[1]) and not re.search(r'[一-龯]', list_lyrics[1]):
                 state = "hj"
             if not re.search(r'[ぁ-ん|ァ-ヶ]', list_lyrics[1]) and not re.search(r'[一-龯]', list_lyrics[1]): ##### hj   hk
-                state = "hj" ##### hj   hk
+                state = "hk" ##### hj   hk       한문 한글히라가나 hj     한문 한글 hk
                 
     if len(list_lyrics) >= 2:
         if re.search(r'[ぁ-ん|ァ-ヶ]', list_lyrics[0]) and not re.search(r'[一-龯]', list_lyrics[0]):
@@ -77,7 +76,7 @@ def get_words_js(request):
             if re.search(r'[ぁ-ん|ァ-ヶ]', list_lyrics[0]) and re.search(r'[ぁ-ん|ァ-ヶ]', list_lyrics[1]):
                 state = "j"
             else:
-                state = "jk"
+                state = "j"    ###### jk      한글히라가나 한글히라가나 j     한글히라가나 한글 jk
 
 
     if len(list_lyrics) >= 3:
@@ -88,156 +87,152 @@ def get_words_js(request):
             else:
                 state = "hkk"
                 print("hkk")
-    print("state: " + state)
     list_lyrics = [item for item in list_lyrics if item != '']
 
 
-    # h hj hk j jk hjk hkk
+    # h j hj hk jk hjk hkk
 
     if state in ['h', 'j']:
         list_lyrics = [item for item in list_lyrics for _ in range(2)]
-        print(list_lyrics)
-        state = "hj"
-
-
-
-
-    # translated = re.sub(r'\|+', '|', translated)
-    # translated = translated.replace("|", ".")
-        
-    if state in ["hj"]:
-        print("hj")
-
-
-        """
-        print(re.sub(r'[.?!]', '|', sentence))
-        translator = Translator(to_lang="ko", from_lang="ja")
-        translated = translator.translate(re.sub(r'[.?!]', '|', sentence))
-        print(7)
-        print(sentence)
-
-        translated_lines = [line.strip() for line in translated.split("|") if line.strip()]
-        """
-
-
-        print(sentence)
-
-
-
-
-
-
-
-
+        state = "h j"
 
         
-        list_sentence = sentence.split(".")
-        print(list_sentence)
+    if state in ["hj", "h j"]:
+        print(state)
+        if state == "hj":
+            list_sentence = sentence.split(".")
+        if state == "h j":
+            list_sentence = list_lyrics
+
+        for i in range(len(list_lyrics)):
+            hiragana_sentence = ""
+            for char in list_lyrics[i]:
+                hiragana_sentence += korean_to_hiragana.get(char, char)
+                list_lyrics[i] = hiragana_sentence
+        
+        list_sentence = [item for item in list_sentence if item != ""]
 
         new_sentence = ".".join([list_sentence[i].strip() for i in range(len(list_sentence)) if i % 2 == 0])
-        print(new_sentence)
-
-
-
-
-
-
-
-
+        
         translator = Translator(to_lang="ko", from_lang="ja")
         translated = translator.translate(new_sentence) # .replace(".", ".<br>")
-        print(translated)
         list_korea = []
         for item in translated.split("."):
             list_korea.append(item.strip())
-        print(list_korea)
 
+        list_new = []
 
-        
-        print(8888888888888888)
+        for i in range(min(len(list_sentence) // 2, len(list_korea))):
+            list_new.append(list_sentence[2 * i])     # list_sentence 0, 2, ...
+            list_new.append(list_sentence[2 * i + 1]) # list_sentence 1, 3, ...
+            list_new.append(list_korea[i])            # list_korea 0, 1, ...
 
+        list_lyrics = list_new
+                            
 
-
-
-
-
-
-
-
-
-
-        list_korea = []
-        for i in range(len(list_sentence)):
-            print(8)
-            if (i+1)%2 == 1:
-                print(list_sentence[i])
-                list_korea.append(list_sentence[i])
-        print(list_korea)
-        print(88888888888)
-
-        return
-
-
-
-
-
-
-
-        translator = Translator(to_lang="ja", from_lang="ko")
-        translated = translator.translate(re.sub(r'[.?!]', '|', sentence))
-        translated = re.sub(r'\|+', '|', translated)
-        translated = translated.replace("|", ".")
-
-
-        return
-        
-
-
-
-        # list_translated = [translated.split("<br>")[i] for i in range(len(translated.split("<br>"))) if i % 2 == 0]
-
-        list_sentence = sentence.split(".")
-        print(list_sentence)
-        list_korea = []
-        korea = []
-        for i in range(len(list_sentence)):
-            print(8)
-            if (i+3)%3 == 1:
-                print(list_sentence[i])
-                list_korea.append(list_sentence[i])
-        print(list_korea)
-
+    if state in ["hk"]:
+        print(state)
+        list_new = []
+        for i, value in enumerate(list_lyrics):
+            list_new.append(value)
+            if (i+1) % 2 == 1:
+                list_new.append(value)
+        list_lyrics = list_new
 
 
 
         
-        for i in range(len(list_lyrics)):
-            if (i+3)%3 == 1:
-                print(list_lyrics[i])
-                translated = translator.translate(re.sub(r'[.?!]', '|', sentence))
-                list_korea = translated.split("|")
-                print(list_korea)
+
 
 
     if state in ["hjk", "hkk"]:
         for i in range(len(list_lyrics)):
-            print((i+1)%3)
             if (i+1)%3 == 2:
-                print(list_lyrics[i])
                 hiragana_sentence = ""
                 for char in list_lyrics[i]:
                     hiragana_sentence += korean_to_hiragana.get(char, char)
-                print(hiragana_sentence)
                 list_lyrics[i] = hiragana_sentence
-                print(777)
-                
 
 
-
-
-
-    
     print(list_lyrics)
+
+    list_hanja = list_lyrics[::3]
+    print(list_hanja)
+    str_hanja = ".".join(list_hanja)
+    print(str_hanja)
+
+
+    tokenizer = Tokenizer()
+
+
+
+    if 1 == 1:
+        tokens = tokenizer.tokenize(str_hanja.split(".")[0])
+
+        hiragana_pattern = re.compile(r'[ぁ-ん]$')
+
+        word_list = []
+        suffixes = ['れ', 'られ', 'れる', 'られる', 'せる', 'させる', 'た', 'だ']
+        stop_words = ['が', 'に', 'へ', 'の', 'し', 'て', 'など', 'を', 'お', 'は', 'と', 'も', 'だ', 'か', 'から', 'まで', 'なる', 'で', 'なっ', 'い', 'ます', 'です', 'ました','いる', 'です', 'する',  'でした', '。', '「', '」', '.', ',', '、', '？', '！', '・', ' ']
+
+        for token in tokens:
+            surface = token.surface
+
+            # 'れ'나 'られ'와 같은 접미사가 붙은 동사를 처리
+            if surface in suffixes and len(word_list) > 0:
+                if hiragana_pattern.search(word_list[-1]):
+                    word_list[-1] = word_list[-1] + surface  # 앞 단어와 합치기
+                else:
+                    if surface not in ["."]:
+                            word_list.append(surface)
+            else:
+                word_list.append(surface)
+
+        word_list = [word for word in word_list if word not in stop_words]
+        word_list = [word for word in word_list if word not in ["？."]]
+
+
+
+
+    print(77777777777777777)
+    print(word_list)
+
+
+    word_list = [
+        word[:-3] + 'る' if word.endswith('られた') else
+        word[:-3] + 'す' if word.endswith('された') else
+        word[:-3] + 'す' if word.endswith('される') else
+        word[:-3] + 'る' if word.endswith('られる') else
+        word
+        for word in word_list
+        ]
+
+
+    count_word_list = 0
+
+    for word in word_list:
+        print(word)
+
+        str_word = ""    # 히라가나 [한자] 한글뜻
+        str_word_list = ""   # 각 word의 1번째 줄에만 word 원본
+
+        html = requests.get(f"https://dic.daum.net/search.do?dic=jp&q={word}")
+        soup = BeautifulSoup(html.text, "html.parser")
+
+        list_hiragana = [div.find("a", class_=["txt_cleansch", "txt_searchword"]).text for div in soup.find_all("div", class_=["cleanword_type kujk_type", "search_type kujk_type"])[:8]]
+        list_meaning = [re.sub("\\(.*?\\)\\s*", "", div.find("span", class_="txt_search").text)[:10] for div in soup.find_all("div", class_=["cleanword_type kujk_type", "search_type kujk_type"])[:8]]
+        list_kanji = [div.find("span", class_="sub_txt").text.replace("\n", "").replace("\t", "").replace(" ", "").replace("口", "") if div.find("span", class_="sub_txt") else "" for div in soup.find_all("div", class_=["cleanword_type kujk_type", "search_type kujk_type"])[:8]]
+
+
+        print(list_hiragana)
+        print(list_meaning)
+        print(list_kanji)
+
+
+
+
+
+                                
     
 
 
