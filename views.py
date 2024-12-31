@@ -162,18 +162,17 @@ def get_words_js(request):
     print(str_hanja)
 
 
+    word_list_total = []
+    hiragana_pattern = re.compile(r'[ぁ-ん]$')
+    suffixes = ['れ', 'られ', 'れる', 'られる', 'せる', 'させる', 'た', 'だ']
+    stop_words = ['が', 'に', 'へ', 'の', 'し', 'て', 'など', 'を', 'お', 'は', 'と', 'も', 'だ', 'か', 'から', 'まで', 'なる', 'で', 'なっ', 'い', 'ます', 'です', 'ました','いる', 'です', 'する',  'でした', '。', '「', '」', '.', ',', '、', '？', '！', '・', ' ']
+
     tokenizer = Tokenizer()
-
-
 
     if 1 == 1:
         tokens = tokenizer.tokenize(str_hanja.split(".")[0])
 
-        hiragana_pattern = re.compile(r'[ぁ-ん]$')
-
         word_list = []
-        suffixes = ['れ', 'られ', 'れる', 'られる', 'せる', 'させる', 'た', 'だ']
-        stop_words = ['が', 'に', 'へ', 'の', 'し', 'て', 'など', 'を', 'お', 'は', 'と', 'も', 'だ', 'か', 'から', 'まで', 'なる', 'で', 'なっ', 'い', 'ます', 'です', 'ました','いる', 'です', 'する',  'でした', '。', '「', '」', '.', ',', '、', '？', '！', '・', ' ']
 
         for token in tokens:
             surface = token.surface
@@ -190,50 +189,110 @@ def get_words_js(request):
 
         word_list = [word for word in word_list if word not in stop_words]
         word_list = [word for word in word_list if word not in ["？."]]
-
-
-
-
-    print(77777777777777777)
-    print(word_list)
-
-
-    word_list = [
-        word[:-3] + 'る' if word.endswith('られた') else
-        word[:-3] + 'す' if word.endswith('された') else
-        word[:-3] + 'す' if word.endswith('される') else
-        word[:-3] + 'る' if word.endswith('られる') else
-        word
-        for word in word_list
+        
+        
+        
+        print(77777777777777777)
+        print(word_list)
+        
+        word_list = [
+            word[:-3] + 'る' if word.endswith('られた') else
+            word[:-3] + 'す' if word.endswith('された') else
+            word[:-3] + 'す' if word.endswith('される') else
+            word[:-3] + 'る' if word.endswith('られる') else
+            word
+            for word in word_list
         ]
+        
+        
+        count_word_list = 0
+        
+        for word in word_list:
+            print(word)
+            
+            str_word = ""    # 히라가나 [한자] 한글뜻
+            str_word_list = ""   # 각 word의 1번째 줄에만 word 원본
+            
+            html = requests.get(f"https://dic.daum.net/search.do?dic=jp&q={word}")
+            soup = BeautifulSoup(html.text, "html.parser")
+            
+            list_hiragana = [div.find("a", class_=["txt_cleansch", "txt_searchword"]).text for div in soup.find_all("div", class_=["cleanword_type kujk_type", "search_type kujk_type"])[:8]]
+            list_meaning = [re.sub("\\(.*?\\)\\s*", "", div.find("span", class_="txt_search").text)[:10] for div in soup.find_all("div", class_=["cleanword_type kujk_type", "search_type kujk_type"])[:8]]
+            list_kanji = [div.find("span", class_="sub_txt").text.replace("\n", "").replace("\t", "").replace(" ", "").replace("口", "") if div.find("span", class_="sub_txt") else "" for div in soup.find_all("div", class_=["cleanword_type kujk_type", "search_type kujk_type"])[:8]]
+            
+            print(list_hiragana)
+            print(list_meaning)
+            print(list_kanji)
+            
+            # 중복 단어 제거
+            unique_hiragana = []
+            unique_meaning = []
+            unique_kanji = []
+            
+            for idx, h in enumerate(list_hiragana):
+                if h not in unique_hiragana:
+                    unique_hiragana.append(h)
+                    unique_meaning.append(list_meaning[idx])
+                    unique_kanji.append(list_kanji[idx])
+            
+            list_hiragana = unique_hiragana[:3]
+            list_meaning = unique_meaning[:3]
+            list_kanji = unique_kanji[:3]
+            
+            # 한자의 한글 뜻, 음   kanji_meaning
+            kanji_meaning = ""
+            if not list_kanji:   # 카타카나 word는 list_kanji = []
+                pass
+            elif list_kanji[0] == "":   # 숫자 word는 list_kanji = ['', '']
+                pass
+            elif ('一' <= list_kanji[0][0] <= '龥') or ('㐀' <= list_kanji[0][0] <= '䶵'):
+                html = requests.get("https://dic.daum.net/search.do?dic=hanja&q=" + list_kanji[0])
+                soup = BeautifulSoup(html.text, "html.parser")
+                div = soup.find("div", class_="card_word")
+                span = div.find_all("span", class_="txt_emph1")
+                list_span = []
+                
+                for data in span:
+                    list_span.append(data.text)
+                
+                a = div.find_all("a", class_="sub_read")
+                list_a = []
+                
+                for data in a:
+                    list_a.append(data.text.split(",")[0])
+                
+                
+                for i in range(min(len(list_span), len(list_a))):
+                    kanji_meaning = kanji_meaning + list_span[i] + " " + list_a[i] + "&nbsp;&nbsp;&nbsp;"
+                kanji_meaning += "end"
+                kanji_meaning = kanji_meaning.strip().replace("&nbsp;&nbsp;&nbsp;end", "")
 
 
-    count_word_list = 0
-
-    for word in word_list:
-        print(word)
-
-        str_word = ""    # 히라가나 [한자] 한글뜻
-        str_word_list = ""   # 각 word의 1번째 줄에만 word 원본
-
-        html = requests.get(f"https://dic.daum.net/search.do?dic=jp&q={word}")
-        soup = BeautifulSoup(html.text, "html.parser")
-
-        list_hiragana = [div.find("a", class_=["txt_cleansch", "txt_searchword"]).text for div in soup.find_all("div", class_=["cleanword_type kujk_type", "search_type kujk_type"])[:8]]
-        list_meaning = [re.sub("\\(.*?\\)\\s*", "", div.find("span", class_="txt_search").text)[:10] for div in soup.find_all("div", class_=["cleanword_type kujk_type", "search_type kujk_type"])[:8]]
-        list_kanji = [div.find("span", class_="sub_txt").text.replace("\n", "").replace("\t", "").replace(" ", "").replace("口", "") if div.find("span", class_="sub_txt") else "" for div in soup.find_all("div", class_=["cleanword_type kujk_type", "search_type kujk_type"])[:8]]
-
-
-        print(list_hiragana)
-        print(list_meaning)
-        print(list_kanji)
-
-
+            
+            # str_word: 히라가나 [한자] 한글뜻   kanji_meaning
+            for i in range(len(list_hiragana)):
+                if list_kanji[i]:   # 한자 word의 한자와 다른 한자 단어 제거
+                    if re.match(r'[\u4e00-\u9fff]', word[0]) and re.match(r'[\u4e00-\u9fff]', list_kanji[i][0]) and re.sub(r'[^\u4e00-\u9fff]', '', word) != re.sub(r'[^\u4e00-\u9fff]', '', list_kanji[i]) and '·' not in list_kanji[i]:
+                        continue
+                
+                if re.match(r'[ア-ン]', word[0]):   # 카타카나 word와 다른 카타카나 단어 제거
+                    if re.match(r'[ア-ン]', word[0]) and re.match(r'[カ-ン]', list_hiragana[i][0]) and re.sub(r'[^ア-ン]', '', word) != re.sub(r'[^ア-ン]', '', list_hiragana[i]):
+                        continue
+                        
+                if len(list_hiragana[0]) <= 8 and len(list_hiragana[i]) > 8: # 긴 설명의 단어 제거
+                    continue
+                    
+                if re.match(r'[ア-ン]', word[0]) and re.match(r'[あ-ん]', list_hiragana[i][0]) and word != list_hiragana[i]:   # 가타카나 word 와 다른 가타카나 제거
+                    continue
+                
+                str_word += list_hiragana[i] + " [" + list_kanji[i] + "] " + list_meaning[i] + "&nbsp;&nbsp;&nbsp;" + kanji_meaning + "<br>"
+                print(str_word)
 
 
 
-                                
-    
+
+
+
 
 
             
@@ -333,7 +392,7 @@ def get_words(request):
         list_kanji = [div.find("span", class_="sub_txt").text.replace("\n", "").replace("\t", "").replace(" ", "").replace("口", "") if div.find("span", class_="sub_txt") else "" for div in soup.find_all("div", class_=["cleanword_type kujk_type", "search_type kujk_type"])[:8]]
 
 
-        # 중복 제거
+        # 중복 단어 제거
         unique_hiragana = []
         unique_meaning = []
         unique_kanji = []
@@ -349,7 +408,7 @@ def get_words(request):
         list_kanji = unique_kanji[:3]
 
 
-        # 한자의 한글 뜻 kanji_meaning
+        # 한자의 한글 뜻, 음   kanji_meaning
 
         kanji_meaning = ""
         if not list_kanji:   # 카타카나 word는 list_kanji = []
