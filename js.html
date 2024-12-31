@@ -107,9 +107,7 @@
 
             sentence = sentence.replace(/\n+/g, '.');
 
-            console.log(sentence);
             // sentence = sentence.replace(/\n/g, "<br>");
-            console.log(sentence);
             // sentence.replace(/\n/g, "<br>")
 
 
@@ -128,6 +126,14 @@
                 if (xhr.readyState === 3) {
                     responseText = xhr.responseText;
                     let parts = responseText.split("!border!");
+                    console.log(parts)
+                    console.log(parts[0])
+                    console.log(parts[1])
+
+
+
+
+                    
 
                     let list_korean = (parts[0].split("<br>[ ")[0]).split(/(?<=\.|\?|!|。|<br>+)/).map(s => s.trim()).filter(Boolean);
                     list_korean = list_korean.filter(item => item !== "<br>");

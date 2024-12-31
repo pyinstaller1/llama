@@ -286,21 +286,46 @@ def get_words_js(request):
                     continue
                 
                 str_word += list_hiragana[i] + " [" + list_kanji[i] + "] " + list_meaning[i] + "&nbsp;&nbsp;&nbsp;" + kanji_meaning + "<br>"
-                print(str_word)
+            print(str_word)
+            print(8)
 
 
+            str_lyrics = ""
+            str_lyrics += list_lyrics[0] + "<br>" + list_lyrics[1] + "<br><u>" + list_lyrics[2] + "</u><br>"
+
+            print(str_lyrics)
 
 
+            if count_word_list == 0: # 1회성 데이터
+                if len(word_list) == 1:
+                    yield (translated + "<br>+[" + str(word_list)).replace("'", "").replace("[", "[ ").replace("]", " ]") + "!border!" + str_word + "!border_title!" + str_word_list + "!border_title!"
+                else:
+                    yield str_lyrics + "!border!"
+                    count_word_list = 1
+
+            yield str_word + "!border_title!" # 실시간 데이터
+                    
 
 
+            """
+
+            if count_word_list == 0: # 1회성 데이터
+                if len(word_list) == 1:
+                    yield (translated + "<br>+[" + str(word_list)).replace("'", "").replace("[", "[ ").replace("]", " ]") + "!border!" + str_word + "!border_title!" + str_word_list + "!border_title!"
+                else:
+                    yield (translated + "<br>+[" + str(word_list)).replace("'", "").replace("[", "[ ").replace("]", " ]") + "!border!"
+                    count_word_list = 1
+
+
+            yield str_word + "!border_title!" + str_word_list + "!border_title!" # 실시간 데이터
+            time.sleep(1)
+            """
+    return
 
 
             
 
 
-
-
-    return
 
 
 
