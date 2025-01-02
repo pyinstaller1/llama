@@ -50,24 +50,29 @@ def get_words(request):
     tokenizer = Tokenizer()
     tokens = tokenizer.tokenize(sentence)
 
+    word_list = []
+
     list_lemmas = []
     for token in doc:
         if not token.is_stop:
             if token.lemma_ not in [ '.', ',']:
-                list_lemmas.append(token.lemma_)
+                word_list.append(token.lemma_)
 
-    print(list_lemmas)
+    print(word_list)
 
+    str_word = str(word_list)
 
-
-
+    print(str_word)
     
 
 
-    word_list = []
-    stop_words = ['が', 'に', 'へ', 'の', 'し', 'て', 'など', 'を', 'は', 'と', 'も', 'だ', 'から', 'まで', 'なる', 'で', 'なっ', 'い', 'ます', 'です', 'ました','いる', 'です', 'する',  'でした', '。', '「', '」', '.', ',', '、', '・', ' ']
 
-    # hiragana_pattern = re.compile(r'[ぁ-ん]$')
+
+
+    print(88888)
+
+
+
 
     for token in tokens:
         word_list.append(token.surface)
