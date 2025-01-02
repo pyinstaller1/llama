@@ -7,6 +7,7 @@ from janome.tokenizer import Tokenizer
 import time
 import urllib3
 from translate import Translator
+import spacy
 
 
 
@@ -23,22 +24,45 @@ def index(request):
 def get_words(request):
     sentence = request.GET.get('sentence', '')
 
-    sentence = "it works well."
+    sentence = "it works well really in paris."
 
     translator = Translator(to_lang="ko", from_lang="en")
     translated = translator.translate(sentence).replace(".", ".<br>")
 
+    print(sentence)
+    print(translated)
 
 
 
 
+
+
+
+    
+
+
+    nlp = spacy.load("en_core_web_sm")
+    doc = nlp(sentence)
+
+    print(doc)
+    print(7)
 
     tokenizer = Tokenizer()
     tokens = tokenizer.tokenize(sentence)
 
-    print(sentence)
-    print(translated)
-    print(tokens)
+    list_lemmas = []
+    for token in doc:
+        if not token.is_stop:
+            if token.lemma_ not in [ '.', ',']:
+                list_lemmas.append(token.lemma_)
+
+    print(list_lemmas)
+
+
+
+
+    
+
 
     word_list = []
     stop_words = ['が', 'に', 'へ', 'の', 'し', 'て', 'など', 'を', 'は', 'と', 'も', 'だ', 'から', 'まで', 'なる', 'で', 'なっ', 'い', 'ます', 'です', 'ました','いる', 'です', 'する',  'でした', '。', '「', '」', '.', ',', '、', '・', ' ']
@@ -50,43 +74,30 @@ def get_words(request):
         
     word_list = [word for word in word_list if word not in stop_words]
  
-    print(word_list)
-
     count_word_list = 0
 
     for word in word_list:
-        print(7)
-        print(word)
-
         html = requests.get("https://www.wordreference.com/enko/" + word)
         soup = BeautifulSoup(html.text, "html.parser")
 
         span = soup.find("span", {"class": "pronWR tooltip pronWidget"})
-        pron = "[" + span.text.split("/")[1].replace("ˈ", "")+ "]"
-        print(pron)
+        pron = " [" + span.text.split("/")[1].replace("ˈ", "").replace("ˌ", "")+ "] "
+        # pron = ": "
 
 
         tr = soup.find_all("tr", {"class": "even"})
-        print(tr)
 
-
-        """
-        for tr_meaning in tr[:5*3]:
+        list_temp = []
+        for tr_meaning in tr[:5*3]:   # 3가지 의미
             if tr_meaning.find("td", {"class": "ToWrd"}):
                 if tr_meaning.find("td", {"class": "ToWrd"}).contents[0]:
                     if str(tr_meaning.find("td", {"class": "ToWrd"}).contents[0])[0] != "<":
-                        print(tr_meaning.find("td", {"class": "ToWrd"}).contents[0])
-                        meaning += str(tr_meaning.find("td", {"class": "ToWrd"}).contents[0])
-                        # meaning = ", ".join(str(tr_meaning.find("td", {"class": "ToWrd"}).contents))
-        meaning += str(tr_meaning.find("td", {"class": "ToWrd"}).contents[0]) if tr_meaning.find("td", {"class": "ToWrd"}) and tr_meaning.find("td", {"class": "ToWrd"}).contents and str(tr_meaning.find("td", {"class": "ToWrd"}).contents[0])[0] != "<" else ""
+                        list_temp.append(tr_meaning.find("td", {"class": "ToWrd"}).contents[0].split(",")[0].split(",")[0].strip())
 
-        """
-
-        if tr:
-            meaning = ", ".join([tr_meaning.find("td", {"class": "ToWrd"}).contents[0].strip() for tr_meaning in tr[:5*3] if tr_meaning.find("td", {"class": "ToWrd"}) ])
-            print(meaning)
-            print (word + " [" + pron + "] " + meaning)
-
+        list_temp = list(dict.fromkeys(list_temp))
+        list_temp = [item for item in list_temp if len(item) <= 7]
+        meaning = ", ".join(list_temp[:2])
+        print (word + pron + meaning + "<br>")
 
 
 
