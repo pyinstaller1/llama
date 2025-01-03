@@ -347,7 +347,9 @@ def get_words(request):
         translated = ""
 
         translator = Translator(to_lang="ja", from_lang="ko")
-        translated = translator.translate(re.sub(r'[.?!]', '|', sentence))
+        translated = translator.translate(re.sub(r'[.?？!]', '|', sentence))
+
+        
         translated = re.sub(r'\|+', '|', translated)
         translated = translated.replace("|", ".")
         
@@ -361,8 +363,24 @@ def get_words(request):
 
         
     else:
+
+        list_sentence = re.findall(r'[^。！？\?！｡\.]+[。！？\?！｡\.]?', sentence)
+        list_sentence = [sentence.strip() for sentence in list_sentence]
+
+        
+    
+
+
+        list_sentence = [
+            sentence + "." if not re.search(r'[。！？\?！｡\.\?！]$', sentence) else sentence
+            for sentence in list_sentence
+        ]
+
+        print(list_sentence)
+
         translator = Translator(to_lang="ko", from_lang="ja")
         translated = translator.translate(sentence).replace(".", ".<br>")
+
 
 
         print(sentence)
