@@ -54,6 +54,15 @@
             margin-left: 8px;  /* 왼쪽 마진 10px */
             margin-right: 8px;  /* 왼쪽 마진 10px */
         }
+        label {
+            cursor: pointer;  /* 텍스트 클릭 가능하게 표시 */
+            font-size: 18px;   /* 텍스트 크기 */
+        }
+        input[type="checkbox"] {
+            margin-left: 80px;  /* 체크박스와 텍스트 사이에 왼쪽 여백 추가 */
+            cursor: pointer;   /* 체크박스 클릭 가능하도록 설정 */
+        }
+ 
     </style>
 </head>
 <body>
@@ -72,27 +81,42 @@
     </div>
     <button onclick="convertToHiragana()">변환</button>&nbsp;&nbsp;&nbsp;
     <button onclick="window.location.href='/'">문장 분석</button>
-    <input type="checkbox" id="katakana_check"> 가타카나
+    <input type="checkbox" id="katakana_check">
+    <label for="katakana_check">가타카나</label>
+
 
     <script>
     function convertToHiragana() {
-        var inputText = document.getElementById("koreanInput").value;
-        var hiraganaText = inputText;  // 현재는 입력된 한글을 그대로 결과로 설정
+        var hiraganaText = document.getElementById("koreanInput").value;
 
-        console.log(hiraganaText)
+        text = hiraganaText.replace(/[^가-힣ぁ-んァ-ン一-龯]/g, "").trim();
+        if ('가' <= text[0] && text[0] <= '힛') {
+            console.log("한글")
+            lang = "korea"
+        } else {
+            console.log("일본어")
+            lang = "japan"
+        }
 
+        
         fetch('/static/japan.json')
             .then(response => response.json())
             .then(data => {
 
+                if (lang == "japan") {
+                            console.log("8888888888888")
+                            console.log(lang)
+                        Object.keys(data.japanese_to_korean).forEach(function(korean) {
+                        var hiragana = data.japanese_to_korean[korean];
+                        hiraganaText = hiraganaText.replace(new RegExp(korean, 'g'), hiragana);
+                    });
 
+                }
 
-                if (!document.getElementById("katakana_check").checked){
-                    console.log("7")
+                else if (!document.getElementById("katakana_check").checked){
 
                     Object.keys(data.korean_to_hiragana).forEach(function(korean) {
                         var hiragana = data.korean_to_hiragana[korean];
-                        console.log(`한글: ${korean} -> 히라가나: ${hiragana}`);
                         hiraganaText = hiraganaText.replace(new RegExp(korean, 'g'), hiragana);
                     });
                     
@@ -102,7 +126,6 @@
                     
                     Object.keys(data.korean_to_katakana).forEach(function(korean) {
                         var katakana = data.korean_to_katakana[korean];
-                        console.log(`한글: ${korean} -> 카타카나: ${katakana}`);
                         hiraganaText = hiraganaText.replace(new RegExp(korean, 'g'), katakana);
                     });
                     
