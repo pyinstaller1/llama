@@ -72,6 +72,7 @@
     </div>
     <button onclick="convertToHiragana()">변환</button>&nbsp;&nbsp;&nbsp;
     <button onclick="window.location.href='/'">문장 분석</button>
+    <input type="checkbox" id="katakana_check"> 가타카나
 
     <script>
     function convertToHiragana() {
@@ -83,16 +84,34 @@
         fetch('/static/japan.json')
             .then(response => response.json())
             .then(data => {
-                const koreanToHiragana = data.korean_to_hiragana;
 
-                Object.keys(koreanToHiragana).forEach(function(korean) {
-                    var hiragana = koreanToHiragana[korean];
-                    console.log(hiragana)
-                    console.log(7)
-                    var regex = new RegExp(korean, 'g');  // 한글 문자열을 찾는 정규식
-                    hiraganaText = hiraganaText.replace(regex, hiragana);  // 변환
+
+
+                if (!document.getElementById("katakana_check").checked){
+                    console.log("7")
+
+                    Object.keys(data.korean_to_hiragana).forEach(function(korean) {
+                        var hiragana = data.korean_to_hiragana[korean];
+                        console.log(`한글: ${korean} -> 히라가나: ${hiragana}`);
+                        hiraganaText = hiraganaText.replace(new RegExp(korean, 'g'), hiragana);
+                    });
                     
-                });
+                }
+                else{
+                    console.log("8")
+                    
+                    Object.keys(data.korean_to_katakana).forEach(function(korean) {
+                        var katakana = data.korean_to_katakana[korean];
+                        console.log(`한글: ${korean} -> 카타카나: ${katakana}`);
+                        hiraganaText = hiraganaText.replace(new RegExp(korean, 'g'), katakana);
+                    });
+                    
+                }
+
+                console.log("88")
+                
+
+
 
                 document.getElementById("result").innerHTML = hiraganaText;
             });
