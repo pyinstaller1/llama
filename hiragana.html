@@ -91,10 +91,8 @@
 
         text = hiraganaText.replace(/[^가-힣ぁ-んァ-ン一-龯]/g, "").trim();
         if ('가' <= text[0] && text[0] <= '힛') {
-            console.log("한글")
             lang = "korea"
         } else {
-            console.log("일본어")
             lang = "japan"
         }
 
@@ -104,8 +102,6 @@
             .then(data => {
 
                 if (lang == "japan") {
-                            console.log("8888888888888")
-                            console.log(lang)
                         Object.keys(data.japanese_to_korean).forEach(function(korean) {
                         var hiragana = data.japanese_to_korean[korean];
                         hiraganaText = hiraganaText.replace(new RegExp(korean, 'g'), hiragana);
@@ -122,7 +118,6 @@
                     
                 }
                 else{
-                    console.log("8")
                     
                     Object.keys(data.korean_to_katakana).forEach(function(korean) {
                         var katakana = data.korean_to_katakana[korean];
@@ -130,11 +125,6 @@
                     });
                     
                 }
-
-                console.log("88")
-                
-
-
 
                 document.getElementById("result").innerHTML = hiraganaText;
             });
