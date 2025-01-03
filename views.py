@@ -378,12 +378,14 @@ def get_words(request):
 
         print(list_sentence)
 
+        str_sentence = str(list_sentence).replace("['", "").replace("']", "").replace("', '", " ")
+        print(str_sentence)
+
         translator = Translator(to_lang="ko", from_lang="ja")
-        translated = translator.translate(sentence).replace(".", ".<br>")
+        translated = translator.translate(str_sentence) # .replace(".", ".<br>")
 
 
 
-        print(sentence)
         print(translated)
         print(8888888888888888)
 
@@ -421,6 +423,8 @@ def get_words(request):
 
 
     count_word_list = 0
+
+    print(word_list)
 
     for word in word_list:
 
@@ -521,7 +525,6 @@ def get_words(request):
             translated = sentence
 
         
-
         if count_word_list == 0: # 1회성 데이터
             if len(word_list) == 1:
                 yield (translated + "<br>+[" + str(word_list)).replace("'", "").replace("[", "[ ").replace("]", " ]") + "!border!" + str_word + "!border_title!" + str_word_list + "!border_title!"

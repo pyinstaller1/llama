@@ -135,7 +135,10 @@
 
             sentence = sentence.replace(/\n+/g, '.');
 
-            let list_japan = sentence.split(/(?<=\.|\?|!|。|<br>)/).map(s => s.trim()).filter(Boolean);
+
+            let list_japan = sentence.split(/(?<=\.|\?|!|。|<br>|！|？|｡|・|\n)/).map(s => s.trim()).filter(Boolean);
+
+            // let list_japan = sentence.split(/(?<=\.|\?|!|。|<br>)/).map(s => s.trim()).filter(Boolean);
             list_japan = list_japan.filter(item => item !== ".");
 
             
