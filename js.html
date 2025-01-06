@@ -57,16 +57,17 @@
             align-items: center; /* 중앙 정렬 */
             margin-right: 10px; /* 화살표와 출력 간 간격 */
             margin-left: 30px; /* 입력 영역과 화살표 간 간격 */
+            margin-top: 20px;
         }
 
         .arrow {
             font-size: 70px;  /* 화살표 크기 (기존보다 크게) */
-            margin: 2px 0;    /* 화살표 간 간격을 줄임 (기존보다 적게) */
+            margin: 10px 0;    /* 화살표 간 간격을 줄임 (기존보다 적게) */
         }
 
         /* 결과 div 스타일 */
         #result {
-            width: 30%; /* 결과 영역의 너비를 설정 */
+            width: 25%; /* 결과 영역의 너비를 설정 */
             background-color: #eeeefe; /* 결과 배경색 */
             border-radius: 20px; /* 모서리 둥글게 */
             padding: 10px; /* 여백 추가 */
@@ -75,129 +76,140 @@
             overflow-y: auto; /* 내용이 넘치면 세로 스크롤이 생기도록 설정 */
         }
 
-        #result_word_list {
-            background-color: #f0f0fa; /* 결과 배경색 */
-            border-radius: 10px; /* 모서리 둥글게 */
-            padding: 10px; /* 여백 추가 */
-            min-height: 30px; /* 최소 높이 설정 */
-            margin-top: 5px; /* 입력 영역과 화살표 간 간격 */
+        #button-container {
+            display: flex;               /* Flexbox 사용 */
+            justify-content: space-between;  /* 버튼들을 왼쪽과 오른쪽에 배치 */
+            gap: 10px;                   /* 버튼 간의 간격을 10px로 설정 */
         }
 
-        #result_title {
-            width: 7%; /* 결과 영역의 너비를 설정 */
-            background-color: #eeeefe; /* 결과 배경색 */
-            border-radius: 20px; /* 모서리 둥글게 */
-            padding: 10px; /* 여백 추가 */
-            margin-left: 5px;
-            min-height: 300px; /* 최소 높이 설정 */
-            max-height: 500px; /* 최대 높이 설정 */
-            overflow-y: auto; /* 내용이 넘치면 세로 스크롤이 생기도록 설정 */
-            scrollbar-width: none; /* Firefox에서 스크롤바 숨기기 */
-            -ms-overflow-style: none;  /* IE에서 스크롤바 숨기기 */
+        #button-container button {
+            font-size: 18px;  /* 글자 크기 */
+            padding: 10px 20px;  /* 버튼 안쪽 여백 */
+            background-color: #5C8DFF;  /* 버튼 배경색 */
+            color: white;  /* 글자색 */
+            border: none;  /* 테두리 없애기 */
+            border-radius: 5px;  /* 둥근 모서리 */
+            cursor: pointer;  /* 마우스를 올렸을 때 포인터 커서 */
+            transition: background-color 0.3s;  /* 배경색 전환 효과 */
         }
+
+        #button-container button:hover {
+            background-color: #6A9BFF;  /* 마우스 오버 시 배경색 */
+        }
+
+
+
+
     </style>
 
     <script>
+        let xhr
+        
         // 문장을 입력받고 Ajax를 통해 데이터를 실시간으로 받아오는 함수
         function fetchDefinitions() {
             document.getElementById("result").innerHTML = "";
-            document.getElementById("result_title").innerHTML = "";
             
             var sentence = document.getElementById("sentence").value;
 
-            sentence = sentence.replace(/\n+/g, '.');
-
-            // sentence = sentence.replace(/\n/g, "<br>");
-            // sentence.replace(/\n/g, "<br>")
+            sentence = sentence.replace(/\n+/g, '.');   // 주변 공백 제거
+            sentence = sentence.replace(/^\.+/, '');    // 맨 앞 . 제
 
 
-            
+            state_combo = "no"
+
+            if (sentence.split(".").filter(part => part !== "").length == 2) {   // hk
+                if (/[\u4e00-\u9fff\u3040-\u309f\u30a0-\u30ff]/.test(sentence.split(".")[0]) && /[\uac00-\ud7a3]/.test(sentence.split(".")[1])) {   // 2줄 [0]한자   [1]한글    hj => hk
+
+                    if (document.getElementById("combo_hj_hk").value == "hj") {
+                        state_combo = "hj"
+                    }
+                                                                                                                                                    
+                    if (document.getElementById("combo_hj_hk").value == "hk") {
+                        state_combo = "hk"
+                    }
+                }
+            }
+
+            if (sentence.split(".").filter(part => part !== "").length >= 3) {   // hj
+                if (/[\u4e00-\u9fff\u3040-\u309f\u30a0-\u30ff]/.test(sentence.split(".")[0]) && /[\uac00-\ud7a3]/.test(sentence.split(".")[1]) && /[\u4e00-\u9fff\u3040-\u309f\u30a0-\u30ff]/.test(sentence.split(".")[2])) {    // 3줄 [0]한자   [1]한글    [2] 한자     hk => hj
+                    if (document.getElementById("combo_hj_hk").value == "hj") {
+                        state_combo = "hj"
+                    }
+                    if (document.getElementById("combo_hj_hk").value == "hk") {
+                        state_combo = "hk"
+                    }
+                                                                                                                                                                                                                                 
+                }
+
+            }
+
+
+            if (sentence.split(".").filter(part => part !== "").length == 1 && /[\uac00-\ud7a3]/.test(sentence.split(".")[0]) ) {  // 1줄 [0] 한글 [1] 한글     j =>  k jk
+                if (document.getElementById("combo_j_k").value == "j") {
+                    state_combo = "j"
+                }
+                if (document.getElementById("combo_j_k").value == "k") {
+                    state_combo = "k"
+                }
+
+            }
+
+
+            if (sentence.split(".").filter(part => part !== "").length >= 2 && /[\uac00-\ud7a3]/.test(sentence.split(".")[0]) && /[\uac00-\ud7a3]/.test(sentence.split(".")[1])) {  // 2줄 [0] 한글 [1] 한글     j =>  k jk
+                if (document.getElementById("combo_j_k_jk").value == "j") {
+                    state_combo = "j"
+                }
+                if (document.getElementById("combo_j_k_jk").value == "k") {
+                    state_combo = "k"
+                }
+                if (document.getElementById("combo_j_k_jk").value == "jk") {
+                    state_combo = "jk"
+                }
+
+            }
+
+            sentence += "!state!" + state_combo
+
+
+            if (["hj", "hk"].includes(state_combo)) {
+                document.getElementById("combo_hj_hk").style.display = "block";
+            }
+            else {
+                document.getElementById("combo_hj_hk").style.display = "none";
+            }
+
+
+            if (sentence.split("!state!")[0].split(".").filter(part => part !== "").length >= 2 && ["j", "k", "jk"].includes(state_combo)) {
+                document.getElementById("combo_j_k_jk").style.display = "block";
+            }
+            else {
+                document.getElementById("combo_j_k_jk").style.display = "none";
+            }
+
+
+            if (sentence.split("!state!")[0].split(".").filter(part => part !== "").length == 1 && ["j", "k"].includes(state_combo)) {
+                document.getElementById("combo_j_k").style.display = "block";
+            }
+            else {
+                document.getElementById("combo_j_k").style.display = "none";
+            }
 
             // 실시간 데이터 스트리밍을 받기 위한 AJAX 요청
-            var xhr = new XMLHttpRequest();
+            xhr = new XMLHttpRequest();
             xhr.open("GET", "/get_response_js/?sentence=" + encodeURIComponent(sentence), true);
 
-            count_word_list = 0;
-            count_border_title = 0;
             responseText = "";
 
             xhr.onreadystatechange = function() {
                 // 데이터가 부분적으로 수신되었을 때 (readyState === 3)
                 if (xhr.readyState === 3) {
-                    responseText = xhr.responseText;
-                    let parts = responseText.split("!border!");
-                    console.log(parts)
-                    console.log(parts[0])
-                    console.log(parts[1])
-
-
-
-
-                    
-
-                    let list_korean = (parts[0].split("<br>[ ")[0]).split(/(?<=\.|\?|!|。|<br>+)/).map(s => s.trim()).filter(Boolean);
-                    list_korean = list_korean.filter(item => item !== "<br>");
-
-
-                    if (count_word_list == 0) {
-                        document.getElementById("result_word_list").innerHTML = ""
-                        for (let i = 0; i < list_japan.length; i++) {
-                            // document.getElementById("result_word_list").innerHTML += `<span style="color: darkblue;"><strong>${list_japan[i]}</strong></span><br>`;  // 1회성 데이터 출력
-
-
-
-                            document.getElementById("result_word_list").innerHTML += `<span style="color: darkblue; font-size:20px;">${list_japan[i]}</span><br>`;  // 1회성 데이터 출력
-                            document.getElementById("result_word_list").innerHTML += list_korean[i] + "<br><br>";  // 1회성 데이터 출력
-                        }
-
-                        document.getElementById("result_word_list").innerHTML += parts[0].split("<br>+[")[1]
-
-                        
-                        // document.getElementById("result_word_list").innerHTML = parts[0];  // 1회성 데이터 출력
-                        count_word_list = 1;  // 1회성 데이터 처리 완료
-                    }
-
-
-                    if (count_word_list != 0) {
-                        document.getElementById("result").innerHTML += parts[1].split("!border_title!")[count_border_title];  // 실시간으로 출력
-                        document.getElementById("result_title").innerHTML += parts[1].split("!border_title!")[count_border_title + 1];  // 실시간으로 word_title 출력
-                        count_border_title += 2;
-                    }
-
-
-                    if (parts[0].split(",").length === 1) {   // 단어가 1개인 문장
-                        document.getElementById("result").innerHTML = parts[1].split("!border_title!")[0];  // 실시간으로 출력
-                        document.getElementById("result_title").innerHTML = parts[1].split("!border_title!")[1];  // 실시간으로 word_title 출력
-                    }
-
-                    
+                    // responseText = xhr.responseText;
+                    // console.log(responseText)
+                    document.getElementById("result").innerHTML = xhr.responseText;
                 }
             };
             xhr.send();
         }
-
-        // 스크롤 동기화 함수
-        document.addEventListener("DOMContentLoaded", function() {
-            function syncScroll() {
-                console.log("스크롤 동기화 중...");
-                let result = document.getElementById("result");
-                let resultTitle = document.getElementById("result_title");
-
-                // result의 스크롤 위치를 result_title에 동기화
-                resultTitle.scrollTop = result.scrollTop;
-            }
-
-            // 스크롤 이벤트 리스너 추가 (두 요소에 동일한 이벤트 적용)
-            let result = document.getElementById("result");
-            let resultTitle = document.getElementById("result_title");
-
-            if (result && resultTitle) {
-                result.addEventListener('scroll', syncScroll);
-                resultTitle.addEventListener('scroll', syncScroll);
-            } else {
-                console.error("result 또는 result_title 요소를 찾을 수 없습니다.");
-            }
-        });
 
     </script>
 </head>
@@ -209,7 +221,7 @@
     <div id="container">
 
         <div id="container_input">
-        <textarea id="sentence" placeholder="일본어 문장을 입력하세요" rows="15" cols="60">ゆるい 坂道 自轉車 押しながら
+        <textarea id="sentence" placeholder="일본어 문장을 입력하세요" rows="21" cols="60">ゆるい 坂道 自轉車 押しながら
 유루이 사카미치 지텐샤 오시나가라
 완만한 언덕길 자전거를 밀면서
 
@@ -217,9 +229,29 @@
 이에마데 오쿳테쿠레타
 집까지 배웅해 주었죠</textarea>
         <button onclick="fetchDefinitions()">분석 시작</button>
-        <div id="result_word_list"></div>
-        </div>
 
+        <select id="combo_hj_hk" style="margin-top: 5px; width: 230px; height: 40px; font-size: 16px; padding: 5px; border: 1px solid #ccc; border-radius: 5px; background-color: #f9f9f9; box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.1); display: none;">
+            <option value="hk">줄1: 한자&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;줄2: 해석</option>
+            <option value="hj">줄1: 한자&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;줄2: 히라가나</option>
+        </select>
+
+        <select id="combo_j_k" style="margin-top: 5px; width: 150px; height: 40px; font-size: 16px; padding: 5px; border: 1px solid #ccc; border-radius: 5px; background-color: #f9f9f9; box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.1); display: none;">
+            <option value="j">줄1: 히라가나</option>
+            <option value="k">줄1: 해석</option>
+        </select>
+
+        <select id="combo_j_k_jk" style="margin-top: 5px; width: 270px; height: 40px; font-size: 16px; padding: 5px; border: 1px solid #ccc; border-radius: 5px; background-color: #f9f9f9; box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.1); display: none;">
+            <option value="j">줄1: 히라가나&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;줄2: 히라가나</option>
+            <option value="k">줄1: 해석&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;줄2: 해석</option>
+            <option value="jk">줄1: 히라가나&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;줄2: 해석</option>
+        </select>
+
+        <div id="button-container">
+           <button onclick="window.location.href='http://127.0.0.1:8000/hiragana'">히라가나 입력</button>
+           <button onclick="window.location.href='http://127.0.0.1:8000/'">문장분석</button>
+        </div>            
+        
+        </div>
         
         <!-- 화살표들을 세로로 배치하는 div -->
         <div class="arrows">
@@ -237,9 +269,6 @@
         
 
     <br>
-
-
-
 
 </body>
 </html>

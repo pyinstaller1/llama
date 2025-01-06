@@ -1,0 +1,1356 @@
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<script>
+function To_Hiragana() {
+   var korean = document.getElementById('text1').value.split('\r\n');
+   hiragana = "";
+   katakana = "";
+
+   for(var i=0; i<korean[0].length; ++i){
+
+      if(korean[0][i]=='와' && korean[0][i+1]==' '){
+         hiragana = hiragana+'は ';
+         katakana = katakana + 'ハ ';
+         ++i;
+         continue;
+      }
+
+      else if(korean[0][i]=='오' && korean[0][i+1]==' '){
+         hiragana = hiragana+'を ';
+         katakana = katakana + 'ヲ ';
+         ++i;
+         continue;
+      }
+
+      else if(korean[0][i]=='아') hiragana = hiragana+'あ';
+      else if(korean[0][i]=='이') hiragana = hiragana+'い';
+      else if(korean[0][i]=='우' | korean[0][i]=='으') hiragana = hiragana+'う';
+      else if(korean[0][i]=='애' | korean[0][i]=='에') hiragana = hiragana+'え';
+      else if(korean[0][i]=='오') hiragana = hiragana+'お';
+
+      else if(korean[0][i]=='카') hiragana = hiragana+'か';
+      else if(korean[0][i]=='키') hiragana = hiragana+'き';
+      else if(korean[0][i]=='쿠' | korean[0][i]=='크') hiragana = hiragana+'く';
+      else if(korean[0][i]=='캐' | korean[0][i]=='케') hiragana = hiragana+'け';
+      else if(korean[0][i]=='코') hiragana = hiragana+'こ';
+
+      else if(korean[0][i]=='까') hiragana = hiragana+'か';
+      else if(korean[0][i]=='끼') hiragana = hiragana+'き';
+      else if(korean[0][i]=='꾸' | korean[0][i]=='끄') hiragana = hiragana+'く';
+      else if(korean[0][i]=='깨' | korean[0][i]=='께') hiragana = hiragana+'け';
+      else if(korean[0][i]=='꼬') hiragana = hiragana+'こ';
+
+      else if(korean[0][i]=='가') hiragana = hiragana+'が';
+      else if(korean[0][i]=='기') hiragana = hiragana+'ぎ';
+      else if(korean[0][i]=='구' | korean[0][i]=='그') hiragana = hiragana+'ぐ';
+      else if(korean[0][i]=='개' | korean[0][i]=='게') hiragana = hiragana+'げ';
+      else if(korean[0][i]=='고') hiragana = hiragana+'ご';
+
+      else if(korean[0][i]=='사') hiragana = hiragana+'さ';
+      else if(korean[0][i]=='시') hiragana = hiragana+'し';
+      else if(korean[0][i]=='수'  | korean[0][i]=='스') hiragana = hiragana+'す';
+      else if(korean[0][i]=='새' | korean[0][i]=='세') hiragana = hiragana+'せ';
+      else if(korean[0][i]=='소') hiragana = hiragana+'そ';
+
+      else if(korean[0][i]=='싸') hiragana = hiragana+'さ';
+      else if(korean[0][i]=='씨') hiragana = hiragana+'し';
+      else if(korean[0][i]=='쑤' | korean[0][i]=='쓰') hiragana = hiragana+'す';
+      else if(korean[0][i]=='쌔' | korean[0][i]=='쎄') hiragana = hiragana+'せ';
+      else if(korean[0][i]=='쏘') hiragana = hiragana+'そ';
+
+      else if(korean[0][i]=='자') hiragana = hiragana+'ざ';
+      else if(korean[0][i]=='지') hiragana = hiragana+'じ';
+      else if(korean[0][i]=='주' | korean[0][i]=='즈') hiragana = hiragana+'ず';
+      else if(korean[0][i]=='재' | korean[0][i]=='제') hiragana = hiragana+'ぜ';
+      else if(korean[0][i]=='조') hiragana = hiragana+'ぞ';
+
+      else if(korean[0][i]=='타') hiragana = hiragana+'た';
+      else if(korean[0][i]=='티') hiragana = hiragana+'ち';
+      else if(korean[0][i]=='투' | korean[0][i]=='트') hiragana = hiragana+'つ';
+      else if(korean[0][i]=='태' | korean[0][i]=='테') hiragana = hiragana+'て';
+      else if(korean[0][i]=='토') hiragana = hiragana+'と';
+
+      else if(korean[0][i]=='따') hiragana = hiragana+'た';
+      else if(korean[0][i]=='띠') hiragana = hiragana+'ち';
+      else if(korean[0][i]=='뚜' | korean[0][i]=='뜨') hiragana = hiragana+'つ';
+      else if(korean[0][i]=='때' | korean[0][i]=='떼') hiragana = hiragana+'て';
+      else if(korean[0][i]=='또') hiragana = hiragana+'と';
+
+      else if(korean[0][i]=='차') hiragana = hiragana+'た';
+      else if(korean[0][i]=='치') hiragana = hiragana+'ち';
+      else if(korean[0][i]=='추' | korean[0][i]=='츠') hiragana = hiragana+'つ';
+      else if(korean[0][i]=='채' | korean[0][i]=='체') hiragana = hiragana+'て';
+      else if(korean[0][i]=='초') hiragana = hiragana+'と';
+
+      else if(korean[0][i]=='짜') hiragana = hiragana+'た';
+      else if(korean[0][i]=='찌') hiragana = hiragana+'ち';
+      else if(korean[0][i]=='쭈' | korean[0][i]=='쯔') hiragana = hiragana+'つ';
+      else if(korean[0][i]=='째' | korean[0][i]=='쩨') hiragana = hiragana+'て';
+      else if(korean[0][i]=='쪼') hiragana = hiragana+'と';
+
+      else if(korean[0][i]=='다') hiragana = hiragana+'だ';
+      else if(korean[0][i]=='디') hiragana = hiragana+'ぢ';
+      else if(korean[0][i]=='두' | korean[0][i]=='드') hiragana = hiragana+'づ';
+      else if(korean[0][i]=='대' | korean[0][i]=='데') hiragana = hiragana+'で';
+      else if(korean[0][i]=='도') hiragana = hiragana+'ど';
+
+      else if(korean[0][i]=='나') hiragana = hiragana+'な';
+      else if(korean[0][i]=='니') hiragana = hiragana+'に';
+      else if(korean[0][i]=='누' | korean[0][i]=='느') hiragana = hiragana+'ぬ';
+      else if(korean[0][i]=='내' | korean[0][i]=='네') hiragana = hiragana+'ね';
+      else if(korean[0][i]=='노') hiragana = hiragana+'の';
+
+      else if(korean[0][i]=='하') hiragana = hiragana+'は';
+      else if(korean[0][i]=='히') hiragana = hiragana+'ひ';
+      else if(korean[0][i]=='후' | korean[0][i]=='흐') hiragana = hiragana+'ふ';
+      else if(korean[0][i]=='해' | korean[0][i]=='헤') hiragana = hiragana+'へ';
+      else if(korean[0][i]=='호') hiragana = hiragana+'ほ';
+
+      else if(korean[0][i]=='바') hiragana = hiragana+'ば';
+      else if(korean[0][i]=='비') hiragana = hiragana+'び';
+      else if(korean[0][i]=='부' | korean[0][i]=='브') hiragana = hiragana+'ぶ';
+      else if(korean[0][i]=='배' | korean[0][i]=='베') hiragana = hiragana+'べ';
+      else if(korean[0][i]=='보') hiragana = hiragana+'ぼ';
+
+      else if(korean[0][i]=='파') hiragana = hiragana+'ぱ';
+      else if(korean[0][i]=='피') hiragana = hiragana+'ぴ';
+      else if(korean[0][i]=='푸' | korean[0][i]=='프') hiragana = hiragana+'ぷ';
+      else if(korean[0][i]=='패' | korean[0][i]=='페') hiragana = hiragana+'ぺ';
+      else if(korean[0][i]=='포') hiragana = hiragana+'ぽ';
+
+      else if(korean[0][i]=='빠') hiragana = hiragana+'ぱ';
+      else if(korean[0][i]=='삐') hiragana = hiragana+'ぴ';
+      else if(korean[0][i]=='뿌' | korean[0][i]=='쁘') hiragana = hiragana+'ぷ';
+      else if(korean[0][i]=='빼' | korean[0][i]=='뻬') hiragana = hiragana+'ぺ';
+      else if(korean[0][i]=='뽀') hiragana = hiragana+'ぽ';
+
+      else if(korean[0][i]=='마') hiragana = hiragana+'ま';
+      else if(korean[0][i]=='미') hiragana = hiragana+'み';
+      else if(korean[0][i]=='무' | korean[0][i]=='므') hiragana = hiragana+'む';
+      else if(korean[0][i]=='매' | korean[0][i]=='메') hiragana = hiragana+'め';
+      else if(korean[0][i]=='모') hiragana = hiragana+'も';
+
+      else if(korean[0][i]=='라') hiragana = hiragana+'ら';
+      else if(korean[0][i]=='리') hiragana = hiragana+'り';
+      else if(korean[0][i]=='루' | korean[0][i]=='르') hiragana = hiragana+'る';
+      else if(korean[0][i]=='래' | korean[0][i]=='레') hiragana = hiragana+'れ';
+      else if(korean[0][i]=='로') hiragana = hiragana+'ろ';
+
+      else if(korean[0][i]=='야') hiragana = hiragana+'や';
+      else if(korean[0][i]=='유') hiragana = hiragana+'ゆ';
+      else if(korean[0][i]=='요') hiragana = hiragana+'よ';
+
+      else if(korean[0][i]=='와') hiragana = hiragana+'わ';
+      else if(korean[0][i]=='위') hiragana = hiragana+'ゐ';
+      else if(korean[0][i]=='외' | korean[0][i]=='왜') hiragana = hiragana+'ゑ';
+      else if(korean[0][i]=='올') hiragana = hiragana+'を';
+
+      else if(korean[0][i]=='앙' | korean[0][i]=='안') hiragana = hiragana+'あん';
+      else if(korean[0][i]=='잉' | korean[0][i]=='인') hiragana = hiragana+'いん';
+      else if(korean[0][i]=='웅' | korean[0][i]=='운' | korean[0][i]=='응' | korean[0][i]=='은') hiragana = hiragana+'うん';
+      else if(korean[0][i]=='앵' | korean[0][i]=='앤' | korean[0][i]=='엥' | korean[0][i]=='엔') hiragana = hiragana+'えん';
+      else if(korean[0][i]=='옹' | korean[0][i]=='온') hiragana = hiragana+'おん';
+
+      else if(korean[0][i]=='캉' | korean[0][i]=='칸') hiragana = hiragana+'かん';
+      else if(korean[0][i]=='킹' | korean[0][i]=='킨') hiragana = hiragana+'きん';
+      else if(korean[0][i]=='쿵' | korean[0][i]=='쿤' | korean[0][i]=='킁' | korean[0][i]=='큰') hiragana = hiragana+'くん';
+      else if(korean[0][i]=='캥' | korean[0][i]=='캔' | korean[0][i]=='켕' | korean[0][i]=='켄') hiragana = hiragana+'けん';
+      else if(korean[0][i]=='콩' | korean[0][i]=='콘') hiragana = hiragana+'こん';
+
+      else if(korean[0][i]=='깡' | korean[0][i]=='깐') hiragana = hiragana+'かん';
+      else if(korean[0][i]=='낑' | korean[0][i]=='낀') hiragana = hiragana+'きん';
+      else if(korean[0][i]=='꿍' | korean[0][i]=='꾼' | korean[0][i]=='끙' | korean[0][i]=='끈') hiragana = hiragana+'くん';
+      else if(korean[0][i]=='깽' | korean[0][i]=='깬' | korean[0][i]=='껭' | korean[0][i]=='껜') hiragana = hiragana+'けん';
+      else if(korean[0][i]=='꽁' | korean[0][i]=='꼰') hiragana = hiragana+'こん';
+
+      else if(korean[0][i]=='강' | korean[0][i]=='간') hiragana = hiragana+'がん';
+      else if(korean[0][i]=='깅' | korean[0][i]=='긴') hiragana = hiragana+'ぎん';
+      else if(korean[0][i]=='궁' | korean[0][i]=='군' | korean[0][i]=='긍' | korean[0][i]=='근') hiragana = hiragana+'ぐん';
+      else if(korean[0][i]=='갱' | korean[0][i]=='갠' | korean[0][i]=='겡' | korean[0][i]=='겐') hiragana = hiragana+'げん';
+      else if(korean[0][i]=='공' | korean[0][i]=='곤') hiragana = hiragana+'ごん';
+
+      else if(korean[0][i]=='상' | korean[0][i]=='산') hiragana = hiragana+'さん';
+      else if(korean[0][i]=='싱' | korean[0][i]=='신') hiragana = hiragana+'しん';
+      else if(korean[0][i]=='숭' | korean[0][i]=='순' | korean[0][i]=='승' | korean[0][i]=='슨') hiragana = hiragana+'すん';
+      else if(korean[0][i]=='생' | korean[0][i]=='샌' | korean[0][i]=='셍' | korean[0][i]=='센') hiragana = hiragana+'せん';
+      else if(korean[0][i]=='송' | korean[0][i]=='손') hiragana = hiragana+'そん';
+
+      else if(korean[0][i]=='쌍' | korean[0][i]=='싼') hiragana = hiragana+'さん';
+      else if(korean[0][i]=='씽' | korean[0][i]=='씬') hiragana = hiragana+'しん';
+      else if(korean[0][i]=='쑹' | korean[0][i]=='쑨' | korean[0][i]=='씅' | korean[0][i]=='쓴') hiragana = hiragana+'すん';
+      else if(korean[0][i]=='쌩' | korean[0][i]=='쌘' | korean[0][i]=='쎙' | korean[0][i]=='쎈') hiragana = hiragana+'せん';
+      else if(korean[0][i]=='쏭' | korean[0][i]=='쏜') hiragana = hiragana+'そん';
+
+      else if(korean[0][i]=='장' | korean[0][i]=='잔') hiragana = hiragana+'ざん';
+      else if(korean[0][i]=='징' | korean[0][i]=='진') hiragana = hiragana+'じん';
+      else if(korean[0][i]=='중' | korean[0][i]=='즌' | korean[0][i]=='증' | korean[0][i]=='즌') hiragana = hiragana+'ずん';
+      else if(korean[0][i]=='쟁' | korean[0][i]=='잰' | korean[0][i]=='젱' | korean[0][i]=='젠') hiragana = hiragana+'ぜん';
+      else if(korean[0][i]=='종' | korean[0][i]=='존') hiragana = hiragana+'ぞん';
+
+      else if(korean[0][i]=='탕' | korean[0][i]=='탄') hiragana = hiragana+'たん';
+      else if(korean[0][i]=='팅' | korean[0][i]=='틴') hiragana = hiragana+'ちん';
+      else if(korean[0][i]=='퉁' | korean[0][i]=='튼' | korean[0][i]=='틍' | korean[0][i]=='튼') hiragana = hiragana+'つん';
+      else if(korean[0][i]=='탱' | korean[0][i]=='탠' | korean[0][i]=='텡' | korean[0][i]=='텐') hiragana = hiragana+'てん';
+      else if(korean[0][i]=='통' | korean[0][i]=='톤') hiragana = hiragana+'とん';
+
+
+      else if(korean[0][i]=='땅' | korean[0][i]=='딴') hiragana = hiragana+'たん';
+      else if(korean[0][i]=='띵' | korean[0][i]=='띤') hiragana = hiragana+'ちん';
+      else if(korean[0][i]=='뚱' | korean[0][i]=='뚠' | korean[0][i]=='뜽' | korean[0][i]=='뜬') hiragana = hiragana+'つん';
+      else if(korean[0][i]=='땡' | korean[0][i]=='땐' | korean[0][i]=='뗑' | korean[0][i]=='뗀') hiragana = hiragana+'てん';
+      else if(korean[0][i]=='똥' | korean[0][i]=='똔') hiragana = hiragana+'とん';
+
+
+      else if(korean[0][i]=='짱' | korean[0][i]=='짠') hiragana = hiragana+'たん';
+      else if(korean[0][i]=='찡' | korean[0][i]=='찐') hiragana = hiragana+'ちん';
+      else if(korean[0][i]=='쭝' | korean[0][i]=='쭌' | korean[0][i]=='쯩' | korean[0][i]=='쯘') hiragana = hiragana+'つん';
+      else if(korean[0][i]=='쨍' | korean[0][i]=='짼' | korean[0][i]=='쩽' | korean[0][i]=='쩬') hiragana = hiragana+'てん';
+      else if(korean[0][i]=='쫑' | korean[0][i]=='쫀') hiragana = hiragana+'とん';
+
+
+      else if(korean[0][i]=='창' | korean[0][i]=='찬') hiragana = hiragana+'たん';
+      else if(korean[0][i]=='칭' | korean[0][i]=='친') hiragana = hiragana+'ちん';
+      else if(korean[0][i]=='충' | korean[0][i]=='춘' | korean[0][i]=='층' | korean[0][i]=='츤') hiragana = hiragana+'つん';
+      else if(korean[0][i]=='챙' | korean[0][i]=='챈' | korean[0][i]=='쳉' | korean[0][i]=='첸') hiragana = hiragana+'てん';
+      else if(korean[0][i]=='총' | korean[0][i]=='촌') hiragana = hiragana+'とん';
+
+      else if(korean[0][i]=='당' | korean[0][i]=='단') hiragana = hiragana+'だん';
+      else if(korean[0][i]=='딩' | korean[0][i]=='딘') hiragana = hiragana+'ぢん';
+      else if(korean[0][i]=='둥' | korean[0][i]=='둔' | korean[0][i]=='등' | korean[0][i]=='든') hiragana = hiragana+'づん';
+      else if(korean[0][i]=='댕' | korean[0][i]=='댄' | korean[0][i]=='뎅' | korean[0][i]=='덴') hiragana = hiragana+'でん';
+      else if(korean[0][i]=='동' | korean[0][i]=='돈') hiragana = hiragana+'どん';
+
+      else if(korean[0][i]=='낭' | korean[0][i]=='난') hiragana = hiragana+'なん';
+      else if(korean[0][i]=='닝' | korean[0][i]=='닌') hiragana = hiragana+'にん';
+      else if(korean[0][i]=='눙' | korean[0][i]=='눈' | korean[0][i]=='능' | korean[0][i]=='는') hiragana = hiragana+'ぬん';
+      else if(korean[0][i]=='냉' | korean[0][i]=='낸' | korean[0][i]=='넹' | korean[0][i]=='넨') hiragana = hiragana+'ねん';
+      else if(korean[0][i]=='농' | korean[0][i]=='논') hiragana = hiragana+'のん';
+
+
+      else if(korean[0][i]=='항' | korean[0][i]=='한') hiragana = hiragana+'はん';
+      else if(korean[0][i]=='힝' | korean[0][i]=='힌') hiragana = hiragana+'ひん';
+      else if(korean[0][i]=='훙' | korean[0][i]=='훈' | korean[0][i]=='흥' | korean[0][i]=='흔') hiragana = hiragana+'ふん';
+      else if(korean[0][i]=='행' | korean[0][i]=='핸' | korean[0][i]=='헹' | korean[0][i]=='헨') hiragana = hiragana+'へん';
+      else if(korean[0][i]=='홍' | korean[0][i]=='혼') hiragana = hiragana+'ほん';
+
+      else if(korean[0][i]=='방' | korean[0][i]=='반') hiragana = hiragana+'ばん';
+      else if(korean[0][i]=='빙' | korean[0][i]=='빈') hiragana = hiragana+'びん';
+      else if(korean[0][i]=='붕' | korean[0][i]=='분' | korean[0][i]=='븡' | korean[0][i]=='븐') hiragana = hiragana+'ぶん';
+      else if(korean[0][i]=='뱅' | korean[0][i]=='밴' | korean[0][i]=='벵' | korean[0][i]=='벤') hiragana = hiragana+'べん';
+      else if(korean[0][i]=='봉' | korean[0][i]=='본') hiragana = hiragana+'ぼん';
+
+      else if(korean[0][i]=='팡' | korean[0][i]=='판') hiragana = hiragana+'ぱん';
+      else if(korean[0][i]=='핑' | korean[0][i]=='핀') hiragana = hiragana+'ぴん';
+      else if(korean[0][i]=='풍' | korean[0][i]=='푼' | korean[0][i]=='픙' | korean[0][i]=='픈') hiragana = hiragana+'ぷん';
+      else if(korean[0][i]=='팽' | korean[0][i]=='팬' | korean[0][i]=='펭' | korean[0][i]=='펜') hiragana = hiragana+'ぺん';
+      else if(korean[0][i]=='퐁' | korean[0][i]=='폰') hiragana = hiragana+'ぽん';
+
+      else if(korean[0][i]=='빵' | korean[0][i]=='빤') hiragana = hiragana+'ぱん';
+      else if(korean[0][i]=='삥' | korean[0][i]=='삔') hiragana = hiragana+'ぴん';
+      else if(korean[0][i]=='뿡' | korean[0][i]=='뿐' | korean[0][i]=='쁭' | korean[0][i]=='쁜') hiragana = hiragana+'ぷん';
+      else if(korean[0][i]=='뺑' | korean[0][i]=='뺀' | korean[0][i]=='뼁' | korean[0][i]=='뻰') hiragana = hiragana+'ぺん';
+      else if(korean[0][i]=='뽕' | korean[0][i]=='뽄') hiragana = hiragana+'ぽん';
+
+      else if(korean[0][i]=='망' | korean[0][i]=='만') hiragana = hiragana+'まん';
+      else if(korean[0][i]=='밍' | korean[0][i]=='민') hiragana = hiragana+'みん';
+      else if(korean[0][i]=='뭉' | korean[0][i]=='문' | korean[0][i]=='믕' | korean[0][i]=='믄') hiragana = hiragana+'むん';
+      else if(korean[0][i]=='맹' | korean[0][i]=='맨' | korean[0][i]=='멩' | korean[0][i]=='멘') hiragana = hiragana+'めん';
+      else if(korean[0][i]=='몽' | korean[0][i]=='몬') hiragana = hiragana+'もん';
+
+      else if(korean[0][i]=='양' | korean[0][i]=='얀') hiragana = hiragana+'やん';
+      else if(korean[0][i]=='융' | korean[0][i]=='윤' | korean[0][i]=='' | korean[0][i]=='') hiragana = hiragana+'ゆん';
+      else if(korean[0][i]=='용' | korean[0][i]=='욘') hiragana = hiragana+'よん';
+
+      else if(korean[0][i]=='랑' | korean[0][i]=='란') hiragana = hiragana+'らん';
+      else if(korean[0][i]=='링' | korean[0][i]=='린') hiragana = hiragana+'りん';
+      else if(korean[0][i]=='룽' | korean[0][i]=='룬' | korean[0][i]=='릉' | korean[0][i]=='른') hiragana = hiragana+'るん';
+      else if(korean[0][i]=='랭' | korean[0][i]=='랜' | korean[0][i]=='렝' | korean[0][i]=='렌') hiragana = hiragana+'れん';
+      else if(korean[0][i]=='롱' | korean[0][i]=='론') hiragana = hiragana+'ろん';
+
+      else if(korean[0][i]=='왕' | korean[0][i]=='완') hiragana = hiragana+'わん';
+      else if(korean[0][i]=='윙' | korean[0][i]=='윈') hiragana = hiragana+'ゐん';
+      else if(korean[0][i]=='욍' | korean[0][i]=='왼' | korean[0][i]=='' | korean[0][i]=='') hiragana = hiragana+'ゑん';
+
+
+      else if(korean[0][i]=='앗') hiragana = hiragana+'あっ';
+      else if(korean[0][i]=='잇') hiragana = hiragana+'いっ';
+      else if(korean[0][i]=='웃' | korean[0][i]=='읏') hiragana = hiragana+'うっ';
+      else if(korean[0][i]=='앤' | korean[0][i]=='엣') hiragana = hiragana+'えっ';
+      else if(korean[0][i]=='옷') hiragana = hiragana+'おっ';
+
+      else if(korean[0][i]=='캇') hiragana = hiragana+'かっ';
+      else if(korean[0][i]=='킷') hiragana = hiragana+'きっ';
+      else if(korean[0][i]=='쿳' | korean[0][i]=='큿') hiragana = hiragana+'くっ';
+      else if(korean[0][i]=='캣' | korean[0][i]=='켓') hiragana = hiragana+'けっ';
+      else if(korean[0][i]=='콘') hiragana = hiragana+'こっ';
+
+      else if(korean[0][i]=='깟') hiragana = hiragana+'かっ';
+      else if(korean[0][i]=='낏') hiragana = hiragana+'きっ';
+      else if(korean[0][i]=='꿋' | korean[0][i]=='끗') hiragana = hiragana+'くっ';
+      else if(korean[0][i]=='깻' | korean[0][i]=='껫') hiragana = hiragana+'けっ';
+      else if(korean[0][i]=='꼿') hiragana = hiragana+'こっ';
+
+      else if(korean[0][i]=='갓') hiragana = hiragana+'がっ';
+      else if(korean[0][i]=='깃') hiragana = hiragana+'ぎっ';
+      else if(korean[0][i]=='굿' | korean[0][i]=='긋') hiragana = hiragana+'ぐっ';
+      else if(korean[0][i]=='갯' | korean[0][i]=='겟') hiragana = hiragana+'げっ';
+      else if(korean[0][i]=='곳') hiragana = hiragana+'ごっ';
+
+      else if(korean[0][i]=='삿') hiragana = hiragana+'さっ';
+      else if(korean[0][i]=='싯') hiragana = hiragana+'しっ';
+      else if(korean[0][i]=='숫' | korean[0][i]=='슷') hiragana = hiragana+'すっ';
+      else if(korean[0][i]=='샛' | korean[0][i]=='셋') hiragana = hiragana+'せっ';
+      else if(korean[0][i]=='솟') hiragana = hiragana+'そっ';
+
+      else if(korean[0][i]=='쌋') hiragana = hiragana+'さっ';
+      else if(korean[0][i]=='씻') hiragana = hiragana+'しっ';
+      else if(korean[0][i]=='쑷' | korean[0][i]=='씃') hiragana = hiragana+'すっ';
+      else if(korean[0][i]=='쌧' | korean[0][i]=='쎗') hiragana = hiragana+'せっ';
+      else if(korean[0][i]=='쏫') hiragana = hiragana+'そっ';
+
+      else if(korean[0][i]=='잣') hiragana = hiragana+'ざっ';
+      else if(korean[0][i]=='짓') hiragana = hiragana+'じっ';
+      else if(korean[0][i]=='줏' | korean[0][i]=='즛') hiragana = hiragana+'ずっ';
+      else if(korean[0][i]=='잿' | korean[0][i]=='젯') hiragana = hiragana+'ぜっ';
+      else if(korean[0][i]=='좃') hiragana = hiragana+'ぞっ';
+
+      else if(korean[0][i]=='탓') hiragana = hiragana+'たっ';
+      else if(korean[0][i]=='팃') hiragana = hiragana+'ちっ';
+      else if(korean[0][i]=='툿' | korean[0][i]=='틋') hiragana = hiragana+'つっ';
+      else if(korean[0][i]=='탯' | korean[0][i]=='텟') hiragana = hiragana+'てっ';
+      else if(korean[0][i]=='톳') hiragana = hiragana+'とっ';
+
+      else if(korean[0][i]=='땃') hiragana = hiragana+'たっ';
+      else if(korean[0][i]=='띳') hiragana = hiragana+'ちっ';
+      else if(korean[0][i]=='툿' | korean[0][i]=='틋') hiragana = hiragana+'つっ';
+      else if(korean[0][i]=='땟' | korean[0][i]=='텟') hiragana = hiragana+'てっ';
+      else if(korean[0][i]=='똣') hiragana = hiragana+'とっ';
+
+      else if(korean[0][i]=='찻') hiragana = hiragana+'たっ';
+      else if(korean[0][i]=='칫') hiragana = hiragana+'ちっ';
+      else if(korean[0][i]=='춧' | korean[0][i]=='츳') hiragana = hiragana+'つっ';
+      else if(korean[0][i]=='챗' | korean[0][i]=='쳇') hiragana = hiragana+'てっ';
+      else if(korean[0][i]=='촛') hiragana = hiragana+'とっ';
+
+      else if(korean[0][i]=='짯') hiragana = hiragana+'たっ';
+      else if(korean[0][i]=='찟') hiragana = hiragana+'ちっ';
+      else if(korean[0][i]=='쭛' | korean[0][i]=='쯧') hiragana = hiragana+'つっ';
+      else if(korean[0][i]=='쨋' | korean[0][i]=='쩻') hiragana = hiragana+'てっ';
+      else if(korean[0][i]=='쫏') hiragana = hiragana+'とっ';
+
+      else if(korean[0][i]=='닷') hiragana = hiragana+'だっ';
+      else if(korean[0][i]=='딧') hiragana = hiragana+'ぢっ';
+      else if(korean[0][i]=='둣' | korean[0][i]=='듯') hiragana = hiragana+'づっ';
+      else if(korean[0][i]=='댓' | korean[0][i]=='뎃') hiragana = hiragana+'でっ';
+      else if(korean[0][i]=='돗') hiragana = hiragana+'どっ';
+
+      else if(korean[0][i]=='낫') hiragana = hiragana+'なっ';
+      else if(korean[0][i]=='닛') hiragana = hiragana+'にっ';
+      else if(korean[0][i]=='눗' | korean[0][i]=='늣') hiragana = hiragana+'ぬっ';
+      else if(korean[0][i]=='냇' | korean[0][i]=='넷') hiragana = hiragana+'ねっ';
+      else if(korean[0][i]=='놋') hiragana = hiragana+'のっ';
+
+      else if(korean[0][i]=='핫') hiragana = hiragana+'はっ';
+      else if(korean[0][i]=='힛') hiragana = hiragana+'ひっ';
+      else if(korean[0][i]=='훗' | korean[0][i]=='흣') hiragana = hiragana+'ふっ';
+      else if(korean[0][i]=='햇' | korean[0][i]=='헷') hiragana = hiragana+'へっ';
+      else if(korean[0][i]=='홋') hiragana = hiragana+'ほっ';
+
+      else if(korean[0][i]=='밧') hiragana = hiragana+'ばっ';
+      else if(korean[0][i]=='빗') hiragana = hiragana+'びっ';
+      else if(korean[0][i]=='붓' | korean[0][i]=='븟') hiragana = hiragana+'ぶっ';
+      else if(korean[0][i]=='뱃' | korean[0][i]=='벳') hiragana = hiragana+'べっ';
+      else if(korean[0][i]=='봇') hiragana = hiragana+'ぼっ';
+
+      else if(korean[0][i]=='팟') hiragana = hiragana+'ぱっ';
+      else if(korean[0][i]=='핏') hiragana = hiragana+'ぴっ';
+      else if(korean[0][i]=='풋' | korean[0][i]=='픗') hiragana = hiragana+'ぷっ';
+      else if(korean[0][i]=='팻' | korean[0][i]=='펫') hiragana = hiragana+'ぺっ';
+      else if(korean[0][i]=='폿') hiragana = hiragana+'ぽっ';
+
+      else if(korean[0][i]=='빳') hiragana = hiragana+'ぱっ';
+      else if(korean[0][i]=='삣') hiragana = hiragana+'ぴっ';
+      else if(korean[0][i]=='뿟' | korean[0][i]=='쁫') hiragana = hiragana+'ぷっ';
+      else if(korean[0][i]=='뺏' | korean[0][i]=='뻿') hiragana = hiragana+'ぺっ';
+      else if(korean[0][i]=='뽓') hiragana = hiragana+'ぽっ';
+
+      else if(korean[0][i]=='맛') hiragana = hiragana+'まっ';
+      else if(korean[0][i]=='밋') hiragana = hiragana+'みっ';
+      else if(korean[0][i]=='뭇' | korean[0][i]=='믓') hiragana = hiragana+'むっ';
+      else if(korean[0][i]=='맷' | korean[0][i]=='멧') hiragana = hiragana+'めっ';
+      else if(korean[0][i]=='못') hiragana = hiragana+'もっ';
+
+      else if(korean[0][i]=='얏') hiragana = hiragana+'やっ';
+      else if(korean[0][i]=='윳' | korean[0][i]=='') hiragana = hiragana+'ゆっ';
+      else if(korean[0][i]=='욧') hiragana = hiragana+'よっ';
+
+      else if(korean[0][i]=='랏') hiragana = hiragana+'らっ';
+      else if(korean[0][i]=='릿') hiragana = hiragana+'りっ';
+      else if(korean[0][i]=='룻' | korean[0][i]=='릇') hiragana = hiragana+'るっ';
+      else if(korean[0][i]=='랫' | korean[0][i]=='렛') hiragana = hiragana+'れっ';
+      else if(korean[0][i]=='롯') hiragana = hiragana+'ろっ';
+
+      else if(korean[0][i]=='왓') hiragana = hiragana+'わっ';
+      else if(korean[0][i]=='윗') hiragana = hiragana+'ゐっ';
+      else if(korean[0][i]=='욋' | korean[0][i]=='') hiragana = hiragana+'ゑっ';
+
+
+      else if(korean[0][i]=='캬') hiragana = hiragana+'きゃ';
+      else if(korean[0][i]=='캰') hiragana = hiragana+'きゃん';
+      else if(korean[0][i]=='컁') hiragana = hiragana+'きゃん';
+      else if(korean[0][i]=='캿') hiragana = hiragana+'きゃっ';
+      else if(korean[0][i]=='큐') hiragana = hiragana+'きゅ';
+      else if(korean[0][i]=='큔') hiragana = hiragana+'きゅん';
+      else if(korean[0][i]=='큥') hiragana = hiragana+'きゅん';
+      else if(korean[0][i]=='큣') hiragana = hiragana+'きゅっ';
+      else if(korean[0][i]=='쿄') hiragana = hiragana+'きょ';
+      else if(korean[0][i]=='쿈') hiragana = hiragana+'きょん';
+      else if(korean[0][i]=='쿙') hiragana = hiragana+'きょん';
+      else if(korean[0][i]=='쿗') hiragana = hiragana+'きょっ';
+
+      else if(korean[0][i]=='꺄') hiragana = hiragana+'きゃ';
+      else if(korean[0][i]=='꺈') hiragana = hiragana+'きゃん';
+      else if(korean[0][i]=='꺙') hiragana = hiragana+'きゃん';
+      else if(korean[0][i]=='꺗') hiragana = hiragana+'きゃっ';
+      else if(korean[0][i]=='뀨') hiragana = hiragana+'きゅ';
+      else if(korean[0][i]=='뀬') hiragana = hiragana+'きゅん';
+      else if(korean[0][i]=='뀽') hiragana = hiragana+'きゅん';
+      else if(korean[0][i]=='뀻') hiragana = hiragana+'きゅっ';
+      else if(korean[0][i]=='꾜') hiragana = hiragana+'きょ';
+      else if(korean[0][i]=='꾠') hiragana = hiragana+'きょん';
+      else if(korean[0][i]=='꾱') hiragana = hiragana+'きょん';
+      else if(korean[0][i]=='꾯') hiragana = hiragana+'きょっ';
+
+      else if(korean[0][i]=='갸') hiragana = hiragana+'ぎゃ';
+      else if(korean[0][i]=='갼') hiragana = hiragana+'ぎゃん';
+      else if(korean[0][i]=='걍') hiragana = hiragana+'ぎゃん';
+      else if(korean[0][i]=='걋') hiragana = hiragana+'ぎゃっ';
+      else if(korean[0][i]=='규') hiragana = hiragana+'ぎゅ';
+      else if(korean[0][i]=='균') hiragana = hiragana+'ぎゅん';
+      else if(korean[0][i]=='뀽') hiragana = hiragana+'ぎゅん';
+      else if(korean[0][i]=='귯') hiragana = hiragana+'ぎゅっ';
+      else if(korean[0][i]=='교') hiragana = hiragana+'ぎょ';
+      else if(korean[0][i]=='굔') hiragana = hiragana+'ぎょん';
+      else if(korean[0][i]=='굥') hiragana = hiragana+'ぎょん';
+      else if(korean[0][i]=='굣') hiragana = hiragana+'ぎょっ';
+
+      else if(korean[0][i]=='샤') hiragana = hiragana+'しゃ';
+      else if(korean[0][i]=='샨') hiragana = hiragana+'しゃん';
+      else if(korean[0][i]=='샹') hiragana = hiragana+'しゃん';
+      else if(korean[0][i]=='샷') hiragana = hiragana+'しゃっ';
+      else if(korean[0][i]=='슈') hiragana = hiragana+'しゅ';
+      else if(korean[0][i]=='슌') hiragana = hiragana+'しゅん';
+      else if(korean[0][i]=='쓩') hiragana = hiragana+'しゅん';
+      else if(korean[0][i]=='슛') hiragana = hiragana+'しゅっ';
+      else if(korean[0][i]=='쇼') hiragana = hiragana+'しょ';
+      else if(korean[0][i]=='숀') hiragana = hiragana+'しょん';
+      else if(korean[0][i]=='숑') hiragana = hiragana+'しょん';
+      else if(korean[0][i]=='숏') hiragana = hiragana+'しょっ';
+
+      else if(korean[0][i]=='쌰') hiragana = hiragana+'しゃ';
+      else if(korean[0][i]=='쌴') hiragana = hiragana+'しゃん';
+      else if(korean[0][i]=='썅') hiragana = hiragana+'しゃん';
+      else if(korean[0][i]=='샷') hiragana = hiragana+'しゃっ';
+      else if(korean[0][i]=='쓔') hiragana = hiragana+'しゅ';
+      else if(korean[0][i]=='쓘') hiragana = hiragana+'しゅん';
+      else if(korean[0][i]=='쓩') hiragana = hiragana+'しゅん';
+      else if(korean[0][i]=='쓧') hiragana = hiragana+'しゅっ';
+      else if(korean[0][i]=='쑈') hiragana = hiragana+'しょ';
+      else if(korean[0][i]=='쑌') hiragana = hiragana+'しょん';
+      else if(korean[0][i]=='쑝') hiragana = hiragana+'しょん';
+      else if(korean[0][i]=='쑛') hiragana = hiragana+'しょっ';
+
+      else if(korean[0][i]=='쟈') hiragana = hiragana+'じゃ';
+      else if(korean[0][i]=='쟌') hiragana = hiragana+'じゃん';
+      else if(korean[0][i]=='쟝') hiragana = hiragana+'じゃん';
+      else if(korean[0][i]=='쟛') hiragana = hiragana+'じゃっ';
+      else if(korean[0][i]=='쥬') hiragana = hiragana+'じゅ';
+      else if(korean[0][i]=='쥰') hiragana = hiragana+'じゅん';
+      else if(korean[0][i]=='즁') hiragana = hiragana+'じゅん';
+      else if(korean[0][i]=='쥿') hiragana = hiragana+'じゅっ';
+      else if(korean[0][i]=='죠') hiragana = hiragana+'じょ';
+      else if(korean[0][i]=='죤') hiragana = hiragana+'じょん';
+      else if(korean[0][i]=='죵') hiragana = hiragana+'じょん';
+      else if(korean[0][i]=='죳') hiragana = hiragana+'じょっ';
+
+      else if(korean[0][i]=='탸') hiragana = hiragana+'ちゃ';
+      else if(korean[0][i]=='땬') hiragana = hiragana+'ちゃん';
+      else if(korean[0][i]=='턍') hiragana = hiragana+'ちゃん';
+      else if(korean[0][i]=='땻') hiragana = hiragana+'ちゃっ';
+      else if(korean[0][i]=='튜') hiragana = hiragana+'ちゅ';
+      else if(korean[0][i]=='튠') hiragana = hiragana+'ちゅん';
+      else if(korean[0][i]=='튱') hiragana = hiragana+'ちゅん';
+      else if(korean[0][i]=='튯') hiragana = hiragana+'ちゅっ';
+      else if(korean[0][i]=='툐') hiragana = hiragana+'ちょ';
+      else if(korean[0][i]=='툔') hiragana = hiragana+'ちょん';
+      else if(korean[0][i]=='툥') hiragana = hiragana+'ちょん';
+      else if(korean[0][i]=='툣') hiragana = hiragana+'ちょっ';
+
+      else if(korean[0][i]=='땨') hiragana = hiragana+'ちゃ';
+      else if(korean[0][i]=='땬') hiragana = hiragana+'ちゃん';
+      else if(korean[0][i]=='땽') hiragana = hiragana+'ちゃん';
+      else if(korean[0][i]=='땻') hiragana = hiragana+'ちゃっ';
+      else if(korean[0][i]=='뜌') hiragana = hiragana+'ちゅ';
+      else if(korean[0][i]=='뜐') hiragana = hiragana+'ちゅん';
+      else if(korean[0][i]=='뜡') hiragana = hiragana+'ちゅん';
+      else if(korean[0][i]=='뜟') hiragana = hiragana+'ちゅっ';
+      else if(korean[0][i]=='뚀') hiragana = hiragana+'ちょ';
+      else if(korean[0][i]=='뚄') hiragana = hiragana+'ちょん';
+      else if(korean[0][i]=='뚕') hiragana = hiragana+'ちょん';
+      else if(korean[0][i]=='뚓') hiragana = hiragana+'ちょっ';
+
+      else if(korean[0][i]=='챠') hiragana = hiragana+'ちゃ';
+      else if(korean[0][i]=='챤') hiragana = hiragana+'ちゃん';
+      else if(korean[0][i]=='챵') hiragana = hiragana+'ちゃん';
+      else if(korean[0][i]=='챳') hiragana = hiragana+'ちゃっ';
+      else if(korean[0][i]=='츄') hiragana = hiragana+'ちゅ';
+      else if(korean[0][i]=='츈') hiragana = hiragana+'ちゅん';
+      else if(korean[0][i]=='츙') hiragana = hiragana+'ちゅん';
+      else if(korean[0][i]=='츗') hiragana = hiragana+'ちゅっ';
+      else if(korean[0][i]=='쵸') hiragana = hiragana+'ちょ';
+      else if(korean[0][i]=='쵼') hiragana = hiragana+'ちょん';
+      else if(korean[0][i]=='춍') hiragana = hiragana+'ちょん';
+      else if(korean[0][i]=='춋') hiragana = hiragana+'ちょっ';
+
+      else if(korean[0][i]=='쨔') hiragana = hiragana+'ちゃ';
+      else if(korean[0][i]=='쨘') hiragana = hiragana+'ちゃん';
+      else if(korean[0][i]=='쨩') hiragana = hiragana+'ちゃん';
+      else if(korean[0][i]=='쨧') hiragana = hiragana+'ちゃっ';
+      else if(korean[0][i]=='쮸') hiragana = hiragana+'ちゅ';
+      else if(korean[0][i]=='쮼') hiragana = hiragana+'ちゅん';
+      else if(korean[0][i]=='쯍') hiragana = hiragana+'ちゅん';
+      else if(korean[0][i]=='쯋') hiragana = hiragana+'ちゅっ';
+      else if(korean[0][i]=='쬬') hiragana = hiragana+'ちょ';
+      else if(korean[0][i]=='쬰') hiragana = hiragana+'ちょん';
+      else if(korean[0][i]=='쭁') hiragana = hiragana+'ちょん';
+      else if(korean[0][i]=='쬿') hiragana = hiragana+'ちょっ';
+
+      else if(korean[0][i]=='댜') hiragana = hiragana+'ぢゃ';
+      else if(korean[0][i]=='댠') hiragana = hiragana+'ぢゃん';
+      else if(korean[0][i]=='댱') hiragana = hiragana+'ぢゃん';
+      else if(korean[0][i]=='댯') hiragana = hiragana+'ぢゃっ';
+      else if(korean[0][i]=='듀') hiragana = hiragana+'ぢゅ';
+      else if(korean[0][i]=='듄') hiragana = hiragana+'ぢゅん';
+      else if(korean[0][i]=='듕') hiragana = hiragana+'ぢゅん';
+      else if(korean[0][i]=='듓') hiragana = hiragana+'ぢゅっ';
+      else if(korean[0][i]=='됴') hiragana = hiragana+'ぢょ';
+      else if(korean[0][i]=='됸') hiragana = hiragana+'ぢょん';
+      else if(korean[0][i]=='둉') hiragana = hiragana+'ぢょん';
+      else if(korean[0][i]=='둇') hiragana = hiragana+'ぢょっ';
+
+      else if(korean[0][i]=='냐') hiragana = hiragana+'にゃ';
+      else if(korean[0][i]=='냔') hiragana = hiragana+'にゃん';
+      else if(korean[0][i]=='냥') hiragana = hiragana+'にゃん';
+      else if(korean[0][i]=='냣') hiragana = hiragana+'にゃっ';
+      else if(korean[0][i]=='뉴') hiragana = hiragana+'にゅ';
+      else if(korean[0][i]=='뉸') hiragana = hiragana+'にゅん';
+      else if(korean[0][i]=='늉') hiragana = hiragana+'にゅん';
+      else if(korean[0][i]=='늇') hiragana = hiragana+'にゅっ';
+      else if(korean[0][i]=='뇨') hiragana = hiragana+'にょ';
+      else if(korean[0][i]=='뇬') hiragana = hiragana+'にょん';
+      else if(korean[0][i]=='뇽') hiragana = hiragana+'にょん';
+      else if(korean[0][i]=='뇻') hiragana = hiragana+'にょっ';
+
+      else if(korean[0][i]=='햐') hiragana = hiragana+'ひゃ';
+      else if(korean[0][i]=='햔') hiragana = hiragana+'ひゃん';
+      else if(korean[0][i]=='향') hiragana = hiragana+'ひゃん';
+      else if(korean[0][i]=='햣') hiragana = hiragana+'ひゃっ';
+      else if(korean[0][i]=='휴') hiragana = hiragana+'ひゅ';
+      else if(korean[0][i]=='휸') hiragana = hiragana+'ひゅん';
+      else if(korean[0][i]=='흉') hiragana = hiragana+'ひゅん';
+      else if(korean[0][i]=='흇') hiragana = hiragana+'ひゅっ';
+      else if(korean[0][i]=='효') hiragana = hiragana+'ひょ';
+      else if(korean[0][i]=='횬') hiragana = hiragana+'ひょん';
+      else if(korean[0][i]=='횽') hiragana = hiragana+'ひょん';
+      else if(korean[0][i]=='횻') hiragana = hiragana+'ひょっ';
+
+      else if(korean[0][i]=='뱌') hiragana = hiragana+'びゃ';
+      else if(korean[0][i]=='뱐') hiragana = hiragana+'びゃん';
+      else if(korean[0][i]=='뱡') hiragana = hiragana+'びゃん';
+      else if(korean[0][i]=='뱟') hiragana = hiragana+'びゃっ';
+      else if(korean[0][i]=='뷰') hiragana = hiragana+'びゅ';
+      else if(korean[0][i]=='뷴') hiragana = hiragana+'びゅん';
+      else if(korean[0][i]=='븅') hiragana = hiragana+'びゅん';
+      else if(korean[0][i]=='븃') hiragana = hiragana+'びゅっ';
+      else if(korean[0][i]=='뵤') hiragana = hiragana+'びょ';
+      else if(korean[0][i]=='뵨') hiragana = hiragana+'びょん';
+      else if(korean[0][i]=='뵹') hiragana = hiragana+'びょん';
+      else if(korean[0][i]=='뵷') hiragana = hiragana+'びょっ';
+
+      else if(korean[0][i]=='퍄') hiragana = hiragana+'ぴゃ';
+      else if(korean[0][i]=='퍈') hiragana = hiragana+'ぴゃん';
+      else if(korean[0][i]=='퍙') hiragana = hiragana+'ぴゃん';
+      else if(korean[0][i]=='퍗') hiragana = hiragana+'ぴゃっ';
+      else if(korean[0][i]=='퓨') hiragana = hiragana+'ぴゅ';
+      else if(korean[0][i]=='퓬') hiragana = hiragana+'ぴゅん';
+      else if(korean[0][i]=='퓽') hiragana = hiragana+'ぴゅん';
+      else if(korean[0][i]=='퓻') hiragana = hiragana+'ぴゅっ';
+      else if(korean[0][i]=='표') hiragana = hiragana+'ぴょ';
+      else if(korean[0][i]=='푠') hiragana = hiragana+'ぴょん';
+      else if(korean[0][i]=='푱') hiragana = hiragana+'ぴょん';
+      else if(korean[0][i]=='푯') hiragana = hiragana+'ぴょっ';
+
+      else if(korean[0][i]=='뺘') hiragana = hiragana+'ぴゃ';
+      else if(korean[0][i]=='뺜') hiragana = hiragana+'ぴゃん';
+      else if(korean[0][i]=='뺭') hiragana = hiragana+'ぴゃん';
+      else if(korean[0][i]=='뺫') hiragana = hiragana+'ぴゃっ';
+      else if(korean[0][i]=='쀼') hiragana = hiragana+'ぴゅ';
+      else if(korean[0][i]=='쁀') hiragana = hiragana+'ぴゅん';
+      else if(korean[0][i]=='쁑') hiragana = hiragana+'ぴゅん';
+      else if(korean[0][i]=='쁏') hiragana = hiragana+'ぴゅっ';
+      else if(korean[0][i]=='뾰') hiragana = hiragana+'ぴょ';
+      else if(korean[0][i]=='뾴') hiragana = hiragana+'ぴょん';
+      else if(korean[0][i]=='뿅') hiragana = hiragana+'ぴょん';
+      else if(korean[0][i]=='뿃') hiragana = hiragana+'ぴょっ';
+
+      else if(korean[0][i]=='먀') hiragana = hiragana+'みゃ';
+      else if(korean[0][i]=='먄') hiragana = hiragana+'みゃん';
+      else if(korean[0][i]=='먕') hiragana = hiragana+'みゃん';
+      else if(korean[0][i]=='먓') hiragana = hiragana+'みゃっ';
+      else if(korean[0][i]=='뮤') hiragana = hiragana+'みゅ';
+      else if(korean[0][i]=='뮨') hiragana = hiragana+'みゅん';
+      else if(korean[0][i]=='뮹') hiragana = hiragana+'みゅん';
+      else if(korean[0][i]=='뮷') hiragana = hiragana+'みゅっ';
+      else if(korean[0][i]=='묘') hiragana = hiragana+'みょ';
+      else if(korean[0][i]=='묜') hiragana = hiragana+'みょん';
+      else if(korean[0][i]=='묭') hiragana = hiragana+'みょん';
+      else if(korean[0][i]=='묫') hiragana = hiragana+'みょっ';
+
+      else if(korean[0][i]=='랴') hiragana = hiragana+'りゃ';
+      else if(korean[0][i]=='랸') hiragana = hiragana+'りゃん';
+      else if(korean[0][i]=='량') hiragana = hiragana+'りゃん';
+      else if(korean[0][i]=='럇') hiragana = hiragana+'りゃっ';
+      else if(korean[0][i]=='류') hiragana = hiragana+'りゅ';
+      else if(korean[0][i]=='륜') hiragana = hiragana+'りゅん';
+      else if(korean[0][i]=='륭') hiragana = hiragana+'りゅん';
+      else if(korean[0][i]=='륫') hiragana = hiragana+'りゅっ';
+      else if(korean[0][i]=='료') hiragana = hiragana+'りょ';
+      else if(korean[0][i]=='룐') hiragana = hiragana+'りょん';
+      else if(korean[0][i]=='룡') hiragana = hiragana+'りょん';
+      else if(korean[0][i]=='룟') hiragana = hiragana+'りょっ';
+
+      else hiragana = hiragana + korean[0][i];
+
+      if(korean[0][i] == '아') katakana = katakana + 'ア';
+      else if(korean[0][i] == '이') katakana = katakana + 'イ';
+      else if(korean[0][i] == '우') katakana = katakana + 'ウ';
+      else if(korean[0][i] == '애') katakana = katakana + 'エ';
+      else if(korean[0][i] == '오') katakana = katakana + 'オ';
+      else if(korean[0][i] == '으') katakana = katakana + 'ウ';
+      else if(korean[0][i] == '에') katakana = katakana + 'エ';
+
+      else if(korean[0][i] == '카') katakana = katakana + 'カ';
+      else if(korean[0][i] == '키') katakana = katakana + 'キ';
+      else if(korean[0][i] == '쿠') katakana = katakana + 'ク';
+      else if(korean[0][i] == '캐') katakana = katakana + 'ケ';
+      else if(korean[0][i] == '코') katakana = katakana + 'コ';
+      else if(korean[0][i] == '크') katakana = katakana + 'ク';
+      else if(korean[0][i] == '케') katakana = katakana + 'ケ';
+
+      else if(korean[0][i] == '까') katakana = katakana + 'カ';
+      else if(korean[0][i] == '끼') katakana = katakana + 'キ';
+      else if(korean[0][i] == '꾸') katakana = katakana + 'ク';
+      else if(korean[0][i] == '깨') katakana = katakana + 'ケ';
+      else if(korean[0][i] == '꼬') katakana = katakana + 'コ';
+      else if(korean[0][i] == '끄') katakana = katakana + 'ク';
+      else if(korean[0][i] == '께') katakana = katakana + 'ケ';
+
+      else if(korean[0][i] == '가') katakana = katakana + 'ガ';
+      else if(korean[0][i] == '기') katakana = katakana + 'ギ';
+      else if(korean[0][i] == '구') katakana = katakana + 'グ';
+      else if(korean[0][i] == '개') katakana = katakana + 'ゲ';
+      else if(korean[0][i] == '고') katakana = katakana + 'ゴ';
+      else if(korean[0][i] == '그') katakana = katakana + 'グ';
+      else if(korean[0][i] == '게') katakana = katakana + 'ゲ';
+
+      else if(korean[0][i] == '사') katakana = katakana + 'サ';
+      else if(korean[0][i] == '시') katakana = katakana + 'シ';
+      else if(korean[0][i] == '수') katakana = katakana + 'ス';
+      else if(korean[0][i] == '새') katakana = katakana + 'セ';
+      else if(korean[0][i] == '소') katakana = katakana + 'ソ';
+      else if(korean[0][i] == '스') katakana = katakana + 'ス';
+      else if(korean[0][i] == '세') katakana = katakana + 'セ';
+
+      else if(korean[0][i] == '싸') katakana = katakana + 'サ';
+      else if(korean[0][i] == '씨') katakana = katakana + 'シ';
+      else if(korean[0][i] == '쑤') katakana = katakana + 'ス';
+      else if(korean[0][i] == '쎄') katakana = katakana + 'セ';
+      else if(korean[0][i] == '쏘') katakana = katakana + 'ソ';
+      else if(korean[0][i] == '쓰') katakana = katakana + 'ス';
+      else if(korean[0][i] == '쎄') katakana = katakana + 'セ';
+
+      else if(korean[0][i] == '자') katakana = katakana + 'ザ';
+      else if(korean[0][i] == '지') katakana = katakana + 'ジ';
+      else if(korean[0][i] == '주') katakana = katakana + 'ズ';
+      else if(korean[0][i] == '재') katakana = katakana + 'ゼ';
+      else if(korean[0][i] == '조') katakana = katakana + 'ゾ';
+      else if(korean[0][i] == '즈') katakana = katakana + 'ズ';
+      else if(korean[0][i] == '제') katakana = katakana + 'ゼ';
+
+      else if(korean[0][i] == '타') katakana = katakana + 'タ';
+      else if(korean[0][i] == '티') katakana = katakana + 'チ';
+      else if(korean[0][i] == '투') katakana = katakana + 'ツ';
+      else if(korean[0][i] == '태') katakana = katakana + 'テ';
+      else if(korean[0][i] == '토') katakana = katakana + 'ト';
+      else if(korean[0][i] == '트') katakana = katakana + 'ツ';
+      else if(korean[0][i] == '테') katakana = katakana + 'テ';
+
+      else if(korean[0][i] == '따') katakana = katakana + 'タ';
+      else if(korean[0][i] == '띠') katakana = katakana + 'チ';
+      else if(korean[0][i] == '뚜') katakana = katakana + 'ツ';
+      else if(korean[0][i] == '때') katakana = katakana + 'テ';
+      else if(korean[0][i] == '또') katakana = katakana + 'ト';
+      else if(korean[0][i] == '뜨') katakana = katakana + 'ツ';
+      else if(korean[0][i] == '떼') katakana = katakana + 'テ';
+
+      else if(korean[0][i] == '차') katakana = katakana + 'タ';
+      else if(korean[0][i] == '치') katakana = katakana + 'チ';
+      else if(korean[0][i] == '추') katakana = katakana + 'ツ';
+      else if(korean[0][i] == '채') katakana = katakana + 'テ';
+      else if(korean[0][i] == '초') katakana = katakana + 'ト';
+      else if(korean[0][i] == '츠') katakana = katakana + 'ツ';
+      else if(korean[0][i] == '체') katakana = katakana + 'テ';
+
+      else if(korean[0][i] == '짜') katakana = katakana + 'タ';
+      else if(korean[0][i] == '찌') katakana = katakana + 'チ';
+      else if(korean[0][i] == '쭈') katakana = katakana + 'ツ';
+      else if(korean[0][i] == '째') katakana = katakana + 'テ';
+      else if(korean[0][i] == '쪼') katakana = katakana + 'ト';
+      else if(korean[0][i] == '쯔') katakana = katakana + 'ツ';
+      else if(korean[0][i] == '쩨') katakana = katakana + 'テ';
+
+      else if(korean[0][i] == '다') katakana = katakana + 'ダ';
+      else if(korean[0][i] == '디') katakana = katakana + 'ヂ';
+      else if(korean[0][i] == '두') katakana = katakana + 'ヅ';
+      else if(korean[0][i] == '대') katakana = katakana + 'デ';
+      else if(korean[0][i] == '도') katakana = katakana + 'ド';
+      else if(korean[0][i] == '드') katakana = katakana + 'ヅ';
+      else if(korean[0][i] == '데') katakana = katakana + 'デ';
+
+      else if(korean[0][i] == '나') katakana = katakana + 'ナ';
+      else if(korean[0][i] == '니') katakana = katakana + '二';
+      else if(korean[0][i] == '누') katakana = katakana + 'ヌ';
+      else if(korean[0][i] == '내') katakana = katakana + 'ネ';
+      else if(korean[0][i] == '노') katakana = katakana + 'ノ';
+      else if(korean[0][i] == '느') katakana = katakana + 'ヌ';
+      else if(korean[0][i] == '네') katakana = katakana + 'ネ';
+
+      else if(korean[0][i] == '하') katakana = katakana + 'ハ';
+      else if(korean[0][i] == '히') katakana = katakana + 'ヒ';
+      else if(korean[0][i] == '후') katakana = katakana + 'フ';
+      else if(korean[0][i] == '해') katakana = katakana + 'ヘ';
+      else if(korean[0][i] == '호') katakana = katakana + 'ホ';
+      else if(korean[0][i] == '흐') katakana = katakana + 'フ';
+      else if(korean[0][i] == '헤') katakana = katakana + 'ヘ';
+
+      else if(korean[0][i] == '바') katakana = katakana + 'バ';
+      else if(korean[0][i] == '비') katakana = katakana + 'ビ';
+      else if(korean[0][i] == '부') katakana = katakana + 'ブ';
+      else if(korean[0][i] == '배') katakana = katakana + 'ベ';
+      else if(korean[0][i] == '보') katakana = katakana + 'ボ';
+      else if(korean[0][i] == '브') katakana = katakana + 'ブ';
+      else if(korean[0][i] == '베') katakana = katakana + 'ベ';
+
+      else if(korean[0][i] == '파') katakana = katakana + 'パ';
+      else if(korean[0][i] == '피') katakana = katakana + 'ピ';
+      else if(korean[0][i] == '푸') katakana = katakana + 'プ';
+      else if(korean[0][i] == '패') katakana = katakana + 'ペ';
+      else if(korean[0][i] == '포') katakana = katakana + 'ポ';
+      else if(korean[0][i] == '프') katakana = katakana + 'プ';
+      else if(korean[0][i] == '페') katakana = katakana + 'ペ';
+
+      else if(korean[0][i] == '빠') katakana = katakana + 'パ';
+      else if(korean[0][i] == '삐') katakana = katakana + 'ピ';
+      else if(korean[0][i] == '뿌') katakana = katakana + 'プ';
+      else if(korean[0][i] == '빼') katakana = katakana + 'ペ';
+      else if(korean[0][i] == '뽀') katakana = katakana + 'ポ';
+      else if(korean[0][i] == '쁘') katakana = katakana + 'プ';
+      else if(korean[0][i] == '뻬') katakana = katakana + 'ペ';
+
+      else if(korean[0][i] == '마') katakana = katakana + 'マ';
+      else if(korean[0][i] == '미') katakana = katakana + 'ミ';
+      else if(korean[0][i] == '무') katakana = katakana + 'ム';
+      else if(korean[0][i] == '매') katakana = katakana + 'メ';
+      else if(korean[0][i] == '모') katakana = katakana + 'モ';
+      else if(korean[0][i] == '므') katakana = katakana + 'ム';
+      else if(korean[0][i] == '메') katakana = katakana + 'メ';
+
+      else if(korean[0][i] == '라') katakana = katakana + 'ラ';
+      else if(korean[0][i] == '리') katakana = katakana + 'リ';
+      else if(korean[0][i] == '루') katakana = katakana + 'ル';
+      else if(korean[0][i] == '래') katakana = katakana + 'レ';
+      else if(korean[0][i] == '로') katakana = katakana + 'ロ';
+      else if(korean[0][i] == '르') katakana = katakana + 'ル';
+      else if(korean[0][i] == '레') katakana = katakana + 'レ';
+
+      else if(korean[0][i] == '야') katakana = katakana + 'ヤ';
+      else if(korean[0][i] == '유') katakana = katakana + 'ユ';
+      else if(korean[0][i] == '요') katakana = katakana + 'ヨ';
+
+      else if(korean[0][i] == '와') katakana = katakana + 'ワ';
+      else if(korean[0][i] == '위') katakana = katakana + 'ヰ';
+      else if(korean[0][i] == '외') katakana = katakana + 'ヲ';
+
+
+      else if(korean[0][i] == '양') katakana = katakana + 'ヤン';
+      else if(korean[0][i] == '융') katakana = katakana + 'ユン';
+      else if(korean[0][i] == '용') katakana = katakana + 'ヨン';
+
+      else if(korean[0][i] == '얀') katakana = katakana + 'ヤン';
+      else if(korean[0][i] == '윤') katakana = katakana + 'ユン';
+      else if(korean[0][i] == '욘') katakana = katakana + 'ヨン';
+
+      else if(korean[0][i] == '얏') katakana = katakana + 'ヤッ';
+      else if(korean[0][i] == '윳') katakana = katakana + 'ユッ';
+      else if(korean[0][i] == '욧') katakana = katakana + 'ヨッ';
+
+
+      else if(korean[0][i] == '왕') katakana = katakana + 'ワン';
+      else if(korean[0][i] == '윙') katakana = katakana + 'ヰン';
+      else if(korean[0][i] == '욍') katakana = katakana + 'ヲン';
+
+      else if(korean[0][i] == '완') katakana = katakana + 'ワン';
+      else if(korean[0][i] == '윈') katakana = katakana + 'ヰン';
+      else if(korean[0][i] == '왼') katakana = katakana + 'ヲン';
+
+      else if(korean[0][i] == '왓') katakana = katakana + 'ワッ';
+      else if(korean[0][i] == '윗') katakana = katakana + 'ヰッ';
+      else if(korean[0][i] == '욋') katakana = katakana + 'ヲッ';
+
+
+      else if(korean[0][i] == '앙') katakana = katakana + 'アン';
+      else if(korean[0][i] == '잉') katakana = katakana + 'イン';
+      else if(korean[0][i] == '웅') katakana = katakana + 'ウン';
+      else if(korean[0][i] == '앵') katakana = katakana + 'エン';
+      else if(korean[0][i] == '옹') katakana = katakana + 'オン';
+      else if(korean[0][i] == '응') katakana = katakana + 'ウン';
+      else if(korean[0][i] == '엥') katakana = katakana + 'エン';
+
+      else if(korean[0][i] == '안') katakana = katakana + 'アン';
+      else if(korean[0][i] == '인') katakana = katakana + 'イン';
+      else if(korean[0][i] == '운') katakana = katakana + 'ウン';
+      else if(korean[0][i] == '앤') katakana = katakana + 'エン';
+      else if(korean[0][i] == '온') katakana = katakana + 'オン';
+      else if(korean[0][i] == '은') katakana = katakana + 'ウン';
+      else if(korean[0][i] == '엔') katakana = katakana + 'エン';
+
+      else if(korean[0][i] == '앗') katakana = katakana + 'アッ';
+      else if(korean[0][i] == '잇') katakana = katakana + 'イッ';
+      else if(korean[0][i] == '웃') katakana = katakana + 'ウッ';
+      else if(korean[0][i] == '앤') katakana = katakana + 'エッ';
+      else if(korean[0][i] == '옷') katakana = katakana + 'オッ';
+      else if(korean[0][i] == '읏') katakana = katakana + 'ウッ';
+      else if(korean[0][i] == '엣') katakana = katakana + 'エッ';
+
+      else if(korean[0][i] == '캉') katakana = katakana + 'カン';
+      else if(korean[0][i] == '킹') katakana = katakana + 'キン';
+      else if(korean[0][i] == '쿵') katakana = katakana + 'クン';
+      else if(korean[0][i] == '캥') katakana = katakana + 'ケン';
+      else if(korean[0][i] == '콩') katakana = katakana + 'コン';
+      else if(korean[0][i] == '킁') katakana = katakana + 'クン';
+      else if(korean[0][i] == '켕') katakana = katakana + 'ケン';
+
+      else if(korean[0][i] == '칸') katakana = katakana + 'カン';
+      else if(korean[0][i] == '킨') katakana = katakana + 'キン';
+      else if(korean[0][i] == '쿤') katakana = katakana + 'クン';
+      else if(korean[0][i] == '캔') katakana = katakana + 'ケン';
+      else if(korean[0][i] == '콘') katakana = katakana + 'コン';
+      else if(korean[0][i] == '큰') katakana = katakana + 'クン';
+      else if(korean[0][i] == '켄') katakana = katakana + 'ケン';
+
+      else if(korean[0][i] == '캇') katakana = katakana + 'カッ';
+      else if(korean[0][i] == '킷') katakana = katakana + 'キッ';
+      else if(korean[0][i] == '쿳') katakana = katakana + 'クッ';
+      else if(korean[0][i] == '캣') katakana = katakana + 'ケッ';
+      else if(korean[0][i] == '콘') katakana = katakana + 'コッ';
+      else if(korean[0][i] == '큿') katakana = katakana + 'クッ';
+      else if(korean[0][i] == '켓') katakana = katakana + 'ケッ';
+
+      else if(korean[0][i] == '깡') katakana = katakana + 'カン';
+      else if(korean[0][i] == '낑') katakana = katakana + 'キン';
+      else if(korean[0][i] == '꿍') katakana = katakana + 'クン';
+      else if(korean[0][i] == '깽') katakana = katakana + 'ケン';
+      else if(korean[0][i] == '꽁') katakana = katakana + 'コン';
+      else if(korean[0][i] == '끙') katakana = katakana + 'クン';
+      else if(korean[0][i] == '껭') katakana = katakana + 'ケン';
+
+      else if(korean[0][i] == '깐') katakana = katakana + 'カン';
+      else if(korean[0][i] == '낀') katakana = katakana + 'キン';
+      else if(korean[0][i] == '꾼') katakana = katakana + 'クン';
+      else if(korean[0][i] == '깬') katakana = katakana + 'ケン';
+      else if(korean[0][i] == '꼰') katakana = katakana + 'コン';
+      else if(korean[0][i] == '끈') katakana = katakana + 'クン';
+      else if(korean[0][i] == '껜') katakana = katakana + 'ケン';
+
+      else if(korean[0][i] == '깟') katakana = katakana + 'カッ';
+      else if(korean[0][i] == '낏') katakana = katakana + 'キッ';
+      else if(korean[0][i] == '꿋') katakana = katakana + 'クッ';
+      else if(korean[0][i] == '깻') katakana = katakana + 'ケッ';
+      else if(korean[0][i] == '꼿') katakana = katakana + 'コッ';
+      else if(korean[0][i] == '끗') katakana = katakana + 'クッ';
+      else if(korean[0][i] == '껫') katakana = katakana + 'ケッ';
+
+      else if(korean[0][i] == '강') katakana = katakana + 'ガン';
+      else if(korean[0][i] == '깅') katakana = katakana + 'ギン';
+      else if(korean[0][i] == '궁') katakana = katakana + 'グン';
+      else if(korean[0][i] == '갱') katakana = katakana + 'ゲン';
+      else if(korean[0][i] == '공') katakana = katakana + 'ゴン';
+      else if(korean[0][i] == '긍') katakana = katakana + 'グン';
+      else if(korean[0][i] == '겡') katakana = katakana + 'ゲン';
+
+      else if(korean[0][i] == '간') katakana = katakana + 'ガン';
+      else if(korean[0][i] == '긴') katakana = katakana + 'ギン';
+      else if(korean[0][i] == '군') katakana = katakana + 'グン';
+      else if(korean[0][i] == '갠') katakana = katakana + 'ゲン';
+      else if(korean[0][i] == '곤') katakana = katakana + 'ゴン';
+      else if(korean[0][i] == '근') katakana = katakana + 'グン';
+      else if(korean[0][i] == '겐') katakana = katakana + 'ゲン';
+
+      else if(korean[0][i] == '갓') katakana = katakana + 'ガッ';
+      else if(korean[0][i] == '깃') katakana = katakana + 'ギッ';
+      else if(korean[0][i] == '굿') katakana = katakana + 'グッ';
+      else if(korean[0][i] == '갯') katakana = katakana + 'ゲッ';
+      else if(korean[0][i] == '곳') katakana = katakana + 'ゴッ';
+      else if(korean[0][i] == '긋') katakana = katakana + 'グッ';
+      else if(korean[0][i] == '겟') katakana = katakana + 'ゲッ';
+
+      else if(korean[0][i] == '상') katakana = katakana + 'サン';
+      else if(korean[0][i] == '싱') katakana = katakana + 'シン';
+      else if(korean[0][i] == '숭') katakana = katakana + 'スン';
+      else if(korean[0][i] == '생') katakana = katakana + 'セン';
+      else if(korean[0][i] == '송') katakana = katakana + 'ソン';
+      else if(korean[0][i] == '승') katakana = katakana + 'スン';
+      else if(korean[0][i] == '셍') katakana = katakana + 'セン';
+
+      else if(korean[0][i] == '산') katakana = katakana + 'サン';
+      else if(korean[0][i] == '신') katakana = katakana + 'シン';
+      else if(korean[0][i] == '순') katakana = katakana + 'スン';
+      else if(korean[0][i] == '샌') katakana = katakana + 'セン';
+      else if(korean[0][i] == '손') katakana = katakana + 'ソン';
+      else if(korean[0][i] == '슨') katakana = katakana + 'スン';
+      else if(korean[0][i] == '센') katakana = katakana + 'セン';
+
+      else if(korean[0][i] == '삿') katakana = katakana + 'サッ';
+      else if(korean[0][i] == '싯') katakana = katakana + 'シッ';
+      else if(korean[0][i] == '숫') katakana = katakana + 'スッ';
+      else if(korean[0][i] == '샛') katakana = katakana + 'セッ';
+      else if(korean[0][i] == '솟') katakana = katakana + 'ソッ';
+      else if(korean[0][i] == '슷') katakana = katakana + 'スッ';
+      else if(korean[0][i] == '셋') katakana = katakana + 'セッ';
+
+      else if(korean[0][i] == '쌍') katakana = katakana + 'サン';
+      else if(korean[0][i] == '씽') katakana = katakana + 'シン';
+      else if(korean[0][i] == '쑹') katakana = katakana + 'スン';
+      else if(korean[0][i] == '쌩') katakana = katakana + 'セン';
+      else if(korean[0][i] == '쏭') katakana = katakana + 'ソン';
+      else if(korean[0][i] == '씅') katakana = katakana + 'スン';
+      else if(korean[0][i] == '쎙') katakana = katakana + 'セン';
+
+      else if(korean[0][i] == '싼') katakana = katakana + 'サン';
+      else if(korean[0][i] == '씬') katakana = katakana + 'シン';
+      else if(korean[0][i] == '쑨') katakana = katakana + 'スン';
+      else if(korean[0][i] == '쌘') katakana = katakana + 'セン';
+      else if(korean[0][i] == '쏜') katakana = katakana + 'ソン';
+      else if(korean[0][i] == '쓴') katakana = katakana + 'スン';
+      else if(korean[0][i] == '쎈') katakana = katakana + 'セン';
+
+      else if(korean[0][i] == '쌋') katakana = katakana + 'サッ';
+      else if(korean[0][i] == '씻') katakana = katakana + 'シッ';
+      else if(korean[0][i] == '쑷') katakana = katakana + 'スッ';
+      else if(korean[0][i] == '쌧') katakana = katakana + 'セッ';
+      else if(korean[0][i] == '쏫') katakana = katakana + 'ソッ';
+      else if(korean[0][i] == '씃') katakana = katakana + 'スッ';
+      else if(korean[0][i] == '쎗') katakana = katakana + 'セッ';
+
+
+      else if(korean[0][i] == '장') katakana = katakana + 'ザン';
+      else if(korean[0][i] == '징') katakana = katakana + 'ジン';
+      else if(korean[0][i] == '중') katakana = katakana + 'ズン';
+      else if(korean[0][i] == '쟁') katakana = katakana + 'ゼン';
+      else if(korean[0][i] == '종') katakana = katakana + 'ゾン';
+      else if(korean[0][i] == '증') katakana = katakana + 'ズン';
+      else if(korean[0][i] == '젱') katakana = katakana + 'ゼン';
+
+      else if(korean[0][i] == '잔') katakana = katakana + 'ザン';
+      else if(korean[0][i] == '진') katakana = katakana + 'ジン';
+      else if(korean[0][i] == '준') katakana = katakana + 'ズン';
+      else if(korean[0][i] == '잰') katakana = katakana + 'ゼン';
+      else if(korean[0][i] == '존') katakana = katakana + 'ゾン';
+      else if(korean[0][i] == '즌') katakana = katakana + 'ズン';
+      else if(korean[0][i] == '젠') katakana = katakana + 'ゼン';
+
+      else if(korean[0][i] == '잣') katakana = katakana + 'ザッ';
+      else if(korean[0][i] == '짓') katakana = katakana + 'ジッ';
+      else if(korean[0][i] == '줏') katakana = katakana + 'ズッ';
+      else if(korean[0][i] == '잿') katakana = katakana + 'ゼッ';
+      else if(korean[0][i] == '좃') katakana = katakana + 'ゾッ';
+      else if(korean[0][i] == '즛') katakana = katakana + 'ズッ';
+      else if(korean[0][i] == '젯') katakana = katakana + 'ゼッ';
+
+      else if(korean[0][i] == '탕') katakana = katakana + 'タン';
+      else if(korean[0][i] == '팅') katakana = katakana + 'チン';
+      else if(korean[0][i] == '퉁') katakana = katakana + 'ツン';
+      else if(korean[0][i] == '탱') katakana = katakana + 'テン';
+      else if(korean[0][i] == '통') katakana = katakana + 'トン';
+      else if(korean[0][i] == '틍') katakana = katakana + 'ツン';
+      else if(korean[0][i] == '텡') katakana = katakana + 'テン';
+
+      else if(korean[0][i] == '탄') katakana = katakana + 'タン';
+      else if(korean[0][i] == '틴') katakana = katakana + 'チン';
+      else if(korean[0][i] == '퉁') katakana = katakana + 'ツン';
+      else if(korean[0][i] == '탠') katakana = katakana + 'テン';
+      else if(korean[0][i] == '톤') katakana = katakana + 'トン';
+      else if(korean[0][i] == '튼') katakana = katakana + 'ツン';
+      else if(korean[0][i] == '텐') katakana = katakana + 'テン';
+
+      else if(korean[0][i] == '탓') katakana = katakana + 'タッ';
+      else if(korean[0][i] == '팃') katakana = katakana + 'チッ';
+      else if(korean[0][i] == '툿') katakana = katakana + 'ツッ';
+      else if(korean[0][i] == '탯') katakana = katakana + 'テッ';
+      else if(korean[0][i] == '톳') katakana = katakana + 'トッ';
+      else if(korean[0][i] == '틋') katakana = katakana + 'ツッ';
+      else if(korean[0][i] == '텟') katakana = katakana + 'テッ';
+
+      else if(korean[0][i] == '땅') katakana = katakana + 'タン';
+      else if(korean[0][i] == '띵') katakana = katakana + 'チン';
+      else if(korean[0][i] == '뚱') katakana = katakana + 'ツン';
+      else if(korean[0][i] == '땡') katakana = katakana + 'テン';
+      else if(korean[0][i] == '똥') katakana = katakana + 'トン';
+      else if(korean[0][i] == '뜽') katakana = katakana + 'ツン';
+      else if(korean[0][i] == '뗑') katakana = katakana + 'テン';
+
+      else if(korean[0][i] == '땅') katakana = katakana + 'タン';
+      else if(korean[0][i] == '띵') katakana = katakana + 'チン';
+      else if(korean[0][i] == '뚱') katakana = katakana + 'ツン';
+      else if(korean[0][i] == '땡') katakana = katakana + 'テン';
+      else if(korean[0][i] == '똥') katakana = katakana + 'トン';
+      else if(korean[0][i] == '뜽') katakana = katakana + 'ツン';
+      else if(korean[0][i] == '뗑') katakana = katakana + 'テン';
+
+      else if(korean[0][i] == '땃') katakana = katakana + 'タッ';
+      else if(korean[0][i] == '띳') katakana = katakana + 'チッ';
+      else if(korean[0][i] == '뚯') katakana = katakana + 'ツッ';
+      else if(korean[0][i] == '땟') katakana = katakana + 'テッ';
+      else if(korean[0][i] == '똣') katakana = katakana + 'トッ';
+      else if(korean[0][i] == '뜻') katakana = katakana + 'ツッ';
+      else if(korean[0][i] == '뗏') katakana = katakana + 'テッ';
+
+      else if(korean[0][i] == '창') katakana = katakana + 'タン';
+      else if(korean[0][i] == '칭') katakana = katakana + 'チン';
+      else if(korean[0][i] == '충') katakana = katakana + 'ツン';
+      else if(korean[0][i] == '챙') katakana = katakana + 'テン';
+      else if(korean[0][i] == '총') katakana = katakana + 'トン';
+      else if(korean[0][i] == '층') katakana = katakana + 'ツン';
+      else if(korean[0][i] == '쳉') katakana = katakana + 'テン';
+
+      else if(korean[0][i] == '찬') katakana = katakana + 'タン';
+      else if(korean[0][i] == '친') katakana = katakana + 'チン';
+      else if(korean[0][i] == '춘') katakana = katakana + 'ツン';
+      else if(korean[0][i] == '챈') katakana = katakana + 'テン';
+      else if(korean[0][i] == '촌') katakana = katakana + 'トン';
+      else if(korean[0][i] == '츤') katakana = katakana + 'ツン';
+      else if(korean[0][i] == '첸') katakana = katakana + 'テン';
+
+      else if(korean[0][i] == '찻') katakana = katakana + 'タッ';
+      else if(korean[0][i] == '칫') katakana = katakana + 'チッ';
+      else if(korean[0][i] == '춧') katakana = katakana + 'ツッ';
+      else if(korean[0][i] == '챗') katakana = katakana + 'テッ';
+      else if(korean[0][i] == '촛') katakana = katakana + 'トッ';
+      else if(korean[0][i] == '츳') katakana = katakana + 'ツッ';
+      else if(korean[0][i] == '쳇') katakana = katakana + 'テッ';
+
+      else if(korean[0][i] == '짱') katakana = katakana + 'タン';
+      else if(korean[0][i] == '찡') katakana = katakana + 'チン';
+      else if(korean[0][i] == '쭝') katakana = katakana + 'ツン';
+      else if(korean[0][i] == '쨍') katakana = katakana + 'テン';
+      else if(korean[0][i] == '쫑') katakana = katakana + 'トン';
+      else if(korean[0][i] == '쯩') katakana = katakana + 'ツン';
+      else if(korean[0][i] == '쩽') katakana = katakana + 'テン';
+
+      else if(korean[0][i] == '짠') katakana = katakana + 'タン';
+      else if(korean[0][i] == '찐') katakana = katakana + 'チン';
+      else if(korean[0][i] == '쭌') katakana = katakana + 'ツン';
+      else if(korean[0][i] == '짼') katakana = katakana + 'テン';
+      else if(korean[0][i] == '쫀') katakana = katakana + 'トン';
+      else if(korean[0][i] == '쯘') katakana = katakana + 'ツン';
+      else if(korean[0][i] == '쩬') katakana = katakana + 'テン';
+
+      else if(korean[0][i] == '짯') katakana = katakana + 'タッ';
+      else if(korean[0][i] == '찟') katakana = katakana + 'チッ';
+      else if(korean[0][i] == '쭛') katakana = katakana + 'ツッ';
+      else if(korean[0][i] == '쨋') katakana = katakana + 'テッ';
+      else if(korean[0][i] == '쫏') katakana = katakana + 'トッ';
+      else if(korean[0][i] == '쯧') katakana = katakana + 'ツッ';
+      else if(korean[0][i] == '쩻') katakana = katakana + 'テッ';
+
+      else if(korean[0][i] == '당') katakana = katakana + 'ダン';
+      else if(korean[0][i] == '딩') katakana = katakana + 'ヂン';
+      else if(korean[0][i] == '둥') katakana = katakana + 'ヅン';
+      else if(korean[0][i] == '댕') katakana = katakana + 'デン';
+      else if(korean[0][i] == '동') katakana = katakana + 'ドン';
+      else if(korean[0][i] == '등') katakana = katakana + 'ヅン';
+      else if(korean[0][i] == '뎅') katakana = katakana + 'デン';
+
+      else if(korean[0][i] == '단') katakana = katakana + 'ダン';
+      else if(korean[0][i] == '딘') katakana = katakana + 'ヂン';
+      else if(korean[0][i] == '둔') katakana = katakana + 'ヅン';
+      else if(korean[0][i] == '댄') katakana = katakana + 'デン';
+      else if(korean[0][i] == '돈') katakana = katakana + 'ドン';
+      else if(korean[0][i] == '든') katakana = katakana + 'ヅン';
+      else if(korean[0][i] == '덴') katakana = katakana + 'デン';
+
+      else if(korean[0][i] == '닷') katakana = katakana + 'ダッ';
+      else if(korean[0][i] == '딧') katakana = katakana + 'ヂッ';
+      else if(korean[0][i] == '둣') katakana = katakana + 'ヅッ';
+      else if(korean[0][i] == '댓') katakana = katakana + 'デッ';
+      else if(korean[0][i] == '돗') katakana = katakana + 'ドッ';
+      else if(korean[0][i] == '듯') katakana = katakana + 'ヅッ';
+      else if(korean[0][i] == '뎃') katakana = katakana + 'デッ';
+
+      else if(korean[0][i] == '낭') katakana = katakana + 'ナン';
+      else if(korean[0][i] == '닝') katakana = katakana + '二ン';
+      else if(korean[0][i] == '눙') katakana = katakana + 'ヌン';
+      else if(korean[0][i] == '냉') katakana = katakana + 'ネン';
+      else if(korean[0][i] == '농') katakana = katakana + 'ノン';
+      else if(korean[0][i] == '능') katakana = katakana + 'ヌン';
+      else if(korean[0][i] == '넹') katakana = katakana + 'ネン';
+
+      else if(korean[0][i] == '난') katakana = katakana + 'ナン';
+      else if(korean[0][i] == '닌') katakana = katakana + '二ン';
+      else if(korean[0][i] == '눈') katakana = katakana + 'ヌン';
+      else if(korean[0][i] == '낸') katakana = katakana + 'ネン';
+      else if(korean[0][i] == '논') katakana = katakana + 'ノン';
+      else if(korean[0][i] == '는') katakana = katakana + 'ヌン';
+      else if(korean[0][i] == '넨') katakana = katakana + 'ネン';
+
+      else if(korean[0][i] == '낫') katakana = katakana + 'ナッ';
+      else if(korean[0][i] == '닛') katakana = katakana + '二ッ';
+      else if(korean[0][i] == '눗') katakana = katakana + 'ヌッ';
+      else if(korean[0][i] == '냇') katakana = katakana + 'ネッ';
+      else if(korean[0][i] == '놋') katakana = katakana + 'ノッ';
+      else if(korean[0][i] == '늣') katakana = katakana + 'ヌッ';
+      else if(korean[0][i] == '넷') katakana = katakana + 'ネッ';
+
+      else if(korean[0][i] == '항') katakana = katakana + 'ハン';
+      else if(korean[0][i] == '힝') katakana = katakana + 'ヒン';
+      else if(korean[0][i] == '훙') katakana = katakana + 'フン';
+      else if(korean[0][i] == '행') katakana = katakana + 'ヘン';
+      else if(korean[0][i] == '홍') katakana = katakana + 'ホン';
+      else if(korean[0][i] == '흥') katakana = katakana + 'フン';
+      else if(korean[0][i] == '헹') katakana = katakana + 'ヘン';
+
+      else if(korean[0][i] == '한') katakana = katakana + 'ハン';
+      else if(korean[0][i] == '힌') katakana = katakana + 'ヒン';
+      else if(korean[0][i] == '훈') katakana = katakana + 'フン';
+      else if(korean[0][i] == '핸') katakana = katakana + 'ヘン';
+      else if(korean[0][i] == '혼') katakana = katakana + 'ホン';
+      else if(korean[0][i] == '흔') katakana = katakana + 'フン';
+      else if(korean[0][i] == '헨') katakana = katakana + 'ヘン';
+
+      else if(korean[0][i] == '핫') katakana = katakana + 'ハッ';
+      else if(korean[0][i] == '힛') katakana = katakana + 'ヒッ';
+      else if(korean[0][i] == '훗') katakana = katakana + 'フッ';
+      else if(korean[0][i] == '햇') katakana = katakana + 'ヘッ';
+      else if(korean[0][i] == '홋') katakana = katakana + 'ホッ';
+      else if(korean[0][i] == '흣') katakana = katakana + 'フッ';
+      else if(korean[0][i] == '헷') katakana = katakana + 'ヘッ';
+
+      else if(korean[0][i] == '방') katakana = katakana + 'バン';
+      else if(korean[0][i] == '빙') katakana = katakana + 'ビン';
+      else if(korean[0][i] == '붕') katakana = katakana + 'ブン';
+      else if(korean[0][i] == '뱅') katakana = katakana + 'ベン';
+      else if(korean[0][i] == '봉') katakana = katakana + 'ボン';
+      else if(korean[0][i] == '븡') katakana = katakana + 'ブン';
+      else if(korean[0][i] == '벵') katakana = katakana + 'ベン';
+
+      else if(korean[0][i] == '반') katakana = katakana + 'バン';
+      else if(korean[0][i] == '빈') katakana = katakana + 'ビン';
+      else if(korean[0][i] == '분') katakana = katakana + 'ブン';
+      else if(korean[0][i] == '밴') katakana = katakana + 'ベン';
+      else if(korean[0][i] == '본') katakana = katakana + 'ボン';
+      else if(korean[0][i] == '븐') katakana = katakana + 'ブン';
+      else if(korean[0][i] == '벤') katakana = katakana + 'ベン';
+
+      else if(korean[0][i] == '밧') katakana = katakana + 'バッ';
+      else if(korean[0][i] == '빗') katakana = katakana + 'ビッ';
+      else if(korean[0][i] == '붓') katakana = katakana + 'ブッ';
+      else if(korean[0][i] == '뱃') katakana = katakana + 'ベッ';
+      else if(korean[0][i] == '봇') katakana = katakana + 'ボッ';
+      else if(korean[0][i] == '븟') katakana = katakana + 'ブッ';
+      else if(korean[0][i] == '벳') katakana = katakana + 'ベッ';
+
+      else if(korean[0][i] == '팡') katakana = katakana + 'パン';
+      else if(korean[0][i] == '핑') katakana = katakana + 'ピン';
+      else if(korean[0][i] == '풍') katakana = katakana + 'プン';
+      else if(korean[0][i] == '팽') katakana = katakana + 'ペン';
+      else if(korean[0][i] == '퐁') katakana = katakana + 'ポン';
+      else if(korean[0][i] == '픙') katakana = katakana + 'プン';
+      else if(korean[0][i] == '펭') katakana = katakana + 'ペン';
+
+      else if(korean[0][i] == '판') katakana = katakana + 'パン';
+      else if(korean[0][i] == '핀') katakana = katakana + 'ピン';
+      else if(korean[0][i] == '푼') katakana = katakana + 'プン';
+      else if(korean[0][i] == '팬') katakana = katakana + 'ペン';
+      else if(korean[0][i] == '폰') katakana = katakana + 'ポン';
+      else if(korean[0][i] == '픈') katakana = katakana + 'プン';
+      else if(korean[0][i] == '펜') katakana = katakana + 'ペン';
+
+      else if(korean[0][i] == '팟') katakana = katakana + 'パッ';
+      else if(korean[0][i] == '핏') katakana = katakana + 'ピッ';
+      else if(korean[0][i] == '풋') katakana = katakana + 'プッ';
+      else if(korean[0][i] == '팻') katakana = katakana + 'ペッ';
+      else if(korean[0][i] == '폿') katakana = katakana + 'ポッ';
+      else if(korean[0][i] == '픗') katakana = katakana + 'プッ';
+      else if(korean[0][i] == '펫') katakana = katakana + 'ペッ';
+
+      else if(korean[0][i] == '빵') katakana = katakana + 'パン';
+      else if(korean[0][i] == '삥') katakana = katakana + 'ピン';
+      else if(korean[0][i] == '뿡') katakana = katakana + 'プン';
+      else if(korean[0][i] == '뺑') katakana = katakana + 'ペン';
+      else if(korean[0][i] == '뽕') katakana = katakana + 'ポン';
+      else if(korean[0][i] == '쁭') katakana = katakana + 'プン';
+      else if(korean[0][i] == '뼁') katakana = katakana + 'ペン';
+
+      else if(korean[0][i] == '빤') katakana = katakana + 'パン';
+      else if(korean[0][i] == '삔') katakana = katakana + 'ピン';
+      else if(korean[0][i] == '뿐') katakana = katakana + 'プン';
+      else if(korean[0][i] == '뺀') katakana = katakana + 'ペン';
+      else if(korean[0][i] == '뽄') katakana = katakana + 'ポン';
+      else if(korean[0][i] == '쁜') katakana = katakana + 'プン';
+      else if(korean[0][i] == '뻰') katakana = katakana + 'ペン';
+
+      else if(korean[0][i] == '빳') katakana = katakana + 'パッ';
+      else if(korean[0][i] == '삣') katakana = katakana + 'ピッ';
+      else if(korean[0][i] == '뿟') katakana = katakana + 'プッ';
+      else if(korean[0][i] == '뺏') katakana = katakana + 'ペッ';
+      else if(korean[0][i] == '뽓') katakana = katakana + 'ポッ';
+      else if(korean[0][i] == '쁫') katakana = katakana + 'プッ';
+      else if(korean[0][i] == '뻿') katakana = katakana + 'ペッ';
+
+      else if(korean[0][i] == '망') katakana = katakana + 'マン';
+      else if(korean[0][i] == '밍') katakana = katakana + 'ミン';
+      else if(korean[0][i] == '뭉') katakana = katakana + 'ムン';
+      else if(korean[0][i] == '맹') katakana = katakana + 'メン';
+      else if(korean[0][i] == '몽') katakana = katakana + 'モン';
+      else if(korean[0][i] == '믕') katakana = katakana + 'ムン';
+      else if(korean[0][i] == '멩') katakana = katakana + 'メン';
+
+      else if(korean[0][i] == '만') katakana = katakana + 'マン';
+      else if(korean[0][i] == '민') katakana = katakana + 'ミン';
+      else if(korean[0][i] == '문') katakana = katakana + 'ムン';
+      else if(korean[0][i] == '맨') katakana = katakana + 'メン';
+      else if(korean[0][i] == '몬') katakana = katakana + 'モン';
+      else if(korean[0][i] == '믄') katakana = katakana + 'ムン';
+      else if(korean[0][i] == '멘') katakana = katakana + 'メン';
+
+      else if(korean[0][i] == '맛') katakana = katakana + 'マッ';
+      else if(korean[0][i] == '밋') katakana = katakana + 'ミッ';
+      else if(korean[0][i] == '뭇') katakana = katakana + 'ムッ';
+      else if(korean[0][i] == '맷') katakana = katakana + 'メッ';
+      else if(korean[0][i] == '못') katakana = katakana + 'モッ';
+      else if(korean[0][i] == '믓') katakana = katakana + 'ムッ';
+      else if(korean[0][i] == '멧') katakana = katakana + 'メッ';
+
+      else if(korean[0][i] == '랑') katakana = katakana + 'ラン';
+      else if(korean[0][i] == '링') katakana = katakana + 'リン';
+      else if(korean[0][i] == '룽') katakana = katakana + 'ルン';
+      else if(korean[0][i] == '랭') katakana = katakana + 'レン';
+      else if(korean[0][i] == '롱') katakana = katakana + 'ロン';
+      else if(korean[0][i] == '릉') katakana = katakana + 'ルン';
+      else if(korean[0][i] == '렝') katakana = katakana + 'レン';
+
+      else if(korean[0][i] == '란') katakana = katakana + 'ラン';
+      else if(korean[0][i] == '린') katakana = katakana + 'リン';
+      else if(korean[0][i] == '룬') katakana = katakana + 'ルン';
+      else if(korean[0][i] == '랜') katakana = katakana + 'レン';
+      else if(korean[0][i] == '론') katakana = katakana + 'ロン';
+      else if(korean[0][i] == '른') katakana = katakana + 'ルン';
+      else if(korean[0][i] == '렌') katakana = katakana + 'レン';
+
+      else if(korean[0][i] == '랏') katakana = katakana + 'ラッ';
+      else if(korean[0][i] == '릿') katakana = katakana + 'リッ';
+      else if(korean[0][i] == '룻') katakana = katakana + 'ルッ';
+      else if(korean[0][i] == '랫') katakana = katakana + 'レッ';
+      else if(korean[0][i] == '롯') katakana = katakana + 'ロッ';
+      else if(korean[0][i] == '릇') katakana = katakana + 'ルッ';
+      else if(korean[0][i] == '렛') katakana = katakana + 'レッ';
+
+      else if(korean[0][i] == '캬') katakana = katakana + 'キャ';
+      else if(korean[0][i] == '캰') katakana = katakana + 'キャン';
+      else if(korean[0][i] == '컁') katakana = katakana + 'キャン';
+      else if(korean[0][i] == '캿') katakana = katakana + 'キャッ';
+      else if(korean[0][i] == '큐') katakana = katakana + 'キュ';
+      else if(korean[0][i] == '큔') katakana = katakana + 'キュン';
+      else if(korean[0][i] == '큥') katakana = katakana + 'キュン';
+      else if(korean[0][i] == '큣') katakana = katakana + 'キュッ';
+      else if(korean[0][i] == '쿄') katakana = katakana + 'キョ';
+      else if(korean[0][i] == '쿈') katakana = katakana + 'キョン';
+      else if(korean[0][i] == '쿙') katakana = katakana + 'キョン';
+      else if(korean[0][i] == '쿗') katakana = katakana + 'キョッ';
+
+      else if(korean[0][i] == '꺄') katakana = katakana + 'キャ';
+      else if(korean[0][i] == '꺈') katakana = katakana + 'キャン';
+      else if(korean[0][i] == '꺙') katakana = katakana + 'キャン';
+      else if(korean[0][i] == '꺗') katakana = katakana + 'キャッ';
+      else if(korean[0][i] == '뀨') katakana = katakana + 'キュ';
+      else if(korean[0][i] == '뀬') katakana = katakana + 'キュン';
+      else if(korean[0][i] == '뀽') katakana = katakana + 'キュン';
+      else if(korean[0][i] == '뀻') katakana = katakana + 'キュッ';
+      else if(korean[0][i] == '꾜') katakana = katakana + 'キョ';
+      else if(korean[0][i] == '꾠') katakana = katakana + 'キョン';
+      else if(korean[0][i] == '꾱') katakana = katakana + 'キョン';
+      else if(korean[0][i] == '꾯') katakana = katakana + 'キョッ';
+
+      else if(korean[0][i] == '갸') katakana = katakana + 'ギャ';
+      else if(korean[0][i] == '갼') katakana = katakana + 'ギャン';
+      else if(korean[0][i] == '걍') katakana = katakana + 'ギャン';
+      else if(korean[0][i] == '걋') katakana = katakana + 'ギャッ';
+      else if(korean[0][i] == '규') katakana = katakana + 'ギュ';
+      else if(korean[0][i] == '균') katakana = katakana + 'ギュン';
+      else if(korean[0][i] == '귱') katakana = katakana + 'ギュン';
+      else if(korean[0][i] == '귯') katakana = katakana + 'ギュッ';
+      else if(korean[0][i] == '교') katakana = katakana + 'ギョ';
+      else if(korean[0][i] == '굔') katakana = katakana + 'ギョン';
+      else if(korean[0][i] == '굥') katakana = katakana + 'ギョン';
+      else if(korean[0][i] == '굣') katakana = katakana + 'ギョッ';
+
+      else if(korean[0][i] == '샤') katakana = katakana + 'シャ';
+      else if(korean[0][i] == '샨') katakana = katakana + 'シャン';
+      else if(korean[0][i] == '샹') katakana = katakana + 'シャン';
+      else if(korean[0][i] == '샷') katakana = katakana + 'シャッ';
+      else if(korean[0][i] == '슈') katakana = katakana + 'シュ';
+      else if(korean[0][i] == '슌') katakana = katakana + 'シュン';
+      else if(korean[0][i] == '슝') katakana = katakana + 'シュン';
+      else if(korean[0][i] == '슛') katakana = katakana + 'シュッ';
+      else if(korean[0][i] == '쇼') katakana = katakana + 'ショ';
+      else if(korean[0][i] == '숀') katakana = katakana + 'ション';
+      else if(korean[0][i] == '숑') katakana = katakana + 'ション';
+      else if(korean[0][i] == '숏') katakana = katakana + 'ショッ';
+
+
+
+
+
+
+
+      else katakana = katakana + korean[0][i];
+   }
+   document.getElementById('text2').value = hiragana;
+   document.getElementById('text3').value = katakana;
+
+   text2.select();
+   document.execCommand("copy");
+
+}
+</script>
+
+
+<textarea rows="8" cols="30" id="text1"></textarea>
+<button onclick="To_Hiragana()" name="button">=></button>
+<textarea rows="8" cols="30" id="text2"></textarea>
+<textarea rows="8" cols="30" id="text3"></textarea>
+<br>
+をおは
+
+
+
+

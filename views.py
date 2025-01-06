@@ -32,6 +32,15 @@ def index_js(request):
 
 def get_words_js(request):
     sentence = request.GET.get('sentence', '')
+    print(sentence)
+
+    state_combo = sentence.split("!state!")[1]
+    sentence = sentence.split("!state!")[0]
+
+    print(777777777777)
+    print(state_combo)
+    print(sentence)
+
     state = "hjk"
 
     with open(os.path.join(os.path.dirname(__file__), 'static\\japan.json'), 'r', encoding='utf-8') as file:
@@ -49,16 +58,8 @@ def get_words_js(request):
         if re.search(r'[一-龯]', list_lyrics[0]):
             state = "h"
     if len(list_lyrics) == 1:
-        if not re.search(r'[一-龯]', list_lyrics[0]):
+        if not re.search(r'[一-龯]', list_lyrics[0]) and re.search(r'[ぁ-んァ-ン]', list_lyrics[0]):
             state = "j"
-            
-    if len(list_lyrics) >= 2:
-        if re.search(r'[一-龯]', list_lyrics[0]):
-            state = "h"
-            if re.search(r'[ぁ-ん|ァ-ヶ]', list_lyrics[1]) and not re.search(r'[一-龯]', list_lyrics[1]):
-                state = "hj"
-            if not re.search(r'[ぁ-ん|ァ-ヶ]', list_lyrics[1]) and not re.search(r'[一-龯]', list_lyrics[1]): ##### hj   hk
-                state = "hk" ##### hj   hk       한문 한글히라가나 hj     한문 한글 hk
                 
     if len(list_lyrics) >= 2:
         if re.search(r'[ぁ-ん|ァ-ヶ]', list_lyrics[0]) and not re.search(r'[一-龯]', list_lyrics[0]):
@@ -69,14 +70,31 @@ def get_words_js(request):
                 state = "h"
             if not re.search(r'[ぁ-ん|ァ-ヶ]', list_lyrics[1]) and not re.search(r'[一-龯]', list_lyrics[1]):
                 state = "jk"
+
+
+    if len(list_lyrics) >= 2:
+        if re.search(r'[一-龯]', list_lyrics[0]):
+            state = "h"
+            if re.search(r'[ぁ-ん|ァ-ヶ]', list_lyrics[1]) and not re.search(r'[一-龯]', list_lyrics[1]):
+                state = "hj"
+            if not re.search(r'[ぁ-ん|ァ-ヶ]', list_lyrics[1]) and not re.search(r'[一-龯]', list_lyrics[1]): #####    2줄 한문 한글 sentence    hk   hj       한자 해석 hk      한자 한글히라가나 hj
+                state = state_combo
+
+    if len(list_lyrics) == 1:
+        if re.search(r'[가-힣]', list_lyrics[0]):   ###  1줄 한글 sentence    j     k
+            state = state_combo                
+
+    if len(list_lyrics) >= 2:
+        if re.search(r'[가-힣]', list_lyrics[0]) and re.search(r'[가-힣]', list_lyrics[1]):   # 2줄 j k jk    한글히라가나 한글히라가나 j      해석 해석 k        한글히라가나 해석 jk
+            state = state_combo
                 
             
     if len(list_lyrics) >= 3:
         if not re.search(r'[一-龯]', list_lyrics[0]) and not re.search(r'[一-龯]', list_lyrics[1]) and not re.search(r'[一-龯]', list_lyrics[2]):
             if re.search(r'[ぁ-ん|ァ-ヶ]', list_lyrics[0]) and re.search(r'[ぁ-ん|ァ-ヶ]', list_lyrics[1]):
                 state = "j"
-            else:
-                state = "j"    ###### jk      한글히라가나 한글히라가나 j     한글히라가나 한글 jk
+
+
 
 
     if len(list_lyrics) >= 3:
@@ -87,14 +105,24 @@ def get_words_js(request):
             else:
                 state = "hkk"
                 print("hkk")
-    list_lyrics = [item for item in list_lyrics if item != '']
+    # list_lyrics = [item for item in list_lyrics if item != '']
 
 
-    # h j hj hk jk hjk hkk
+    # h j hj k hk jk hjk hkk
 
     if state in ['h', 'j']:
         list_lyrics = [item for item in list_lyrics for _ in range(2)]
         state = "h j"
+
+
+
+
+
+
+
+
+
+
 
         
     if state in ["hj", "h j"]:
@@ -128,9 +156,48 @@ def get_words_js(request):
             list_new.append(list_korea[i])            # list_korea 0, 1, ...
 
         list_lyrics = list_new
+
+
+        
+    if state in ["k"]:   ### k
+        print(state)
+
+        list_hjk = []
+
+        translator = Translator(to_lang="ja", from_lang="ko")
+        translated = translator.translate(sentence)
+
+        list_new = []
+
+        print(sentence)
+        print(7)
+
+        print(translated)
+        print(list_lyrics)
+        print(888)
+        print(re.findall(r'[^。！？\.!?]+[。！？\.!?]*', translated))
+
+
+
+        for idx_translated, item in enumerate(list_lyrics):
+            print(idx_translated)
+            list_new.append(re.findall(r'[^。！？\.!?]+[。！？\.!?]*', translated)[idx_translated])
+            list_new.append(re.findall(r'[^。！？\.!?]+[。！？\.!?]*', translated)[idx_translated])
+            list_new.append(item)
+            print(list_new)
+
+        list_lyrics = list_new
+
+        
+
+
+
+
+
+        
                             
 
-    if state in ["hk"]:
+    if state in ["hk", "jk"]:
         print(state)
         list_new = []
         for i, value in enumerate(list_lyrics):
@@ -145,23 +212,25 @@ def get_words_js(request):
 
 
 
-    if state in ["hjk", "hkk"]:
+    if state in ["hjk", "hkk", "jk"]:
         for i in range(len(list_lyrics)):
             if (i+1)%3 == 2:
                 hiragana_sentence = ""
                 for char in list_lyrics[i]:
                     hiragana_sentence += korean_to_hiragana.get(char, char)
-                list_lyrics[i] = hiragana_sentence
 
+                if state == "jk":
+                    list_lyrics[i-1] = hiragana_sentence
+                    list_lyrics[i] = hiragana_sentence
+                else:
+                    list_lyrics[i] = hiragana_sentence
+
+    list_lyrics = [line.strip() for line in list_lyrics]
 
     print(list_lyrics)
-
     list_hanja = list_lyrics[::3]
-    print(list_hanja)
     str_hanja = ".".join(list_hanja)
-    print(str_hanja)
-
-
+    
     word_list_total = []
     hiragana_pattern = re.compile(r'[ぁ-ん]$')
     suffixes = ['れ', 'られ', 'れる', 'られる', 'せる', 'させる', 'た', 'だ']
@@ -169,8 +238,14 @@ def get_words_js(request):
 
     tokenizer = Tokenizer()
 
-    if 1 == 1:
-        tokens = tokenizer.tokenize(str_hanja.split(".")[0])
+    list_total = []
+
+
+
+
+    # for idx_sentence in range(len(list_sentence)):
+    for idx_hanja in range(len(list_hanja)):
+        tokens = tokenizer.tokenize(str_hanja.split(".")[idx_hanja])
 
         word_list = []
 
@@ -190,9 +265,7 @@ def get_words_js(request):
         word_list = [word for word in word_list if word not in stop_words]
         word_list = [word for word in word_list if word not in ["？."]]
         
-        
-        
-        print(77777777777777777)
+                
         print(word_list)
         
         word_list = [
@@ -203,12 +276,53 @@ def get_words_js(request):
             word
             for word in word_list
         ]
+
+
+
+        print(list_lyrics)
+        print(7)
+        for idx_lyrics in range(0, len(list_lyrics), 3):
+            print(idx_lyrics)
+            print(list_lyrics[idx_lyrics])
+            if idx_lyrics == idx_hanja*3:
+                yield "<span style='color: darkblue; font-size:20px;'>" + list_lyrics[idx_lyrics] + "</span><br>" + list_lyrics[idx_lyrics+1] + "<br><u>" + list_lyrics[idx_lyrics+2] + "</u><br><br>"   # 1회성 가사 문장 전송
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
         
         
-        count_word_list = 0
-        
-        for word in word_list:
+        for idx_word, word in enumerate(word_list):
             print(word)
+
+            list_total.append(word)
             
             str_word = ""    # 히라가나 [한자] 한글뜻
             str_word_list = ""   # 각 word의 1번째 줄에만 word 원본
@@ -217,12 +331,16 @@ def get_words_js(request):
             soup = BeautifulSoup(html.text, "html.parser")
             
             list_hiragana = [div.find("a", class_=["txt_cleansch", "txt_searchword"]).text for div in soup.find_all("div", class_=["cleanword_type kujk_type", "search_type kujk_type"])[:8]]
-            list_meaning = [re.sub("\\(.*?\\)\\s*", "", div.find("span", class_="txt_search").text)[:10] for div in soup.find_all("div", class_=["cleanword_type kujk_type", "search_type kujk_type"])[:8]]
+            list_meaning = [re.sub("\\(.*?\\)\\s*", "", div.find("span", class_="txt_search").text)[:7] for div in soup.find_all("div", class_=["cleanword_type kujk_type", "search_type kujk_type"])[:8]]
             list_kanji = [div.find("span", class_="sub_txt").text.replace("\n", "").replace("\t", "").replace(" ", "").replace("口", "") if div.find("span", class_="sub_txt") else "" for div in soup.find_all("div", class_=["cleanword_type kujk_type", "search_type kujk_type"])[:8]]
-            
+
+
             print(list_hiragana)
             print(list_meaning)
             print(list_kanji)
+
+
+
             
             # 중복 단어 제거
             unique_hiragana = []
@@ -246,9 +364,14 @@ def get_words_js(request):
             elif list_kanji[0] == "":   # 숫자 word는 list_kanji = ['', '']
                 pass
             elif ('一' <= list_kanji[0][0] <= '龥') or ('㐀' <= list_kanji[0][0] <= '䶵'):
+                print(list_kanji[0])
                 html = requests.get("https://dic.daum.net/search.do?dic=hanja&q=" + list_kanji[0])
                 soup = BeautifulSoup(html.text, "html.parser")
                 div = soup.find("div", class_="card_word")
+
+                if not div:
+                    continue
+                
                 span = div.find_all("span", class_="txt_emph1")
                 list_span = []
                 
@@ -284,43 +407,29 @@ def get_words_js(request):
                     
                 if re.match(r'[ア-ン]', word[0]) and re.match(r'[あ-ん]', list_hiragana[i][0]) and word != list_hiragana[i]:   # 가타카나 word 와 다른 가타카나 제거
                     continue
-                
-                str_word += list_hiragana[i] + " [" + list_kanji[i] + "] " + list_meaning[i] + "&nbsp;&nbsp;&nbsp;" + kanji_meaning + "<br>"
-            print(str_word)
-            print(8)
+
+                if i > 0 and len(list_meaning[i]) > 6:   # 2번째 단어 부터 뜻이 7글자 이상이면 제거
+                    continue
 
 
-            str_lyrics = ""
-            str_lyrics += list_lyrics[0] + "<br>" + list_lyrics[1] + "<br><u>" + list_lyrics[2] + "</u><br>"
-
-            print(str_lyrics)
-
-
-            if count_word_list == 0: # 1회성 데이터
-                if len(word_list) == 1:
-                    yield (translated + "<br>+[" + str(word_list)).replace("'", "").replace("[", "[ ").replace("]", " ]") + "!border!" + str_word + "!border_title!" + str_word_list + "!border_title!"
+                if kanji_meaning:
+                    str_word += list_hiragana[i] + " [" + list_kanji[i] + "] " + list_meaning[i] + "&nbsp;&nbsp;&nbsp;" + kanji_meaning + "<br>"
                 else:
-                    yield str_lyrics + "!border!"
-                    count_word_list = 1
+                    str_word += list_hiragana[i] + " [" + list_kanji[i] + "] " + list_meaning[i] + "<br>"
 
-            yield str_word + "!border_title!" # 실시간 데이터
+            if idx_word == len(word_list)-1:
+                str_word += "<br>"
+
+            if str_word != "":
+                yield str_word + "<br>"   # 실시간 단어 데이터
+
+            if idx_word == len(word_list)-1 and idx_hanja == len(list_hanja)-1:
+                yield str(list_total).replace("[", "[ ").replace("]", " ]").replace("'", "").replace(",", "&nbsp;")
+
+            time.sleep(1)
                     
 
 
-            """
-
-            if count_word_list == 0: # 1회성 데이터
-                if len(word_list) == 1:
-                    yield (translated + "<br>+[" + str(word_list)).replace("'", "").replace("[", "[ ").replace("]", " ]") + "!border!" + str_word + "!border_title!" + str_word_list + "!border_title!"
-                else:
-                    yield (translated + "<br>+[" + str(word_list)).replace("'", "").replace("[", "[ ").replace("]", " ]") + "!border!"
-                    count_word_list = 1
-
-
-            yield str_word + "!border_title!" + str_word_list + "!border_title!" # 실시간 데이터
-            time.sleep(1)
-            """
-    return
 
 
             
@@ -343,15 +452,22 @@ def get_words(request):
 
     if re.compile(r"[가-힣]").search(sentence):
 
+        list_sentence = re.findall(r'[^。！？\?！｡\.]+[。！？\?！｡\.]?', sentence)
+        list_sentence = [sentence.strip() for sentence in list_sentence]
+
+
+        list_sentence = [
+            sentence + "." if not re.search(r'[。！？\?！｡\.\?！]$', sentence) else sentence
+            for sentence in list_sentence
+        ]
+
+        str_sentence = str(list_sentence).replace("['", "").replace("']", "").replace("', '", " ")
+
         translated_temp = ""
-        translated = ""
 
         translator = Translator(to_lang="ja", from_lang="ko")
-        translated = translator.translate(re.sub(r'[.?？!]', '|', sentence))
+        translated = translator.translate(str_sentence)
 
-        
-        translated = re.sub(r'\|+', '|', translated)
-        translated = translated.replace("|", ".")
         
         sentence_temp = sentence
         sentence = translated    # 일-한 번역 => 한-일 번역
@@ -367,9 +483,6 @@ def get_words(request):
         list_sentence = re.findall(r'[^。！？\?！｡\.]+[。！？\?！｡\.]?', sentence)
         list_sentence = [sentence.strip() for sentence in list_sentence]
 
-        
-    
-
 
         list_sentence = [
             sentence + "." if not re.search(r'[。！？\?！｡\.\?！]$', sentence) else sentence
@@ -378,19 +491,30 @@ def get_words(request):
 
         print(list_sentence)
 
-        str_sentence = str(list_sentence).replace("['", "").replace("']", "").replace("', '", " ")
-        print(str_sentence)
-
-        translator = Translator(to_lang="ko", from_lang="ja")
-        translated = translator.translate(str_sentence) # .replace(".", ".<br>")
 
 
+    translator = Translator(to_lang="ko", from_lang="ja")
 
-        print(translated)
-        print(8888888888888888)
+    list_translated = []
+    for idx, item in enumerate(list_sentence):
+        if len(item) >= 500:
+            yield "1문장에 500자 이내 까지만 번역 가능합니다.<br><br>" + item
+            return
+        translated = translator.translate(item)
+        
+        yield "!response_start!" + "<span style='color: darkblue; font-size:20px;'>" + item + "</span><br><u>" + translated + "</u><br><br>"
+    yield "!border!"
 
-        tokenizer = Tokenizer()
-        tokens = tokenizer.tokenize(sentence)
+
+
+
+
+
+
+
+
+    tokenizer = Tokenizer()
+    tokens = tokenizer.tokenize(sentence)
 
 
     hiragana_pattern = re.compile(r'[ぁ-ん]$')
@@ -420,13 +544,20 @@ def get_words(request):
         word
         for word in word_list
         ]
+    
+    word_list = [word.replace('.', '') for word in word_list]    
+    word_list = [word for word in word_list if not re.match(r"^[\u3000\u2000-\u200B\u00A0【】]+$", word)]
 
-
+    list_total = []
     count_word_list = 0
 
     print(word_list)
 
-    for word in word_list:
+    for word in (word_list):
+
+        print(word)
+        
+        list_total.append(word)
 
         str_word = ""    # 히라가나 [한자] 한글뜻
         str_word_list = ""   # 각 word의 1번째 줄에만 word 원본
@@ -435,7 +566,7 @@ def get_words(request):
         soup = BeautifulSoup(html.text, "html.parser")
 
         list_hiragana = [div.find("a", class_=["txt_cleansch", "txt_searchword"]).text for div in soup.find_all("div", class_=["cleanword_type kujk_type", "search_type kujk_type"])[:8]]
-        list_meaning = [re.sub("\\(.*?\\)\\s*", "", div.find("span", class_="txt_search").text)[:10] for div in soup.find_all("div", class_=["cleanword_type kujk_type", "search_type kujk_type"])[:8]]
+        list_meaning = [re.sub("\\(.*?\\)\\s*", "", div.find("span", class_="txt_search").text)[:7] for div in soup.find_all("div", class_=["cleanword_type kujk_type", "search_type kujk_type"])[:8]]
         list_kanji = [div.find("span", class_="sub_txt").text.replace("\n", "").replace("\t", "").replace(" ", "").replace("口", "") if div.find("span", class_="sub_txt") else "" for div in soup.find_all("div", class_=["cleanword_type kujk_type", "search_type kujk_type"])[:8]]
 
 
@@ -501,6 +632,9 @@ def get_words(request):
 
             if re.match(r'[ア-ン]', word[0]) and re.match(r'[あ-ん]', list_hiragana[i][0]) and word != list_hiragana[i]:   # 가타카나 word 와 다른 가타카나 제거
                 continue
+            if i > 0 and len(list_meaning[i]) > 6:   # 2번째 단어 부터 뜻이 7글자 이상이면 제거
+                continue
+
 
 
             
@@ -521,20 +655,17 @@ def get_words(request):
 
 
 
-        if sentence_temp != "":
-            translated = sentence
-
-        
-        if count_word_list == 0: # 1회성 데이터
-            if len(word_list) == 1:
-                yield (translated + "<br>+[" + str(word_list)).replace("'", "").replace("[", "[ ").replace("]", " ]") + "!border!" + str_word + "!border_title!" + str_word_list + "!border_title!"
-            else:
-                yield (translated + "<br>+[" + str(word_list)).replace("'", "").replace("[", "[ ").replace("]", " ]") + "!border!"
-                count_word_list = 1
-
+        print(str_word)
+        print(8)
 
         yield str_word + "!border_title!" + str_word_list + "!border_title!" # 실시간 데이터
-        time.sleep(1)
+        # time.sleep(3)
+
+    str_total = str(list_total).replace("[", "[ ").replace("]", " ]").replace("'", "").replace(", ", "&nbsp;&nbsp;")
+
+    time.sleep(1)
+    yield "!word_total!<br>" + str_total
+        
 
 
 

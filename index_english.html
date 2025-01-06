@@ -75,29 +75,15 @@
             overflow-y: auto; /* 내용이 넘치면 세로 스크롤이 생기도록 설정 */
         }
 
-        #result_word_list {
-            background-color: #f0f0fa; /* 결과 배경색 */
-            border-radius: 10px; /* 모서리 둥글게 */
-            padding: 10px; /* 여백 추가 */
-            min-height: 30px; /* 최소 높이 설정 */
-            margin-top: 5px; /* 입력 영역과 화살표 간 간격 */
-        }
 
-        #result_title {
-            width: 7%; /* 결과 영역의 너비를 설정 */
-            background-color: #eeeefe; /* 결과 배경색 */
-            border-radius: 20px; /* 모서리 둥글게 */
-            padding: 10px; /* 여백 추가 */
-            margin-left: 5px;
-            min-height: 300px; /* 최소 높이 설정 */
-            max-height: 500px; /* 최대 높이 설정 */
-            overflow-y: auto; /* 내용이 넘치면 세로 스크롤이 생기도록 설정 */
-            scrollbar-width: none; /* Firefox에서 스크롤바 숨기기 */
-            -ms-overflow-style: none;  /* IE에서 스크롤바 숨기기 */
-        }
     </style>
 
+
     <script>
+
+
+        let xhr
+    
         // 문장을 입력받고 Ajax를 통해 데이터를 실시간으로 받아오는 함수
         function fetchDefinitions() {
             document.getElementById("result").innerHTML = "";
@@ -106,40 +92,17 @@
             var sentence = document.getElementById("sentence").value;
 
             // 실시간 데이터 스트리밍을 받기 위한 AJAX 요청
-            var xhr = new XMLHttpRequest();
+            xhr = new XMLHttpRequest();
             xhr.open("GET", "/english/get_response/?sentence=" + encodeURIComponent(sentence), true);
-
-            count_word_list = 0;
-            count_border_title = 0;
-            responseText = "";
 
             xhr.onreadystatechange = function() {
                 // 데이터가 부분적으로 수신되었을 때 (readyState === 3)
                 if (xhr.readyState === 3) {
                     responseText = xhr.responseText;
-                    let parts = responseText.split("!border!");
+                    console.log(responseText)
 
-                    console.log(count_border_title)
-
-
-                    if (count_word_list == 0) {
-                        document.getElementById("result_word_list").innerHTML = parts[0];  // 1회성 데이터 출력
-                        count_word_list = 1;  // 1회성 데이터 처리 완료
-                    }
-
-
-                    if (count_word_list != 0) {
-                        document.getElementById("result").innerHTML += parts[1].split("!border_title!")[count_border_title];  // 실시간으로 출력
-                        document.getElementById("result_title").innerHTML += parts[1].split("!border_title!")[count_border_title + 1];  // 실시간으로 word_title 출력
-                        count_border_title += 2;
-                    }
-
-
-                    if (parts[0].split(",").length === 1) {   // 단어가 1개인 문장
-                        document.getElementById("result").innerHTML = parts[1].split("!border_title!")[0];  // 실시간으로 출력
-                        document.getElementById("result_title").innerHTML = parts[1].split("!border_title!")[1];  // 실시간으로 word_title 출력
-                    }
-
+                    document.getElementById("result").innerHTML = responseText;
+                    
                     
                 }
             };
@@ -179,9 +142,14 @@
     <div id="container">
 
         <div id="container_input">
-        <textarea id="sentence" placeholder="일본어 문장을 입력하세요" rows="15" cols="60">観客７人が強風にあおられたテントの下敷きになるなどして負傷し</textarea>
+        <textarea id="sentence" placeholder="영어 문장을 입력하세요" rows="15" cols="60">It works really very well in paris.
+What do you think about this?
+
+
+America is very good.
+
+Sanfransico?</textarea>
         <button onclick="fetchDefinitions()">분석 시작</button>
-        <div id="result_word_list"></div>
         </div>
 
         

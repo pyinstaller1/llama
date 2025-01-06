@@ -96,28 +96,26 @@
             -ms-overflow-style: none;  /* IE에서 스크롤바 숨기기 */
         }
 
+        #button-container {
+            display: flex;               /* Flexbox 사용 */
+            justify-content: space-between;  /* 버튼들을 왼쪽과 오른쪽에 배치 */
+            gap: 10px;                   /* 버튼 간의 간격을 10px로 설정 */
+        }
 
+        #button-container button {
+            font-size: 18px;  /* 글자 크기 */
+            padding: 10px 20px;  /* 버튼 안쪽 여백 */
+            background-color: #5C8DFF;  /* 버튼 배경색 */
+            color: white;  /* 글자색 */
+            border: none;  /* 테두리 없애기 */
+            border-radius: 5px;  /* 둥근 모서리 */
+            cursor: pointer;  /* 마우스를 올렸을 때 포인터 커서 */
+            transition: background-color 0.3s;  /* 배경색 전환 효과 */
+        }
 
-#button-container {
-    display: flex;               /* Flexbox 사용 */
-    justify-content: space-between;  /* 버튼들을 왼쪽과 오른쪽에 배치 */
-    gap: 10px;                   /* 버튼 간의 간격을 10px로 설정 */
-}
-
-#button-container button {
-    font-size: 18px;  /* 글자 크기 */
-    padding: 10px 20px;  /* 버튼 안쪽 여백 */
-    background-color: #5C8DFF;  /* 버튼 배경색 */
-    color: white;  /* 글자색 */
-    border: none;  /* 테두리 없애기 */
-    border-radius: 5px;  /* 둥근 모서리 */
-    cursor: pointer;  /* 마우스를 올렸을 때 포인터 커서 */
-    transition: background-color 0.3s;  /* 배경색 전환 효과 */
-}
-
-#button-container button:hover {
-    background-color: #6A9BFF;  /* 마우스 오버 시 배경색 */
-}
+        #button-container button:hover {
+            background-color: #6A9BFF;  /* 마우스 오버 시 배경색 */
+        }
 
 
 
@@ -127,9 +125,15 @@
 
     <script>
         // 문장을 입력받고 Ajax를 통해 데이터를 실시간으로 받아오는 함수
+
+        let xhr = null; // 전역 변수로 선언
+        var cnt_word = 0
+        
         function fetchDefinitions() {
             document.getElementById("result").innerHTML = "";
             document.getElementById("result_title").innerHTML = "";
+            document.getElementById("result_word_list").innerHTML = ""; // 결과 지우기
+
             
             var sentence = document.getElementById("sentence").value;
 
@@ -137,25 +141,73 @@
 
 
             let list_japan = sentence.split(/(?<=\.|\?|!|。|<br>|！|？|｡|・|\n)/).map(s => s.trim()).filter(Boolean);
-
-            // let list_japan = sentence.split(/(?<=\.|\?|!|。|<br>)/).map(s => s.trim()).filter(Boolean);
             list_japan = list_japan.filter(item => item !== ".");
+
+
+
+            if (xhr) {
+                xhr.abort(); // 현재 요청 중단
+            }
+            
 
             
 
             // 실시간 데이터 스트리밍을 받기 위한 AJAX 요청
-            var xhr = new XMLHttpRequest();
+            xhr = new XMLHttpRequest();
             xhr.open("GET", "/get_response/?sentence=" + encodeURIComponent(sentence), true);
 
-            count_word_list = 0;
+            flag_word_list = 0;
             count_border_title = 0;
             responseText = "";
 
+
             xhr.onreadystatechange = function() {
+                
                 // 데이터가 부분적으로 수신되었을 때 (readyState === 3)
                 if (xhr.readyState === 3) {
-                    responseText = xhr.responseText;
+                    responseText = xhr.responseText;                    
+
+                    responseText = responseText.split("!response_start!")[responseText.split("!response_start!").length - 1];  // 새로운 응답을 이전 응답으로 저장
+
                     let parts = responseText.split("!border!");
+                    
+
+                    if (parts.length == 1) {
+                        document.getElementById("result_word_list").innerHTML += parts[0];
+                    }
+
+                    if (parts.length >= 2) {
+                        if (parts[1] == "") {
+                            document.getElementById("result_word_list").innerHTML += parts[0];
+                        }
+                        flag_word_list = 1
+                        word = responseText.split("!border!")
+
+                    }
+
+                    list_a = [1, 2, 3]
+
+                    if (parts.length >= 2 && flag_word_list != 0) {
+                        if (count_border_title > 0) {
+                            document.getElementById("result").innerHTML += parts[1].split("!border_title!")[(count_border_title*2) - 2];
+                            if (responseText.split("!word_total!").length == 1) {
+                                document.getElementById("result_title").innerHTML += parts[1].split("!border_title!")[(count_border_title*2) - 1];  // 실시간으로 word_title 출력
+                            }
+                        }
+                        count_border_title += 1;
+
+                    }
+
+                    if (responseText.split("!word_total!").length == 2) {
+
+                        document.getElementById("result").innerHTML = document.getElementById("result").innerHTML.replace(/!word_total!/g, "")
+
+                    }
+
+
+
+
+                    /*
 
                     let list_korean = (parts[0].split("<br>[ ")[0]).split(/(?<=\.|\?|!|。|<br>+)/).map(s => s.trim()).filter(Boolean);
                     list_korean = list_korean.filter(item => item !== "<br>");
@@ -164,8 +216,6 @@
                     if (count_word_list == 0) {
                         document.getElementById("result_word_list").innerHTML = ""
                         for (let i = 0; i < list_japan.length; i++) {
-                            // document.getElementById("result_word_list").innerHTML += `<span style="color: darkblue;"><strong>${list_japan[i]}</strong></span><br>`;  // 1회성 데이터 출력
-
 
 
 
@@ -177,22 +227,16 @@
                                 document.getElementById("result_word_list").innerHTML += list_korean[i] + "<br><br>";  // 1회성 데이터 출력
                             }
 
-
-
-
                         }
 
-
-
                         document.getElementById("result_word_list").innerHTML += parts[0].split("<br>+[")[1]
-
-                        
-                        // document.getElementById("result_word_list").innerHTML = parts[0];  // 1회성 데이터 출력
                         count_word_list = 1;  // 1회성 데이터 처리 완료
                     }
 
 
                     if (count_word_list != 0) {
+                        // console.log(count_border_title)
+                        // console.log(parts[1].split("!border_title!")[count_border_title])
                         document.getElementById("result").innerHTML += parts[1].split("!border_title!")[count_border_title];  // 실시간으로 출력
                         document.getElementById("result_title").innerHTML += parts[1].split("!border_title!")[count_border_title + 1];  // 실시간으로 word_title 출력
                         count_border_title += 2;
@@ -203,6 +247,7 @@
                         document.getElementById("result").innerHTML = parts[1].split("!border_title!")[0];  // 실시간으로 출력
                         document.getElementById("result_title").innerHTML = parts[1].split("!border_title!")[1];  // 실시간으로 word_title 출력
                     }
+                    */
 
                     
                 }
