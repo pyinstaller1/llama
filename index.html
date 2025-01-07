@@ -203,54 +203,31 @@
                         document.getElementById("result").innerHTML = document.getElementById("result").innerHTML.replace(/!word_total!/g, "")
 
                     }
-
-
-
-
-                    /*
-
-                    let list_korean = (parts[0].split("<br>[ ")[0]).split(/(?<=\.|\?|!|。|<br>+)/).map(s => s.trim()).filter(Boolean);
-                    list_korean = list_korean.filter(item => item !== "<br>");
-
-
-                    if (count_word_list == 0) {
-                        document.getElementById("result_word_list").innerHTML = ""
-                        for (let i = 0; i < list_japan.length; i++) {
-
-
-
-                            if (/[가-힣]/.test(sentence)) { // 한-일 번역
-                                document.getElementById("result_word_list").innerHTML += `<span style="color: darkblue; font-size:20px;">${list_korean[i].slice(0, -1)}</span><br>`;  // 1회성 데이터 출력
-                                document.getElementById("result_word_list").innerHTML += list_japan[i] + "<br><br>";  // 1회성 데이터 출력
-                            } else {   // 일-한 번역
-                                document.getElementById("result_word_list").innerHTML += `<span style="color: darkblue; font-size:20px;">${list_japan[i]}</span><br>`;  // 1회성 데이터 출력
-                                document.getElementById("result_word_list").innerHTML += list_korean[i] + "<br><br>";  // 1회성 데이터 출력
-                            }
-
-                        }
-
-                        document.getElementById("result_word_list").innerHTML += parts[0].split("<br>+[")[1]
-                        count_word_list = 1;  // 1회성 데이터 처리 완료
-                    }
-
-
-                    if (count_word_list != 0) {
-                        // console.log(count_border_title)
-                        // console.log(parts[1].split("!border_title!")[count_border_title])
-                        document.getElementById("result").innerHTML += parts[1].split("!border_title!")[count_border_title];  // 실시간으로 출력
-                        document.getElementById("result_title").innerHTML += parts[1].split("!border_title!")[count_border_title + 1];  // 실시간으로 word_title 출력
-                        count_border_title += 2;
-                    }
-
-
-                    if (parts[0].split(",").length === 1) {   // 단어가 1개인 문장
-                        document.getElementById("result").innerHTML = parts[1].split("!border_title!")[0];  // 실시간으로 출력
-                        document.getElementById("result_title").innerHTML = parts[1].split("!border_title!")[1];  // 실시간으로 word_title 출력
-                    }
-                    */
-
-                    
                 }
+
+                if (xhr.readyState === 4) {
+                    document.getElementById("result_title").innerHTML += "<br><br><br><br><br>"
+
+
+
+
+
+                }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                
             };
             xhr.send();
         }
