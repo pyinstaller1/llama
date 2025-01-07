@@ -100,16 +100,14 @@ def get_words_js(request):
     if len(list_lyrics) >= 4:
         print(list_lyrics)
         if re.search(r'[一-龯]', list_lyrics[0]) and re.search(r'[一-龯]', list_lyrics[3]):
-            if re.search(r'[ぁ-ん|ァ-ヶ]', list_lyrics[1]):
+            if re.search(r'[ぁ-ん|ァ-ヶ]', list_lyrics[1]) and not re.search(r'[一-龯]', list_lyrics[1]) and re.search(r'[가-힣]', list_lyrics[2]):
                 state = "hjk"
                 print("hjk")
-            else:
-                state = "hkk"
-                print("hkk")
+
     # list_lyrics = [item for item in list_lyrics if item != '']
 
 
-    # h j hj k hk jk hjk hkk
+    # h j hj k hk jk hjk
 
     if state in ['h', 'j']:
         list_lyrics = [item for item in list_lyrics for _ in range(2)]
@@ -131,7 +129,7 @@ def get_words_js(request):
 
 
 
-    if state in ["hjk", "hkk", "jk"]:
+    if state in ["hjk", "jk"]:
         for i in range(len(list_lyrics)):
             if (i+1)%3 == 2:
                 hiragana_sentence = ""
@@ -160,10 +158,10 @@ def get_words_js(request):
     list_total = []
 
 
-    if state in ['hj']:
-        len_sentence = len(sentence.split("."))//2
+    if state in ['hj']:        
+        len_sentence = len(sentence.split(".")) //2
         list_lyrics_temp = []
-    if state in ['h', 'j']:
+    elif state in ['h', 'j']:
         len_sentence = len(sentence.split("."))
         list_lyrics_temp = []
     elif state in ['k']:
@@ -172,13 +170,8 @@ def get_words_js(request):
         len_sentence = len(list_lyrics)//3
 
 
-
-    print(sentence.split("."))
-
-
-
-
     for idx_sentence in range(len_sentence):
+        
         if state in ["hj", "h", "j"]:   ### hj    h j
             print(state)
             if state == "hj":
@@ -193,17 +186,9 @@ def get_words_js(request):
 
             list_sentence = [item for item in list_sentence if item != ""]
 
-
-            print(7)
-            print(sentence.split("."))
-            print(idx_sentence)
-            print(len_sentence)
-
             hiragana_sentence = ""
             for char in list_sentence[2 * idx_sentence + 1]:
                 hiragana_sentence += korean_to_hiragana.get(char, char)
-            print(8888888888888)
-            print(hiragana_sentence)
 
             translator = Translator(to_lang="ko", from_lang="ja")
             translated = translator.translate(hiragana_sentence) # .replace(".", ".<br>")
@@ -220,7 +205,7 @@ def get_words_js(request):
             if state == "h":
                 list_lyrics_temp = []
                 list_lyrics_temp.append(list_sentence[2 * idx_sentence])    # h
-                list_lyrics_temp.append(hiragana_sentence)
+                list_lyrics_temp.append(list_sentence[2 * idx_sentence])
                 list_lyrics_temp.append(korea)
 
                 tokens = tokenizer.tokenize(list_sentence[2 * idx_sentence])
@@ -232,46 +217,41 @@ def get_words_js(request):
                 list_lyrics_temp.append(hiragana_sentence)
                 list_lyrics_temp.append(korea)
 
-                print(888)
-                print(hiragana_sentence)
-
                 tokens = tokenizer.tokenize(hiragana_sentence)
+
                 
             # tokens = tokenizer.tokenize(list_sentence[2 * idx_sentence])
 
 
-        if state in ["k"]:   ### k
+        elif state in ["k"]:   ### k
             print(state)
 
 
             list_sentence = sentence.split(".")
 
-            for i in range(len(list_lyrics)):
-                hiragana_sentence = ""
-                for char in list_lyrics[i]:
-                    hiragana_sentence += korean_to_hiragana.get(char, char)
-                    list_lyrics[i] = hiragana_sentence
+            print(list_sentence)
+            print(8888888888888888888)
 
-            list_sentence = [item for item in list_sentence if item != ""]
-                
+            hiragana_sentence = ""
+            for char in list_sentence[idx_sentence]:
+                hiragana_sentence += korean_to_hiragana.get(char, char)
+            print(hiragana_sentence)
 
             translator = Translator(to_lang="ja", from_lang="ko")
-            translated = translator.translate(sentence)
-
-            list_new = []
-
+            translated = translator.translate(hiragana_sentence)
             print(translated)
-            print(list_lyrics)
-            print(re.findall(r'[^。！？\.!?]+[。！？\.!?]*', translated))
+            # print(re.findall(r'[^。！？\.!?]+[。！？\.!?]*', translated))
+            
+            list_lyrics_temp = []
 
-            for idx_translated, item in enumerate(list_lyrics):
-                print(idx_translated)
-                list_new.append(re.findall(r'[^。！？\.!?]+[。！？\.!?]*', translated)[idx_translated])
-                list_new.append(re.findall(r'[^。！？\.!?]+[。！？\.!?]*', translated)[idx_translated])
-                list_new.append(item)
+            list_lyrics_temp.append(translated)
+            list_lyrics_temp.append(translated)
+            list_lyrics_temp.append(list_sentence[idx_sentence])
 
-            print(list_new)
-            list_lyrics = list_new
+            tokens = tokenizer.tokenize(translated)
+
+            print(list_lyrics_temp)
+            print(77777)
 
 
         else:
@@ -281,6 +261,7 @@ def get_words_js(request):
 
         for token in tokens:
             surface = token.surface
+            print(777)
             print(surface)
 
             # 'れ'나 'られ'와 같은 접미사가 붙은 동사를 처리
@@ -315,7 +296,7 @@ def get_words_js(request):
         print(77777777777777777777777777777777777)
         print(state)
 
-        if state in ["hj", "h", "j"]:
+        if state in ["hj", "h", "j", "k"]:
             print(7)
             yield "<span style='color: darkblue; font-size:20px;'>" + list_lyrics_temp[0] + "</span><br>" + list_lyrics_temp[1] + "<br><u>" + list_lyrics_temp[2] + "</u><br><br>"   # 1회성 가사 문장 전송
 
@@ -472,11 +453,14 @@ def get_words_js(request):
 
             if str_word != "":
                 yield str_word + "<br>"   # 실시간 단어 데이터
-
-            if idx_word == len(word_list)-1 and idx_sentence == len(list_hanja)-1:
-                yield str(list_total).replace("[", "[ ").replace("]", " ]").replace("'", "").replace(",", "&nbsp;") + "<br><br>"
-
             time.sleep(1)
+
+    list_total = [re.sub(r"[\(\)\[\]【】\u3000]|\d+", "", word) for word in list_total]
+    list_total = [word for word in list_total if word]
+    
+    yield str(list_total).replace("[", "[ ").replace("]", " ]").replace("'", "").replace(",", "&nbsp;") + "<br><br>"
+
+
                     
 
 
