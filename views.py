@@ -215,19 +215,29 @@ def get_words_js(request):
                 list_lyrics_temp.append(hiragana_sentence)
                 list_lyrics_temp.append(korea)
 
+                tokens = tokenizer.tokenize(list_sentence[2 * idx_sentence])
+
             if state == "h":
                 list_lyrics_temp = []
                 list_lyrics_temp.append(list_sentence[2 * idx_sentence])    # h
                 list_lyrics_temp.append(hiragana_sentence)
                 list_lyrics_temp.append(korea)
 
+                tokens = tokenizer.tokenize(list_sentence[2 * idx_sentence])
+
+
             if state == "j":
                 list_lyrics_temp = []
                 list_lyrics_temp.append(hiragana_sentence)    # j
                 list_lyrics_temp.append(hiragana_sentence)
                 list_lyrics_temp.append(korea)
+
+                print(888)
+                print(hiragana_sentence)
+
+                tokens = tokenizer.tokenize(hiragana_sentence)
                 
-            tokens = tokenizer.tokenize(list_sentence[2 * idx_sentence])
+            # tokens = tokenizer.tokenize(list_sentence[2 * idx_sentence])
 
 
         if state in ["k"]:   ### k
@@ -271,6 +281,7 @@ def get_words_js(request):
 
         for token in tokens:
             surface = token.surface
+            print(surface)
 
             # 'れ'나 'られ'와 같은 접미사가 붙은 동사를 처리
             if surface in suffixes and len(word_list) > 0:
