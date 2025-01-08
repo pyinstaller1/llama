@@ -125,7 +125,14 @@
     <script>
 
 
+
+
+
+    
+
+
         let xhr
+        
     
         // 문장을 입력받고 Ajax를 통해 데이터를 실시간으로 받아오는 함수
         function fetchDefinitions() {
@@ -133,31 +140,24 @@
             document.getElementById("result_title").innerHTML = "";
             
             var sentence = document.getElementById("sentence").value;
+            var check_word = document.getElementById("check_word").checked;
+            var check_pron = document.getElementById("check_pron").checked;
 
-
-            var isTranslationChecked = document.getElementById("translationCheck").checked;
-
-
-            // 번역 사용 여부 출력 (디버깅용)
-            console.log("번역 사용 여부: ", isTranslationChecked);
-
-            if (isTranslationChecked) {
-                url += "&translate=true";
-            } else {
-                url += "&translate=false";
-            }
-
-
+            url = "/english/get_response/?sentence=" + encodeURIComponent(sentence) + "&check_word=" + check_word + "&check_pron=" + check_pron;
+            console.log(url)
 
             
 
             // 실시간 데이터 스트리밍을 받기 위한 AJAX 요청
             xhr = new XMLHttpRequest();
-            xhr.open("GET", "/english/get_response/?sentence=" + encodeURIComponent(sentence), true);
-
+            xhr.open("GET", url, true);
+            console.log("88")
             xhr.onreadystatechange = function() {
                 // 데이터가 부분적으로 수신되었을 때 (readyState === 3)
                 if (xhr.readyState === 3) {
+
+                    console.log("888")
+                    
                     responseText = xhr.responseText;
                     console.log(responseText)
 
@@ -190,6 +190,25 @@
             } else {
                 console.error("result 또는 result_title 요소를 찾을 수 없습니다.");
             }
+
+
+            // 체크박스 상태에 따라 발음 체크박스를 표시하거나 숨기는 함수
+            function handleCheckBoxes() {
+                if (document.getElementById("check_word").checked) {
+                    document.getElementById("check_pron").style.display = "inline-block"
+                    document.getElementById("label_pron").style.display = "inline-block"
+                }
+                else {
+                    document.getElementById("check_pron").style.display = "none"
+                    document.getElementById("label_pron").style.display = "none"
+                    document.getElementById("check_pron").checked = false
+                }
+            }
+
+            document.getElementById("check_word").addEventListener("change", handleCheckBoxes); // 'change' 이벤트 추가
+            document.getElementById("check_word").checked = true;
+            
+            
         });
 
     </script>
@@ -217,7 +236,7 @@ Sanfransico?</textarea>
             &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 
             <input type="checkbox" id="check_pron" name="check_pron">
-            <label for="check_word">발음</label>
+            <label for="check_word"id="label_pron" >발음기호</label>
         </div>
 
 

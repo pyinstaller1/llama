@@ -22,6 +22,20 @@ def index(request):
 
 
 def get_words(request):
+
+    sentence = request.GET.get('sentence')  # 쿼리 파라미터에서 'sentence' 가져오기
+    check_word = request.GET.get('check_word') == 'true'  # 체크박스 상태를 받아옵니다
+    check_pron = request.GET.get('check_pron') == 'true'  # 체크박스 상태를 받아옵니다
+
+    # 디버깅용 출력
+    print(888888888)
+    print(f"Sentence: {sentence}")
+    print(f"Check Word: {check_word}")
+    print(f"Check Pronunciation: {check_pron}")
+
+
+
+    
     sentence = request.GET.get('sentence', '')
     
     list_sentence = re.findall(r'[^.?!\n]+[.?!\n]?', sentence)
@@ -87,21 +101,20 @@ def get_words(request):
 
         word_list = []
 
-        for token in doc:
-            if not token.is_stop:
-                if token.lemma_ not in [ '.', ',']:
-                    word_list.append(token.lemma_)
+        if check_word:
+
+            for token in doc:
+                if not token.is_stop:
+                    if token.lemma_ not in [ '.', ',']:
+                        word_list.append(token.lemma_)
+
+            word_list = [word for word in word_list if word not in ['', '.', '!', '?', '\n']]
+            stop_words = ['works']
+            word_list = [word for word in word_list if word not in stop_words]
 
 
-        word_list = [word for word in word_list if word not in ['', '.', '!', '?', '\n']]
 
-        """
-        for token in tokens:
-            word_list.append(token.surface)
-        """
 
-        stop_words = ['works']
-        word_list = [word for word in word_list if word not in stop_words]
 
 
         count_word_list = 0
@@ -111,8 +124,16 @@ def get_words(request):
             soup = BeautifulSoup(html.text, "html.parser")
 
             span = soup.find("span", {"class": "pronWR tooltip pronWidget"})
-            # pron = " [" + span.text.split("/")[1].replace("ˈ", "").replace("ˌ", "")+ "] "
-            pron = " "
+
+            if check_pron:
+                if span:
+                    pron = " [" + span.text.split("/")[1].replace("ˈ", "").replace("ˌ", "")+ "] "
+                else:
+                    pron = " "
+            else:
+                pron = " "
+
+
             tr = soup.find_all("tr", {"class": "even"})
 
             list_temp = []
@@ -141,10 +162,9 @@ def get_words(request):
             
         yield "<br><br>"
         # time.sleep(1)
-
-
-
-    yield str_word_total
+        
+    if check_word:
+        yield str_word_total
 
     # return
         
