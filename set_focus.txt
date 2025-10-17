@@ -1,0 +1,85 @@
+방법 1️⃣ wait로 창 완전히 뜨는 걸 기다리기
+import time
+from pywinauto import Application
+import pygetwindow as gw
+
+win = gw.getWindowsWithTitle('Editing game/vp')[0]
+
+# 창이 뜰 때까지 기다림
+while not win.isVisible:
+    time.sleep(0.1)
+    
+app = Application().connect(handle=win._hWnd)
+window = app.window(handle=win._hWnd)
+window.set_focus()
+
+
+win.isVisible 체크로 윈도우가 표시될 때까지 기다림
+
+
+
+
+
+
+방법 2️⃣ 최소화 상태 처리
+if win.isMinimized:
+    win.restore()   # 최소화 상태면 복원
+window.set_focus()
+
+
+
+
+방법 3️⃣ set_focus() 대신 set_foreground() 사용
+window.set_focus()          # 일반 포커스
+window.set_foreground()     # 강제로 최상위로 올림
+
+
+set_foreground()는 OS에 따라 권한 요구할 수 있음
+
+특히 게임처럼 DirectX 창은 set_focus()보다 set_foreground()가 안정적
+
+방법 4️⃣ 관리자 권한 확인
+
+파이썬 스크립트와 게임이 같은 권한에서 실행되어야 함
+
+관리자 권한 게임 → 관리자 권한 Python 필요
+
+
+
+
+
+
+
+
+3️⃣ 요약
+
+set_focus()가 항상 실패하는 건 창 상태 / OS 포커스 정책 / 최소화 여부 / 권한 때문
+
+안정적인 순서:
+
+win = gw.getWindowsWithTitle('Editing game/vp')[0]
+
+if win.isMinimized:
+    win.restore()
+
+while not win.isVisible:
+    time.sleep(0.1)
+
+app = Application().connect(handle=win._hWnd)
+window = app.window(handle=win._hWnd)
+window.set_focus()
+window.set_foreground()
+
+
+
+
+
+
+
+
+
+
+
+
+
+
