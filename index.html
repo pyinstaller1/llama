@@ -1,307 +1,418 @@
-<!DOCTYPE html>
-<html lang="ko">
-<html lang="ko">
 <head>
-    <meta charset="UTF-8">
-    <title>Japan</title>
-    <style>
-        /* 전체 레이아웃을 flex로 사용하여 가로로 배치 */
-        #container {
-            display: flex;
+  <meta charset="UTF-8" />
+  <title>RSI 검색</title>
+  <style>
+    .rounded-box {
+      background-color: #fffef3;
+      border-radius: 12px;
+      padding: 10px;
+      margin-top: 10px;
+      width: 457px;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+      height: 500px;
+      overflow-y: auto;
+      line-height: 18px;
+    }
+
+    .kospi-row {
+      display: grid;
+      grid-template-columns: 23px 143px 67px 80px 80px 1fr;
+      row-gap: 4px;
+      column-gap: 10px;
+      margin-bottom: 4px;
+    }
+
+    .kospi-row > div:first-child {
+      text-align: right;
+    }
+
+    .ilbong-container {
+      background-color: #eef8ff;
+      border-radius: 12px;
+      padding: 10px;
+      width: 650px;
+      height: 500px;
+      overflow: hidden;
+      box-sizing: border-box;
+    }
+
+    .ilbong-box {
+      height: 100%;
+      overflow-y: auto;
+      overflow-x: hidden;
+      padding: 0;
+      box-sizing: border-box;
+      background-color: transparent;
+    }
+
+    .ilbong-box table {
+      width: 100%;
+      border-collapse: collapse;
+      table-layout: fixed;
+      margin-top: 0;
+    }
+
+    .ilbong-box th,
+    .ilbong-box td {
+      padding: 6px 8px;
+      border: 1px solid #ccc;
+      font-size: 13px;
+      word-wrap: break-word;
+    }
+
+    .ilbong-box thead th {
+      position: sticky;
+      top: 0;
+      background-color: #d9ebff;
+      z-index: 5;
+      text-align: center;
+    }
+
+    .ilbong-box tbody td {
+      background-color: #eef8ff;
+      text-align: center;
+    }
+
+    .ilbong-box th:nth-child(1),
+    .ilbong-box td:nth-child(1) {
+      width: 20%;
+    }
+
+    .ilbong-box td:nth-child(2),
+    .ilbong-box td:nth-child(3) {
+      text-align: right;
+    }
+
+    .ilbong-box th:nth-child(2),
+    .ilbong-box th:nth-child(3) {
+      text-align: center;
+    }
+
+
+
+
+  a.stock-link {
+    text-decoration: none;
+    color: black;
+    transition: color 0.3s, font-weight 0.3s;
+  }
+
+  a.stock-link:hover,
+  a.stock-link.active {
+    font-weight: bold !important;
+    color: #1E90FF !important;
+    text-decoration: none !important;
+  }
+
+  a.stock-link:visited {
+    color: black;
+  }
+
+  </style>
+
+  <script src="https://unpkg.com/htmx.org@1.9.2"></script>
+
+  <script src="https://code.highcharts.com/stock/highstock.js"></script>
+  <script src="https://code.highcharts.com/stock/modules/data.js"></script>
+  <script src="https://code.highcharts.com/stock/modules/exporting.js"></script>
+  <script src="https://code.highcharts.com/stock/indicators/indicators-all.js"></script> 
+  <style>
+    /* 차트 컨테이너 스타일 */
+    #chartContainer {
+        height: 1000px;
+        min-width: 310px;
+        margin: 0 auto;
+    }
+  </style>
+    
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chartjs-chart-financial"></script>
+  <script src="https://cdn.jsdelivr.net/npm/luxon@3.4.0/build/global/luxon.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-luxon"></script>
+  <style>
+    #candlestick-container {
+      width: 800px;
+      height: 400px;
+      margin: 20px 0;
+    }
+    #candlestickChart {
+      width: 100%;
+      height: 100%;
+    }
+  </style>
+
+</head>
+
+
+
+
+
+
+
+<body>
+
+  <!-- flex로 나란히 정렬 -->
+  <div style="display: flex; gap: 20px; align-items: flex-start;">
+
+    <!-- KOSPI 조각 뷰 -->
+    <div id="kospi-box">
+      {% include '_kospi_partial.html' with kospi=kospi %}
+    </div>
+
+    <!-- 일봉 데이터 영역 -->
+    <div id="box_common_ilbong">
+      {% include '_partial_common_ilbong.html' with code=code json_ilbong=json_ilbong %} 
+    </div>
+
+  </div>
+
+  <br>
+
+  <!-- 종목코드 입력 폼 -->
+  <form hx-get="{% url '_partial_common_ilbong' %}" hx-target="#box_common_ilbong" hx-swap="innerHTML">
+    {% csrf_token %}
+    <input type="text" name="code" placeholder="종목코드" required>
+    <button type="submit">일봉 데이터</button>
+  </form>
+
+  <br>
+
+  <!-- KOSPI 관련 버튼 -->
+  <button
+    hx-get="{% url '_kospi_partial' %}"
+    hx-target="#kospi-box"
+    hx-swap="innerHTML">
+    시총 순위
+  </button>
+
+  <button
+    id="bt_rsi"
+    hx-get="{% url '_partial_rsi' %}"
+    hx-target="#kospi-box"
+    hx-swap="innerHTML">
+    RSI
+  </button>
+
+  <button
+    id="bt_macd"
+    hx-get="{% url '_partial_macd' %}"
+    hx-target="#kospi-box"
+    hx-swap="innerHTML">
+    MACD
+  </button>
+
+  <script>
+    let activeCode = null;
+
+    // 링크 클릭 시 현재 선택된 코드 저장
+    function setActive(clicked, code) {
+      activeCode = code;
+
+      document.querySelectorAll('.stock-link').forEach(link => {
+        link.classList.remove('active'); // 전체 (이전 클릭된) 종목 코드의 active 삭제
+      });
+
+      clicked.classList.add('active'); // 방금 클릭된 종목 코드 active
+    }
+
+    // htmx로 kospi 뷰 다시 로딩된 후, active 클래스 복원
+    document.body.addEventListener('htmx:afterSwap', function(evt) {
+      if (evt.detail.target.id === 'kospi-box') {
+        // 새로 로드된 .stock-link에 onclick 다시 등록
+        document.querySelectorAll('.stock-link').forEach(link => {
+          link.onclick = function() {
+            setActive(this, this.dataset.code);
+          };
+        });
+
+        // 이전에 클릭된 링크가 있으면 active 복원
+        if (activeCode) {
+          const activeLink = document.querySelector(`.stock-link[data-code='${activeCode}']`);
+          if (activeLink) activeLink.classList.add('active');
         }
+      }
+    });
+  </script>
 
-        #container_input {
-            display: flex;
-            flex-direction: column; /* 요소들을 세로로 배치 */
-            width: 600px; /* 고정된 너비로 설정 */
-        }
-
-        #container_input textarea {
-            font-size: 18px;  /* 글자 크기 */
-            padding: 10px;  /* 텍스트 영역 안쪽 여백 */
-            background-color: #efefff;  /* 배경색 */
-            border: 1px solid #ccc;  /* 테두리 */
-            border-radius: 5px;  /* 둥근 모서리 */
-            width: 100%; /* 100%로 설정하여 부모 요소의 너비에 맞게 고정 */
-        }
-
-        #container_input button {
-            font-size: 18px;  /* 글자 크기 */
-            padding: 10px 20px;  /* 버튼 안쪽 여백 */
-            background-color: #5C8DFF ; /* 버튼 배경색 */
-            color: white;  /* 글자색 */
-            border: none;  /* 테두리 없애기 */
-            border-radius: 5px;  /* 둥근 모서리 */
-            cursor: pointer;  /* 마우스를 올렸을 때 포인터 커서 */
-            transition: background-color 0.3s; /* 배경색 전환 효과 */
-            margin-top: 5px;
-            width: 103%;
-        }
-
-
-        #container_input button:hover {
-            background-color: #6A9BFF;  /* 마우스 오버 시 배경색 */
-        }
-
-        /* 문장 입력 textarea 스타일 */
-        #sentence {
-            font-size: 20px;  /* 텍스트 크기 */
-            background-color: #efefff; /* 입력 영역 배경색 */
-            margin-right: 20px; /* 입력과 화살표 간 간격 */
-        }
-
-        /* 화살표를 세로로 배치 */
-        .arrows {
-            display: flex; /* 화살표들을 세로로 배치 */
-            flex-direction: column; /* 세로로 배치 */
-            align-items: center; /* 중앙 정렬 */
-            margin-right: 10px; /* 화살표와 출력 간 간격 */
-            margin-left: 30px; /* 입력 영역과 화살표 간 간격 */
-        }
-
-        .arrow {
-            font-size: 70px;  /* 화살표 크기 (기존보다 크게) */
-            margin: 2px 0;    /* 화살표 간 간격을 줄임 (기존보다 적게) */
-        }
-
-        /* 결과 div 스타일 */
-        #result {
-            width: 30%; /* 결과 영역의 너비를 설정 */
-            background-color: #eeeefe; /* 결과 배경색 */
-            border-radius: 20px; /* 모서리 둥글게 */
-            padding: 10px; /* 여백 추가 */
-            min-height: 300px; /* 최소 높이 설정 */
-            max-height: 500px; /* 최대 높이 설정 */
-            overflow-y: auto; /* 내용이 넘치면 세로 스크롤이 생기도록 설정 */
-        }
-
-        #result_word_list {
-            background-color: #f0f0fa; /* 결과 배경색 */
-            border-radius: 10px; /* 모서리 둥글게 */
-            padding: 10px; /* 여백 추가 */
-            min-height: 30px; /* 최소 높이 설정 */
-            margin-top: 5px; /* 입력 영역과 화살표 간 간격 */
-        }
-
-        #result_title {
-            width: 7%; /* 결과 영역의 너비를 설정 */
-            background-color: #eeeefe; /* 결과 배경색 */
-            border-radius: 20px; /* 모서리 둥글게 */
-            padding: 10px; /* 여백 추가 */
-            margin-left: 5px;
-            min-height: 300px; /* 최소 높이 설정 */
-            max-height: 500px; /* 최대 높이 설정 */
-            overflow-y: auto; /* 내용이 넘치면 세로 스크롤이 생기도록 설정 */
-            scrollbar-width: none; /* Firefox에서 스크롤바 숨기기 */
-            -ms-overflow-style: none;  /* IE에서 스크롤바 숨기기 */
-        }
-
-        #button-container {
-            display: flex;               /* Flexbox 사용 */
-            justify-content: space-between;  /* 버튼들을 왼쪽과 오른쪽에 배치 */
-            gap: 10px;                   /* 버튼 간의 간격을 10px로 설정 */
-        }
-
-        #button-container button {
-            font-size: 18px;  /* 글자 크기 */
-            padding: 10px 20px;  /* 버튼 안쪽 여백 */
-            background-color: #5C8DFF;  /* 버튼 배경색 */
-            color: white;  /* 글자색 */
-            border: none;  /* 테두리 없애기 */
-            border-radius: 5px;  /* 둥근 모서리 */
-            cursor: pointer;  /* 마우스를 올렸을 때 포인터 커서 */
-            transition: background-color 0.3s;  /* 배경색 전환 효과 */
-        }
-
-        #button-container button:hover {
-            background-color: #6A9BFF;  /* 마우스 오버 시 배경색 */
-        }
+</body>
 
 
 
 
-        
-    </style>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    <div id="chartContainer"></div>
 
     <script>
-        // 문장을 입력받고 Ajax를 통해 데이터를 실시간으로 받아오는 함수
+        // 캔들 및 거래량 색상 정의 (상승: 빨강, 하락: 파랑)
+        const UP_COLOR = 'red';
+        const DOWN_COLOR = 'blue';
 
-        let xhr = null; // 전역 변수로 선언
-        var cnt_word = 0
-        
-        function fetchDefinitions() {
-            document.getElementById("result").innerHTML = "";
-            document.getElementById("result_title").innerHTML = "";
-            document.getElementById("result_word_list").innerHTML = ""; // 결과 지우기
-
+        // ----------------------------------------------------------------------
+        // 1. 데이터 생성 함수 (OHLCV + Color를 하나의 배열로 통합하여 반환)
+        // ----------------------------------------------------------------------
+        function createSampleData() {
+            // 🚨 ohlcvData: 하나의 배열에 모든 정보를 담음
+            const ohlcvData = []; 
+            let date = new Date('2025-08-01').getTime();
+            let price = 50000;
             
-            var sentence = document.getElementById("sentence").value;
+            // 120일선까지 표시될 수 있도록 200일치 데이터 생성 (이전 요청사항 반영)
+            for (let i = 0; i < 200; i++) { 
+                const day = new Date(date).getDay();
+                if (day === 0 || day === 6) { 
+                    date += 24 * 3600 * 1000;
+                    i--;
+                    continue;
+                }
+                const open = price;
+                const change = Math.floor(Math.random() * 2000) - 1000; 
+                const close = open + change;
+                const high = Math.max(open, close) + Math.floor(Math.random() * 500);
+                const low = Math.min(open, close) - Math.floor(Math.random() * 500);
+                const volume = Math.floor(Math.random() * 100000) + 10000; 
+                
+                const barColor = (close > open) ? UP_COLOR : DOWN_COLOR;
+                
+                // 🚨 OHLCV + Color (7개 요소)를 하나의 배열로 저장
+                ohlcvData.push([
+                    date, 
+                    Math.round(open), 
+                    Math.round(high), 
+                    Math.round(low), 
+                    Math.round(close),
+                    volume,
+                    barColor // 캔들의 색상 정보
+                ]);
 
-            sentence = sentence.replace(/\n+/g, '.');
-
-
-            let list_japan = sentence.split(/(?<=\.|\?|!|。|<br>|！|？|｡|・|\n)/).map(s => s.trim()).filter(Boolean);
-            list_japan = list_japan.filter(item => item !== ".");
-
-
-
-            if (xhr) {
-                xhr.abort(); // 현재 요청 중단
+                date += 24 * 3600 * 1000;
+                price = close;
             }
+            return { ohlcvData };
+        }
+        
+        // ----------------------------------------------------------------------
+        // 2. 데이터 처리 함수 (통합 데이터를 Highcharts 포맷으로 분리)
+        // ----------------------------------------------------------------------
+        function processDataForHighcharts(combinedData) {
+            const ohlcData = []; 
+            const volumeData = []; 
             
-
+            combinedData.ohlcvData.forEach(item => {
+                // 통합 데이터 [날짜, 시가, 고가, 저가, 종가, 거래량, 색상]
+                const [date, open, high, low, close, volume, color] = item;
+                
+                // 캔들스틱 데이터 (5개 요소)
+                ohlcData.push([date, open, high, low, close]); 
+                
+                // 거래량 데이터 (객체 형태, 색상 포함)
+                volumeData.push({ x: date, y: volume, color: color });
+            });
             
-
-            // 실시간 데이터 스트리밍을 받기 위한 AJAX 요청
-            xhr = new XMLHttpRequest();
-            xhr.open("GET", "/get_response/?sentence=" + encodeURIComponent(sentence), true);
-
-            flag_word_list = 0;
-            count_border_title = 0;
-            responseText = "";
-
-
-            xhr.onreadystatechange = function() {
-                
-                // 데이터가 부분적으로 수신되었을 때 (readyState === 3)
-                if (xhr.readyState === 3) {
-                    responseText = xhr.responseText;                    
-
-                    responseText = responseText.split("!response_start!")[responseText.split("!response_start!").length - 1];  // 새로운 응답을 이전 응답으로 저장
-
-                    let parts = responseText.split("!border!");
-                    
-
-                    if (parts.length == 1) {
-                        document.getElementById("result_word_list").innerHTML += parts[0];
-                    }
-
-                    if (parts.length >= 2) {
-                        if (parts[1] == "") {
-                            document.getElementById("result_word_list").innerHTML += parts[0];
-                        }
-                        flag_word_list = 1
-                        word = responseText.split("!border!")
-
-                    }
-
-                    list_a = [1, 2, 3]
-
-                    if (parts.length >= 2 && flag_word_list != 0) {
-                        if (count_border_title > 0) {
-                            document.getElementById("result").innerHTML += parts[1].split("!border_title!")[(count_border_title*2) - 2];
-                            if (responseText.split("!word_total!").length == 1) {
-                                document.getElementById("result_title").innerHTML += parts[1].split("!border_title!")[(count_border_title*2) - 1];  // 실시간으로 word_title 출력
-                            }
-                        }
-                        count_border_title += 1;
-
-                    }
-
-                    if (responseText.split("!word_total!").length == 2) {
-
-                        document.getElementById("result").innerHTML = document.getElementById("result").innerHTML.replace(/!word_total!/g, "")
-
-                    }
-                }
-
-                if (xhr.readyState === 4) {
-                    document.getElementById("result_title").innerHTML += "<br><br><br><br><br>"
-
-
-
-
-
-                }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-                
-            };
-            xhr.send();
+            return { ohlcData, volumeData };
         }
 
-        // 스크롤 동기화 함수
-        document.addEventListener("DOMContentLoaded", function() {
-            function syncScroll() {
-                console.log("스크롤 동기화 중...");
-                let result = document.getElementById("result");
-                let resultTitle = document.getElementById("result_title");
+        const rawData = createSampleData();
+        // 🚨 데이터 처리 함수를 사용하여 ohlcData와 volumeData 분리
+        const { ohlcData, volumeData } = processDataForHighcharts(rawData); 
+        const mainSeriesId = 'main-series';
+        
+        // ----------------------------------------------------------------------
+        // 3. Highcharts 차트 렌더링 
+        // ----------------------------------------------------------------------
+        Highcharts.stockChart('chartContainer', {
 
-                // result의 스크롤 위치를 result_title에 동기화
-                resultTitle.scrollTop = result.scrollTop;
-            }
+            navigator: { enabled: false }, // 네비게이터 제거
 
-            // 스크롤 이벤트 리스너 추가 (두 요소에 동일한 이벤트 적용)
-            let result = document.getElementById("result");
-            let resultTitle = document.getElementById("result_title");
+            rangeSelector: { selected: 1 },
+            title: { text: '가상 주식 종목 일봉 차트 (OHLCV 통합 데이터)' },
+            
+            // Y축 설정 (4개 패널) 
+            yAxis: [{
+                title: { text: '가격' }, height: '40%', lineWidth: 2, resize: { enabled: true }
+            }, {
+                title: { text: '거래량' }, top: '45%', height: '15%', offset: 0, lineWidth: 2, labels: { align: 'right', x: -3 }
+            }, {
+                title: { text: 'RSI' }, top: '65%', height: '15%', offset: 0, lineWidth: 2,
+                plotLines: [{ value: 70, color: UP_COLOR, dashStyle: 'shortdash', width: 1, label: { text: '70', align: 'right' }
+                }, { value: 30, color: DOWN_COLOR, dashStyle: 'shortdash', width: 1, label: { text: '30', align: 'right' } }]
+            }, {
+                title: { text: 'MACD' }, top: '85%', height: '15%', offset: 0, lineWidth: 2,
+                plotLines: [{ value: 0, color: '#000000', width: 1 }]
+            }],
 
-            if (result && resultTitle) {
-                result.addEventListener('scroll', syncScroll);
-                resultTitle.addEventListener('scroll', syncScroll);
-            } else {
-                console.error("result 또는 result_title 요소를 찾을 수 없습니다.");
-            }
+            // 시리즈 설정
+            series: [{
+                // 시리즈 0: 캔들스틱 (가격)
+                id: mainSeriesId, 
+                type: 'candlestick', 
+                name: '가상 종목', 
+                data: ohlcData, // 분리된 OHLC 데이터 사용
+                
+                // 캔들 윤곽선 및 꼬리 색상 설정
+                color: DOWN_COLOR, upColor: UP_COLOR, 
+                lineColor: DOWN_COLOR, upLineColor: UP_COLOR,
+                
+                dataGrouping: { units: [['day', [1]]] }
+            }, {
+                // 시리즈 1: 거래량 (Volume) - 분리된 Volume 데이터 사용
+                type: 'column', name: '거래량', data: volumeData, yAxis: 1,
+                dataGrouping: { units: [['day', [1]]] }
+            }, {
+                // 시리즈 2: RSI
+                type: 'rsi', name: 'RSI(14)', linkedTo: mainSeriesId, yAxis: 2, 
+                tooltip: { valueDecimals: 2 }, params: { period: 14 }
+            }, {
+                // 시리즈 3: MACD (히스토그램 제거)
+                type: 'macd', name: 'MACD(12, 26, 9)', linkedTo: mainSeriesId, yAxis: 3, 
+                showInHistogram: false, 
+                styles: { 
+                    macdLine: { strokeWidth: 1, stroke: UP_COLOR }, 
+                    signalLine: { strokeWidth: 1, stroke: DOWN_COLOR }, 
+                    columns: { color: 'transparent', upColor: 'transparent', strokeWidth: 0 }
+                },
+                tooltip: { valueDecimals: 3 }
+            }]
         });
 
     </script>
-</head>
-
-<body>
-    <h3>일본어 문장 분석</h3>
 
 
-    <div id="container">
-
-        <div id="container_input">
-        <textarea id="sentence" placeholder="일본어 문장을 입력하세요" rows="15" cols="60">メンバーとして初のゴールイン報告となった。
-
-【写真あり】お相手の狩野舞子さんとは？　ロンドン五輪銅の元バレーボール女子日本代表</textarea>
-        <button onclick="fetchDefinitions()">분석 시작</button>
-        <div id="result_word_list"></div>
-
-        <div id="button-container">
-           <button onclick="window.location.href='http://127.0.0.1:8000/hiragana'">히라가나 입력</button>
-           <button onclick="window.location.href='http://127.0.0.1:8000/js'">3단분석</button>
-        </div>
-
-        </div>
-
-        
-        <!-- 화살표들을 세로로 배치하는 div -->
-        <div class="arrows">
-            <span class="arrow">⇨</span>
-            <span class="arrow">⇨</span>
-            <span class="arrow">⇨</span>
-        </div>
-        <div id="result"></div>
-        <div id="result_title"></div>
-    </div>
 
 
-        <!-- 결과 출력 div -->
 
-        
 
-    <br>
+
+
+
+
 
 
 
 
 </body>
-</html>
-
-
-
-

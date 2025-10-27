@@ -1,0 +1,71 @@
+<div id="chartContainer_main_{{ code }}" class="ilbong-container">
+    <!-- JSON 데이터 삽입 -->
+    <script type="application/json" id="json_{{ code }}">
+        {{ json_ilbong|safe }}
+    </script>
+</div>
+
+<div id="chartContainer_partial_{{ code }}" class="ilbong-container">
+    <!-- 차트 렌더링용 -->
+</div>
+
+<script>
+(function(){
+    const code = "{{ code }}";
+    const containerMain = document.getElementById('chartContainer_main_' + code);
+    const containerChart = document.getElementById('chartContainer_partial_' + code);
+    if (!containerMain) return;
+
+    try {
+        const scriptTag = containerMain.querySelector('#json_' + code);
+        if (!scriptTag) return;
+
+        const ilbongData = JSON.parse(scriptTag.textContent || '[]');
+        if (!ilbongData || ilbongData.length === 0) {
+            containerMain.innerHTML = "<p>데이터가 없습니다.</p>";
+            return;
+        }
+
+        let tableHTML = `
+            <div class="ilbong-box">
+                <div style="text-align:center; font-weight:bold; font-size:24px; margin-bottom:10px; color:#1E90FF;">
+                    ${ilbongData[0].종목명 || '종목명 없음'}
+                </div>
+                <table border="1" cellspacing="0" cellpadding="6">
+                    <thead>
+                        <tr>
+                            <th>일자</th>
+                            <th>종가</th>
+                            <th>거래량</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+        `;
+
+        ilbongData.forEach(row => {
+            tableHTML += `
+                <tr>
+                    <td>${row.date}</td>
+                    <td>${Number(row.close).toLocaleString()}</td>
+                    <td>${Number(row.volume).toLocaleString()}</td>
+                </tr>
+            `;
+        });
+        tableHTML += "</tbody></table></div>";
+
+        containerMain.innerHTML = tableHTML;
+
+        // 차트용 전역 변수 저장
+        window.currentChartCode = code;
+        window.currentIlbongData = ilbongData;
+
+        if (typeof renderIlbongChart === "function") {
+            renderIlbongChart(containerChart, ilbongData);
+        }
+
+    } catch(e) {
+        console.error("JSON 파싱 오류:", e);
+        containerMain.innerHTML = "<p>데이터 로드 오류</p>";
+    }
+})();
+</script>
